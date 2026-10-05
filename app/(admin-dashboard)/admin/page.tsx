@@ -6,6 +6,8 @@ import {
   Users,
   Shield,
   GraduationCap,
+  Heart,
+  ShieldCheck,
   ArrowLeft,
   UserCheck,
 } from 'lucide-react'
@@ -32,27 +34,38 @@ export default async function AdminPage() {
   const statCards = [
     {
       icon: Users,
-      label: 'إجمالي الحسابات',
+      label: 'إجمالي المستخدمين',
       value: counts.total,
       color: 'text-ink-700 bg-ink-100/70',
+      href: '/admin/users',
     },
     {
       icon: GraduationCap,
       label: 'الطلاب',
       value: counts.student,
       color: 'text-sage-dark bg-sage-50',
+      href: '/admin/students',
     },
     {
       icon: Users,
       label: 'المعلمون',
       value: counts.teacher,
       color: 'text-gold-dark bg-gold/15',
+      href: '/admin/teachers',
     },
     {
-      icon: Shield,
-      label: 'المشرفون',
-      value: counts.admin + counts.supervisor,
-      color: 'text-ink-900 bg-ink-200/60',
+      icon: Heart,
+      label: 'المستشارون',
+      value: counts.counselor,
+      color: 'text-rose-700 bg-rose-50',
+      href: '/admin/counselors',
+    },
+    {
+      icon: ShieldCheck,
+      label: 'المشرفون التربويون',
+      value: counts.supervisor,
+      color: 'text-blue-800 bg-blue-50',
+      href: '/admin/supervisors',
     },
   ]
 
@@ -65,24 +78,29 @@ export default async function AdminPage() {
         </div>
         <div>
           <h1 className="font-heading font-extrabold text-2xl text-ink-900">لوحة التحكم</h1>
-          <p className="text-sm text-ink-500">إدارة المنصة والمحتوى والمستخدمين</p>
+          <p className="text-sm text-ink-500">إدارة المنصة والمحتوى ومجموعات المستخدمين</p>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">
         {statCards.map((card, i) => {
           const Icon = card.icon
           return (
-            <div key={i} className="card p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${card.color}`}>
-                  <Icon className="w-5 h-5" />
+            <Link
+              key={i}
+              href={card.href}
+              className="card p-4 sm:p-5 card-hover transition-all block group"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center ${card.color}`}>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
+                <ArrowLeft className="w-3.5 h-3.5 text-ink-400 group-hover:-translate-x-1 transition-transform" />
               </div>
               <p className="font-heading font-extrabold text-2xl text-ink-900">{card.value}</p>
               <p className="text-xs text-ink-500 mt-0.5">{card.label}</p>
-            </div>
+            </Link>
           )
         })}
       </div>

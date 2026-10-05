@@ -144,26 +144,17 @@ export function Navbar() {
           ) : userData ? (
             <>
               {userData.role === 'admin' && (
-                <>
-                  <Link
-                    href="/admin"
-                    className={`btn-ghost text-sm font-medium hover:text-ink-900 ${
-                      pathname === '/admin' ? 'bg-ink-100/70 text-ink-900' : ''
-                    }`}
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    <span>لوحة الإدارة</span>
-                  </Link>
-                  <Link
-                    href="/admin/users"
-                    className={`btn-ghost text-sm font-medium hover:text-ink-900 ${
-                      pathname === '/admin/users' ? 'bg-ink-100/70 text-ink-900' : ''
-                    }`}
-                  >
-                    <Users className="w-4 h-4" />
-                    <span>إدارة المستخدمين</span>
-                  </Link>
-                </>
+                <Link
+                  href="/admin"
+                  className={`btn-ghost text-sm font-medium hover:text-ink-900 ${
+                    pathname.startsWith('/admin') && pathname !== '/admin/profile'
+                      ? 'bg-ink-100/70 text-ink-900'
+                      : ''
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>لوحة الإدارة</span>
+                </Link>
               )}
 
               {userData.role === 'teacher' && (
@@ -311,24 +302,14 @@ export function Navbar() {
 
               {/* Navigation Links based on role */}
               {userData.role === 'admin' && (
-                <>
-                  <Link
-                    href="/admin"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="btn-outline w-full justify-start text-sm py-2.5 px-3 bg-white"
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    <span>لوحة الإدارة الرئيسية</span>
-                  </Link>
-                  <Link
-                    href="/admin/users"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="btn-outline w-full justify-start text-sm py-2.5 px-3 bg-white"
-                  >
-                    <Users className="w-4 h-4" />
-                    <span>إدارة المستخدمين</span>
-                  </Link>
-                </>
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="btn-outline w-full justify-start text-sm py-2.5 px-3 bg-white"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>لوحة الإدارة</span>
+                </Link>
               )}
 
               {userData.role === 'teacher' && (
