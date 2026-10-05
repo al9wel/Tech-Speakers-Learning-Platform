@@ -1,14 +1,39 @@
-
+import Link from 'next/link'
+import { AlertTriangle, ArrowLeft, Home } from 'lucide-react'
 
 export default function ErrorPage() {
-    return (
-        <main className="bg-white text-black min-h-screen p-4">
-            <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+  return (
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 animate-page">
+      <div className="card p-8 bg-white shadow-card border border-ink-100/80 w-full max-w-md text-center">
+        <div className="w-16 h-16 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4 shadow-soft">
+          <AlertTriangle className="w-8 h-8" />
+        </div>
 
-            <p className="mb-8">
-                Please try again.
-            </p>
+        <h1 className="font-heading font-extrabold text-2xl text-ink-900 mb-2">
+          خطأ في المصادقة
+        </h1>
 
-            </main>
-    )
+        <p className="text-sm text-ink-600 mb-6 leading-relaxed">
+          حدث خطأ أثناء محاولة تسجيل الدخول أو التحقق من صلاحيات حسابك. يرجى التأكد من صحة بياناتك أو إعادة المحاولة.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/login"
+            className="btn-primary text-sm flex items-center justify-center gap-2"
+          >
+            <span>تسجيل الدخول</span>
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <Link
+            href="/"
+            className="btn-outline text-sm flex items-center justify-center gap-2"
+          >
+            <Home className="w-4 h-4" />
+            <span>الرئيسية</span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
 }
