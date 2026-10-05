@@ -13,13 +13,25 @@ import {
 export const dynamic = 'force-dynamic'
 
 export default async function TeacherPage() {
-  await requireRole('teacher')
+  const { user, supabase } = await requireRole('teacher')
+
+  // Count lessons created by this teacher
+  const { count: lessonsCount } = await supabase
+    .from('lessons')
+    .select('*', { count: 'exact', head: true })
+    .eq('created_by', user.id)
 
   const statCards = [
-    { icon: BookOpen, label: 'المواد النشطة', value: '4', color: 'text-ink-700 bg-ink-100/70' },
-    { icon: FileText, label: 'الموارد المنشورة', value: '18', color: 'text-gold-dark bg-gold/15' },
-    { icon: MessageSquare, label: 'استفسارات الطلاب', value: '12', color: 'text-sage-dark bg-sage-50' },
-    { icon: Users, label: 'الطلاب المتابعون', value: '85', color: 'text-ink-800 bg-ink-200/60' },
+    {
+      icon: BookOpen,
+      label: 'دروسي المنشورة',
+      value: String(lessonsCount ?? 0),
+      color: 'text-ink-700 bg-ink-100/70',
+      href: '/teacher/lessons',
+    },
+    { icon: FileText, label: 'أقسام تفاعلية', value: 'نشطة', color: 'text-gold-dark bg-gold/15' },
+    { icon: MessageSquare, label: 'تفاعل الطلاب', value: 'متاح', color: 'text-sage-dark bg-sage-50' },
+    { icon: Users, label: 'صلاحية المعلم', value: 'معتمد', color: 'text-ink-800 bg-ink-200/60' },
   ]
 
   return (
@@ -31,7 +43,7 @@ export default async function TeacherPage() {
         </div>
         <div>
           <h1 className="font-heading font-extrabold text-2xl text-ink-900">واجهة المعلم</h1>
-          <p className="text-sm text-ink-500">إدارة المحتوى التعليمي والتفاعل مع أسئلة الطلاب</p>
+          <p className="text-sm text-ink-500">إدارة الدروس والمحتوى التعليمي وإرفاق الشروحات والملفات</p>
         </div>
       </div>
 
@@ -39,15 +51,28 @@ export default async function TeacherPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((card, i) => {
           const Icon = card.icon
-          return (
-            <div key={i} className="card p-5">
+          const content = (
+            <>
               <div className="flex items-center justify-between mb-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${card.color}`}>
                   <Icon className="w-5 h-5" />
                 </div>
+                {card.href && (
+                  <ArrowLeft className="w-3.5 h-3.5 text-ink-400 group-hover:-translate-x-1 transition-transform" />
+                )}
               </div>
               <p className="font-heading font-extrabold text-2xl text-ink-900">{card.value}</p>
               <p className="text-xs text-ink-500 mt-0.5">{card.label}</p>
+            </>
+          )
+
+          return card.href ? (
+            <Link key={i} href={card.href} className="card p-5 card-hover block group">
+              {content}
+            </Link>
+          ) : (
+            <div key={i} className="card p-5">
+              {content}
             </div>
           )
         })}
@@ -55,10 +80,42 @@ export default async function TeacherPage() {
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card p-6 card-hover flex flex-col justify-between">
+        {/* Manage Lessons Card */}
+        <div className="card p-6 card-hover flex flex-col justify-between border-gold/30">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-11 h-11 rounded-xl bg-gold/15 text-gold-dark flex items-center justify-center">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="font-heading font-bold text-lg text-ink-900">إدارة الدروس التعليمية</h2>
+                <p className="text-xs text-ink-500">إنشاء وتعديل ونشر الدروس لطلابك</p>
+              </div>
+            </div>
+            <p className="text-sm text-ink-600 mb-6 leading-relaxed">
+              قم باختيار المادة الدراسية المعتمدة، ثم أضف شروحات الدروس وقسمها إلى أجزاء ديناميكية مع إرفاق الصور التوضيحية أو مستندات PDF.
+            </p>
+          </div>
+
+          <div className="pt-4 border-t border-ink-100/60 flex items-center justify-between">
+            <span className="text-xs text-ink-500">
+              عدد دروسك: <strong className="text-ink-900">{lessonsCount ?? 0} درس</strong>
+            </span>
+            <Link
+              href="/teacher/lessons"
+              className="btn-primary text-sm flex items-center gap-2"
+            >
+              <span>إدارة دروسي</span>
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Profile Card */}
+        <div className="card p-6 card-hover flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-xl bg-ink-100 text-ink-700 flex items-center justify-center">
                 <UserCheck className="w-6 h-6" />
               </div>
               <div>
@@ -75,33 +132,11 @@ export default async function TeacherPage() {
             <span className="chip bg-gold/20 text-gold-dark text-xs">حساب معلم معتمد</span>
             <Link
               href="/teacher/profile"
-              className="btn-primary text-sm flex items-center gap-2"
+              className="btn-outline text-sm flex items-center gap-2 hover:bg-ink-50"
             >
               <span>الملف الشخصي</span>
               <ArrowLeft className="w-4 h-4" />
             </Link>
-          </div>
-        </div>
-
-        <div className="card p-6 card-hover flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-11 h-11 rounded-xl bg-ink-100 text-ink-700 flex items-center justify-center">
-                <MessageSquare className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="font-heading font-bold text-lg text-ink-900">رسائل واستفسارات الطلاب</h2>
-                <p className="text-xs text-ink-500">الرد على أسئلة الطلاب في المواد الدراسية</p>
-              </div>
-            </div>
-            <p className="text-sm text-ink-600 mb-6 leading-relaxed">
-              استقبل استفسارات الطلاب وأسئلتهم حول المنهج وقم بتقديم الإرشادات والشروحات التعليمية المناسبة.
-            </p>
-          </div>
-
-          <div className="pt-4 border-t border-ink-100/60 flex items-center justify-between">
-            <span className="text-xs text-ink-500">12 استفسار بانتظار الرد</span>
-            <span className="chip bg-sage-50 text-sage-dark text-xs font-semibold">مفعل</span>
           </div>
         </div>
       </div>

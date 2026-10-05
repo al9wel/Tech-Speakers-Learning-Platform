@@ -13,13 +13,17 @@ import {
 export const dynamic = 'force-dynamic'
 
 export default async function StudentPage() {
-  await requireRole('student')
+  const { supabase } = await requireRole('student')
+
+  const { count: subjectsCount } = await supabase
+    .from('subjects')
+    .select('*', { count: 'exact', head: true })
 
   const statCards = [
-    { icon: BookOpen, label: 'المواد المسجلة', value: '6', color: 'text-ink-700 bg-ink-100/70' },
-    { icon: Bookmark, label: 'الموارد المحفوظة', value: '14', color: 'text-gold-dark bg-gold/15' },
-    { icon: Users, label: 'معلمون أتابعهم', value: '5', color: 'text-sage-dark bg-sage-50' },
-    { icon: MessageSquare, label: 'استفساراتي', value: '3', color: 'text-ink-800 bg-ink-200/60' },
+    { icon: BookOpen, label: 'المواد الدراسية', value: String(subjectsCount ?? 0), color: 'text-ink-700 bg-ink-100/70' },
+    { icon: Bookmark, label: 'الموارد والمقررات', value: 'متاحة', color: 'text-gold-dark bg-gold/15' },
+    { icon: Users, label: 'الكوادر التعليمية', value: 'معتمدون', color: 'text-sage-dark bg-sage-50' },
+    { icon: MessageSquare, label: 'المنهج الدراسي', value: 'شامل', color: 'text-ink-800 bg-ink-200/60' },
   ]
 
   return (
@@ -31,7 +35,7 @@ export default async function StudentPage() {
         </div>
         <div>
           <h1 className="font-heading font-extrabold text-2xl text-ink-900">لوحة الطالب</h1>
-          <p className="text-sm text-ink-500">الوصول السريع لمحتواك التعليمي ومتابعة المعلمين</p>
+          <p className="text-sm text-ink-500">الوصول السريع لمحتواك التعليمي وتصفح الدروس والمناهج</p>
         </div>
       </div>
 
@@ -55,10 +59,40 @@ export default async function StudentPage() {
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card p-6 card-hover flex flex-col justify-between">
+        {/* Subjects Card */}
+        <div className="card p-6 card-hover flex flex-col justify-between border-gold/30">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-11 h-11 rounded-xl bg-gold/15 text-gold-dark flex items-center justify-center">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="font-heading font-bold text-lg text-ink-900">المواد الدراسية</h2>
+                <p className="text-xs text-ink-500">تصفح المناهج والملخصات والدروس</p>
+              </div>
+            </div>
+            <p className="text-sm text-ink-600 mb-6 leading-relaxed">
+              استكشف المقررات التعليمية المعتمدة واطلع على شروحات الدروس، والصور التوضيحية، والملفات المرفقة بصيغة PDF.
+            </p>
+          </div>
+
+          <div className="pt-4 border-t border-ink-100/60 flex items-center justify-between">
+            <span className="chip bg-gold/15 text-gold-dark text-xs font-semibold">تصفح الفهرس</span>
+            <Link
+              href="/student/subjects"
+              className="btn-primary text-sm flex items-center gap-2"
+            >
+              <span>دخول المواد</span>
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Profile Card */}
+        <div className="card p-6 card-hover flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-xl bg-ink-100 text-ink-700 flex items-center justify-center">
                 <UserCheck className="w-6 h-6" />
               </div>
               <div>
@@ -75,33 +109,11 @@ export default async function StudentPage() {
             <span className="chip bg-sage-50 text-sage-dark text-xs">حساب طالب</span>
             <Link
               href="/student/profile"
-              className="btn-primary text-sm flex items-center gap-2"
+              className="btn-outline text-sm flex items-center gap-2 hover:bg-ink-50"
             >
               <span>الملف الشخصي</span>
               <ArrowLeft className="w-4 h-4" />
             </Link>
-          </div>
-        </div>
-
-        <div className="card p-6 card-hover flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-11 h-11 rounded-xl bg-ink-100 text-ink-700 flex items-center justify-center">
-                <BookOpen className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="font-heading font-bold text-lg text-ink-900">المواد الدراسية</h2>
-                <p className="text-xs text-ink-500">تصفح المناهج والملخصات والدروس</p>
-              </div>
-            </div>
-            <p className="text-sm text-ink-600 mb-6 leading-relaxed">
-              استكشف المواد الدراسية والملفات التعليمية المتاحة وتواصل مع نخبة من أفضل المعلمين.
-            </p>
-          </div>
-
-          <div className="pt-4 border-t border-ink-100/60 flex items-center justify-between">
-            <span className="text-xs text-ink-500">المنهج اليمني الشامل</span>
-            <span className="chip bg-gold/15 text-gold-dark text-xs font-semibold">متاح الآن</span>
           </div>
         </div>
       </div>

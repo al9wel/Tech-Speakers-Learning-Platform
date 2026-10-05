@@ -116,13 +116,13 @@ export default async function HomePage() {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-                  <Link href="/login" className="btn-primary text-base py-3 px-6">
-                    <span>تسجيل الدخول</span>
-                    <ArrowLeft className="w-4 h-4" />
-                  </Link>
-                  <Link href="/signup" className="btn-gold text-base py-3 px-6 font-bold">
-                    <span>إنشاء حساب طالب</span>
+                <div className="flex justify-center lg:justify-start">
+                  <Link
+                    href="/auth"
+                    className="btn-primary text-base py-3.5 px-8 shadow-card hover:shadow-soft flex items-center gap-2.5 font-bold rounded-xl"
+                  >
+                    <span>ابدأ الآن</span>
+                    <ArrowLeft className="w-5 h-5" />
                   </Link>
                 </div>
               )}

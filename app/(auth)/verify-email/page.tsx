@@ -19,10 +19,10 @@ export default function VerifyEmailPage() {
 
         <div className="pt-2">
           <Link
-            href="/login"
+            href="/auth"
             className="btn-primary w-full text-sm flex items-center justify-center gap-2"
           >
-            <span>العودة لصفحة تسجيل الدخول</span>
+            <span>العودة لصفحة الدخول</span>
             <ArrowLeft className="w-4 h-4" />
           </Link>
         </div>

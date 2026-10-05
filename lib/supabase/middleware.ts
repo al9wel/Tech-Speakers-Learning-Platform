@@ -40,16 +40,14 @@ export async function updateSession(request: NextRequest) {
 
     const isPublicRoute =
         pathname === '/' ||
-        pathname.startsWith('/login') ||
-        pathname.startsWith('/signup') ||
+        pathname.startsWith('/auth') ||
         pathname.startsWith('/verify-email') ||
-        pathname.startsWith('/error') ||
-        pathname.startsWith('/auth')
+        pathname.startsWith('/error')
 
     if (!user) {
         if (!isPublicRoute) {
             const url = request.nextUrl.clone()
-            url.pathname = '/login'
+            url.pathname = '/auth'
 
             return NextResponse.redirect(url)
         }
@@ -73,13 +71,10 @@ export async function updateSession(request: NextRequest) {
     const role = profile.role
     const dashboardPath = rolePaths[role]
 
-    const isLoginPage =
-        pathname === '/login' || pathname.startsWith('/login/')
+    const isAuthRoute =
+        pathname === '/auth' || pathname.startsWith('/auth/')
 
-    const isSignupPage =
-        pathname === '/signup' || pathname.startsWith('/signup/')
-
-    if (isLoginPage || isSignupPage) {
+    if (isAuthRoute) {
         const url = request.nextUrl.clone()
         url.pathname = dashboardPath
 

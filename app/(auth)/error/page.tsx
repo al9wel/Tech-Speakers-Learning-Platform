@@ -19,10 +19,10 @@ export default function ErrorPage() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/login"
+            href="/auth"
             className="btn-primary text-sm flex items-center justify-center gap-2"
           >
-            <span>تسجيل الدخول</span>
+            <span>العودة لصفحة الدخول</span>
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <Link
