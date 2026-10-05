@@ -10,7 +10,7 @@ export async function requireRole(requiredRole: AppRole) {
     } = await supabase.auth.getUser()
 
     if (!user) {
-        redirect('/login')
+        redirect('/auth')
     }
 
     const { data: profile } = await supabase

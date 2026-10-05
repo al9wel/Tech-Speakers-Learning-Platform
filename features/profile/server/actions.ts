@@ -138,7 +138,7 @@ export async function changePasswordAction(data: {
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/auth')
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -164,7 +164,7 @@ export async function updateProfile(formData: FormData) {
 export async function changePassword(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) redirect('/auth')
 
   const { data: profile } = await supabase
     .from('profiles')

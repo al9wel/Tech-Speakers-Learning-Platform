@@ -65,7 +65,13 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
       setIsSigningUp(false)
       setSignupError(res.message || 'فشل إنشاء الحساب')
     } else {
-      router.push(res.redirectTo || '/verify-email')
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('auth-changed'))
+      }
+      // تم تعليق التحقق من البريد مؤقتاً
+      // router.push(res.redirectTo || '/verify-email')
+      router.push(res.redirectTo || '/student')
+      router.refresh()
     }
   }
 
@@ -181,7 +187,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                 <button
                   type="submit"
                   disabled={isLoggingIn}
-                  className="btn-primary w-full text-base py-3 font-bold flex items-center justify-center gap-2"
+                  className="w-full text-base py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-gold-dark hover:bg-gold text-white shadow-soft transition cursor-pointer"
                 >
                   {isLoggingIn ? (
                     <>
@@ -212,7 +218,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                   الاسم الكامل:
                 </label>
                 <div className="relative">
-                  <UserIcon className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                  <UserIcon className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
                   <input
                     id="signup_fullname"
                     type="text"
@@ -220,7 +226,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                     value={signupFullName}
                     onChange={(e) => setSignupFullName(e.target.value)}
                     placeholder="مثال: سالم أحمد علي"
-                    className="input-field text-sm pr-10"
+                    className="input-field text-sm !pr-11 pl-4"
                   />
                 </div>
               </div>
@@ -233,7 +239,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                   البريد الإلكتروني:
                 </label>
                 <div className="relative">
-                  <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                  <Mail className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
                   <input
                     id="signup_email"
                     type="email"
@@ -241,7 +247,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
                     placeholder="student@example.com"
-                    className="input-field text-sm pr-10"
+                    className="input-field text-sm !pr-11 pl-4"
                     dir="ltr"
                   />
                 </div>
@@ -255,7 +261,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                   كلمة المرور:
                 </label>
                 <div className="relative">
-                  <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
+                  <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
                   <input
                     id="signup_password"
                     type="password"
@@ -263,7 +269,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     placeholder="6 أحرف على الأقل"
-                    className="input-field text-sm pr-10"
+                    className="input-field text-sm !pr-11 pl-4"
                     dir="ltr"
                   />
                 </div>
@@ -273,7 +279,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                 <button
                   type="submit"
                   disabled={isSigningUp}
-                  className="btn-gold w-full text-base py-3 font-bold flex items-center justify-center gap-2"
+                  className="w-full text-base py-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-gold-dark hover:bg-gold text-white shadow-soft transition cursor-pointer"
                 >
                   {isSigningUp ? (
                     <>

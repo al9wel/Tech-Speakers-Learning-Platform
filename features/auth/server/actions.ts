@@ -109,10 +109,20 @@ export async function signupAction(data: {
     }
   }
 
+  // If email verification is paused and no session was created by signUp, establish session
+  if (!authData.session) {
+    await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+  }
+
   revalidatePath('/', 'layout')
   return {
     success: true,
-    redirectTo: '/verify-email',
+    // تم تعليق التحقق من البريد مؤقتاً بناءً على طلب المستخدم
+    // redirectTo: '/verify-email',
+    redirectTo: '/student',
   }
 }
 
@@ -125,10 +135,12 @@ export async function signup(formData: FormData) {
   const res = await signupAction({ full_name: fullName, email, password })
 
   if (!res.success) {
-    redirect(`/signup?error=${encodeURIComponent(res.message || 'Error')}`)
+    redirect(`/auth?error=${encodeURIComponent(res.message || 'Error')}`)
   }
 
-  redirect(res.redirectTo || '/verify-email')
+  // تم تعليق التحقق من البريد مؤقتاً
+  // redirect(res.redirectTo || '/verify-email')
+  redirect(res.redirectTo || '/student')
 }
 
 export async function login(formData: FormData) {
@@ -138,7 +150,7 @@ export async function login(formData: FormData) {
   const res = await loginAction({ email, password })
 
   if (!res.success) {
-    redirect(`/login?error=${encodeURIComponent(res.message || 'Error')}`)
+    redirect(`/auth?error=${encodeURIComponent(res.message || 'Error')}`)
   }
 
   redirect(res.redirectTo || '/')
@@ -148,5 +160,5 @@ export async function signout() {
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
-  redirect('/login')
+  redirect('/auth')
 }
