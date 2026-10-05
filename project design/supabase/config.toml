@@ -1,0 +1,2 @@
+[functions.create-moderator]
+verify_jwt = true
