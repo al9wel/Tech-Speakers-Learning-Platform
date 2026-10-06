@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BookOpen, UserCheck, Sparkles, MessageSquareText, Newspaper } from 'lucide-react'
+import { LayoutDashboard, BookOpen, UserCheck, Sparkles, MessageSquareText, Newspaper, HeartHandshake } from 'lucide-react'
 
 const studentNavItems = [
   {
@@ -27,6 +27,12 @@ const studentNavItems = [
     href: '/student/suggestions',
     label: 'المقترحات',
     icon: MessageSquareText,
+    exact: false,
+  },
+  {
+    href: '/student/counseling',
+    label: 'المستشار النفسي',
+    icon: HeartHandshake,
     exact: false,
   },
   {

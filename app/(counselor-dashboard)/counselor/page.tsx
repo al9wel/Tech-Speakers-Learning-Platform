@@ -7,18 +7,63 @@ import {
   CheckCircle2,
   ArrowLeft,
   UserCheck,
+  MessageSquareText,
+  Clock3,
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
 export default async function CounselorPage() {
-  await requireRole('counselor')
+  const { user, supabase } = await requireRole('counselor')
+
+  // Real stats
+  const { count: totalConsultations } = await supabase
+    .from('counseling_messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('counselor_id', user.id)
+
+  const { count: pendingConsultations } = await supabase
+    .from('counseling_messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('counselor_id', user.id)
+    .eq('status', 'pending')
+
+  const { count: answeredConsultations } = await supabase
+    .from('counseling_messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('counselor_id', user.id)
+    .eq('status', 'answered')
+
+  const { count: totalStudents } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true })
+    .eq('role', 'student')
 
   const statCards = [
-    { icon: MessageCircle, label: 'جلسات استشارية', value: '9', color: 'text-rose-700 bg-rose-50' },
-    { icon: Users, label: 'طلاب تمت مساعدتهم', value: '43', color: 'text-gold-dark bg-gold/15' },
-    { icon: CheckCircle2, label: 'استشارات مكتملة', value: '38', color: 'text-sage-dark bg-sage-50' },
-    { icon: Heart, label: 'نسبة الرضا', value: '99%', color: 'text-ink-800 bg-ink-100/70' },
+    {
+      icon: MessageCircle,
+      label: 'جلسات واستشارات واردة',
+      value: String(totalConsultations || 0),
+      color: 'text-rose-700 bg-rose-50',
+    },
+    {
+      icon: Clock3,
+      label: 'بانتظار رد المستشار',
+      value: String(pendingConsultations || 0),
+      color: 'text-amber-700 bg-amber-50',
+    },
+    {
+      icon: CheckCircle2,
+      label: 'استشارات مكتملة الرد',
+      value: String(answeredConsultations || 0),
+      color: 'text-sage-dark bg-sage-50',
+    },
+    {
+      icon: Users,
+      label: 'الطلاب المسجلون بالمنصة',
+      value: String(totalStudents || 0),
+      color: 'text-gold-dark bg-gold/15',
+    },
   ]
 
   return (
@@ -52,8 +97,38 @@ export default async function CounselorPage() {
         })}
       </div>
 
-      {/* Cards */}
+      {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="card p-6 card-hover flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center">
+                <MessageSquareText className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="font-heading font-bold text-lg text-ink-900">التواصل مع الطلاب</h2>
+                <p className="text-xs text-ink-500">الاستماع للطلاب والرد عليهم أو بدء محادثة جديدة</p>
+              </div>
+            </div>
+            <p className="text-sm text-ink-600 mb-6 leading-relaxed">
+              استقبل طلبات الاستشارة الخاصة بالطلاب وقدم لهم الدعم التوجيهي والنفسي بسرية وأمان تام، أو ابحث عن أي طالب لمراسلته مباشرة.
+            </p>
+          </div>
+
+          <div className="pt-4 border-t border-ink-100/60 flex items-center justify-between">
+            <span className="text-xs text-ink-500 font-bold">
+              {pendingConsultations || 0} استشارة بانتظار ردك
+            </span>
+            <Link
+              href="/counselor/students"
+              className="btn-primary text-sm flex items-center gap-2"
+            >
+              <span>إدارة الاستشارات</span>
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+
         <div className="card p-6 card-hover flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-4">
@@ -74,33 +149,11 @@ export default async function CounselorPage() {
             <span className="chip bg-rose-50 text-rose-800 text-xs">صلاحية مستشار نفسي</span>
             <Link
               href="/counselor/profile"
-              className="btn-primary text-sm flex items-center gap-2"
+              className="btn-secondary text-sm flex items-center gap-2"
             >
               <span>الملف الشخصي</span>
               <ArrowLeft className="w-4 h-4" />
             </Link>
-          </div>
-        </div>
-
-        <div className="card p-6 card-hover flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-11 h-11 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center">
-                <MessageCircle className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="font-heading font-bold text-lg text-ink-900">طلبات الاستشارة الواردة</h2>
-                <p className="text-xs text-ink-500">الاستماع للطلاب وتقديم التوجيه المناسب</p>
-              </div>
-            </div>
-            <p className="text-sm text-ink-600 mb-6 leading-relaxed">
-              استقبل طلبات الاستشارة الخاصة بالطلاب وقدم لهم الدعم التوجيهي والنفسي بسرية وأمان تام.
-            </p>
-          </div>
-
-          <div className="pt-4 border-t border-ink-100/60 flex items-center justify-between">
-            <span className="text-xs text-ink-500">9 طلبات قيد الانتظار</span>
-            <span className="chip bg-sage-50 text-sage-dark text-xs font-semibold">استقبال نشط</span>
           </div>
         </div>
       </div>
