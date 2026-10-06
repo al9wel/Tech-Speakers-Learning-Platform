@@ -54,10 +54,10 @@ export function AdminSubNav() {
   const pathname = usePathname()
 
   return (
-    <div className="bg-white/90 backdrop-blur-md border-b border-ink-100 sticky top-16 z-30 shadow-2xs">
+    <div className="bg-white/95 backdrop-blur-md border-b border-ink-100 sticky top-16 z-30 shadow-2xs">
       <div className="container-page">
         <nav
-          className="flex items-center gap-1.5 sm:gap-2 py-2.5 overflow-x-auto no-scrollbar"
+          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto no-scrollbar"
           aria-label="أقسام لوحة الإدارة"
         >
           {adminNavItems.map((item) => {
@@ -70,13 +70,13 @@ export function AdminSubNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-150 shrink-0 ${
+                className={`inline-flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-150 shrink-0 ${
                   isActive
                     ? 'bg-ink-700 text-white shadow-soft'
                     : 'text-ink-600 hover:text-ink-900 hover:bg-ink-100/70'
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold' : 'text-ink-400'}`} />
+                <Icon className={`w-4 h-4 sm:w-4.5 sm:h-4.5 shrink-0 ${isActive ? 'text-gold' : 'text-ink-400'}`} />
                 <span>{item.label}</span>
               </Link>
             )

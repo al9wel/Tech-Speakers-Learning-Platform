@@ -11,16 +11,24 @@ export default function Logo({ variant = 'full', className = '', showTagline = f
   const subColor = variant === 'white' ? 'text-white/70' : 'text-ink-500';
 
   return (
-    <Link href="/" className={`flex items-center gap-2.5 group ${className}`} aria-label="مِداد - الصفحة الرئيسية">
-      <span className="shrink-0">
+    <Link
+      href="/"
+      className={`flex items-center gap-2 sm:gap-2.5 group shrink-0 select-none ${className}`}
+      aria-label="مِداد - الصفحة الرئيسية"
+    >
+      <span className="shrink-0 flex items-center justify-center">
         <LogoMark variant={variant} />
       </span>
-      <span className="flex flex-col leading-none">
-        <span className={`font-heading font-extrabold text-xl tracking-tight ${textColor}`}>
+      <span className="flex flex-col leading-none shrink-0">
+        <span
+          className={`font-heading font-extrabold text-lg sm:text-xl tracking-tight ${textColor}`}
+        >
           مِداد
         </span>
         {variant !== 'compact' && (
-          <span className={`text-[11px] font-medium ${subColor} mt-0.5`}>
+          <span
+            className={`text-[10px] sm:text-[11px] font-medium ${subColor} mt-0.5 whitespace-nowrap`}
+          >
             {showTagline ? 'المعرفة تُكتب وتُشارك' : 'MIDAD'}
           </span>
         )}

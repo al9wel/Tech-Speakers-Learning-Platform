@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/require-role'
+import { LessonQuestionsSection } from '@/features/questions/components/LessonQuestionsSection'
+import type { QuestionItem } from '@/features/questions/types'
 import {
   BookOpen,
   ArrowRight,
@@ -11,6 +13,7 @@ import {
   Layers,
   Pencil,
   Sparkles,
+  GraduationCap,
 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -21,9 +24,9 @@ interface PageProps {
 
 export default async function TeacherLessonViewPage({ params }: PageProps) {
   const { id: lessonId } = await params
-  const { user, supabase } = await requireRole('teacher')
+  const { user, profile, supabase } = await requireRole('teacher')
 
-  // Fetch lesson with subject
+  // Fetch lesson with subject and creator
   const { data: lesson, error: lessonError } = await supabase
     .from('lessons')
     .select(`
@@ -31,6 +34,11 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
       subject:subjects (
         id,
         name
+      ),
+      creator:profiles!lessons_created_by_fkey (
+        id,
+        full_name,
+        role
       )
     `)
     .eq('id', lessonId)
@@ -88,7 +96,70 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
     })
   )
 
+  // Fetch questions for this lesson along with answers and authors
+  const { data: rawQuestions } = await supabase
+    .from('questions')
+    .select(`
+      id,
+      lesson_id,
+      created_by,
+      title,
+      content,
+      created_at,
+      updated_at,
+      author:profiles!questions_created_by_fkey (
+        id,
+        full_name,
+        role
+      ),
+      question_answers (
+        id,
+        question_id,
+        user_id,
+        content,
+        created_at,
+        updated_at,
+        author:profiles!question_answers_user_id_fkey (
+          id,
+          full_name,
+          role
+        )
+      )
+    `)
+    .eq('lesson_id', lessonId)
+    .order('created_at', { ascending: false })
+
+  const questions: QuestionItem[] = (rawQuestions ?? []).map((q: any) => ({
+    id: q.id,
+    lesson_id: q.lesson_id,
+    created_by: q.created_by,
+    title: q.title,
+    content: q.content,
+    created_at: q.created_at,
+    updated_at: q.updated_at,
+    author: q.author ? {
+      id: q.author.id,
+      full_name: q.author.full_name,
+      role: q.author.role,
+    } : undefined,
+    answers: (q.question_answers ?? []).map((ans: any) => ({
+      id: ans.id,
+      question_id: ans.question_id,
+      user_id: ans.user_id,
+      content: ans.content,
+      created_at: ans.created_at,
+      updated_at: ans.updated_at,
+      author: ans.author ? {
+        id: ans.author.id,
+        full_name: ans.author.full_name,
+        role: ans.author.role,
+      } : undefined,
+    })),
+    answersCount: (q.question_answers ?? []).length,
+  }))
+
   const subjectName = (lesson.subject as any)?.name ?? 'المادة الدراسية'
+  const teacherName = (lesson.creator as any)?.full_name
 
   return (
     <div className="container-page py-8 animate-page max-w-4xl mx-auto">
@@ -141,10 +212,19 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
 
       {/* Lesson Header Card */}
       <div className="card p-6 sm:p-8 bg-white border-ink-100 mb-8 shadow-card">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-bold">
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>{subjectName}</span>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-bold">
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>{subjectName}</span>
+            </div>
+
+            {teacherName && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-ink-100 text-ink-700 text-xs font-semibold border border-ink-200">
+                <GraduationCap className="w-3.5 h-3.5 text-gold-dark" />
+                <span>إعداد المعلم: أ. {teacherName}</span>
+              </div>
+            )}
           </div>
 
           <span className="text-xs text-ink-400 font-mono">
@@ -278,6 +358,15 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
           </div>
         )}
       </div>
+
+      {/* Lesson Questions & Discussions Section */}
+      <LessonQuestionsSection
+        lessonId={lessonId}
+        lessonTitle={lesson.title}
+        initialQuestions={questions}
+        currentUserId={user.id}
+        currentUserRole={profile.role}
+      />
 
       {/* Footer Navigation */}
       <div className="pt-8 mt-8 border-t border-ink-100 flex flex-col sm:flex-row items-center justify-between gap-4">
