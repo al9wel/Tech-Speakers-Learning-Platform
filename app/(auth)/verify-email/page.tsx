@@ -1,5 +1,11 @@
 import Link from 'next/link'
 import { MailCheck, ArrowLeft } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'تأكيد البريد الإلكتروني',
+  description: 'يرجى تأكيد حسابك من خلال الرابط المرسل إلى بريدك الإلكتروني',
+}
 
 export default function VerifyEmailPage() {
   return (

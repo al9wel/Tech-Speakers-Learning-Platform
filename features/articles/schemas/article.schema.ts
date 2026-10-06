@@ -12,6 +12,7 @@ export const articleFormSchema = z.object({
   category: z.string().min(1, 'يرجى تحديد التصنيف'),
   image_path: z.string().nullable().optional(),
   pdf_path: z.string().nullable().optional(),
+  video_path: z.string().nullable().optional(),
 })
 
 export type ArticleFormValues = z.infer<typeof articleFormSchema>

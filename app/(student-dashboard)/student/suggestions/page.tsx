@@ -5,7 +5,7 @@ import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'مقترحاتي | منصة التعلّم',
+  title: 'مقترحاتي',
   description: 'متابعة وإرسال المقترحات لإدارة المنصة والمشرفين',
 }
 

@@ -14,6 +14,166 @@ export type Database = {
   }
   public: {
     Tables: {
+      articles: {
+        Row: {
+          author_id: string
+          category: string
+          content: string
+          created_at: string
+          id: string
+          image_path: string | null
+          pdf_path: string | null
+          video_path: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          pdf_path?: string | null
+          video_path?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          pdf_path?: string | null
+          video_path?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      counseling_messages: {
+        Row: {
+          content: string
+          counselor_id: string
+          created_at: string
+          id: string
+          responder_id: string | null
+          response: string | null
+          response_at: string | null
+          sender_id: string
+          status: string
+          student_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          counselor_id: string
+          created_at?: string
+          id?: string
+          responder_id?: string | null
+          response?: string | null
+          response_at?: string | null
+          sender_id: string
+          status?: string
+          student_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          counselor_id?: string
+          created_at?: string
+          id?: string
+          responder_id?: string | null
+          response?: string | null
+          response_at?: string | null
+          sender_id?: string
+          status?: string
+          student_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "counseling_messages_counselor_id_fkey"
+            columns: ["counselor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "counseling_messages_responder_id_fkey"
+            columns: ["responder_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "counseling_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "counseling_messages_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      counseling_replies: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          message_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          message_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          message_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "counseling_replies_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "counseling_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "counseling_replies_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lesson_sections: {
         Row: {
           content: string
@@ -22,6 +182,7 @@ export type Database = {
           image_path: string | null
           lesson_id: string
           pdf_path: string | null
+          video_path: string | null
           sort_order: number
           title: string
           updated_at: string
@@ -33,6 +194,7 @@ export type Database = {
           image_path?: string | null
           lesson_id: string
           pdf_path?: string | null
+          video_path?: string | null
           sort_order?: number
           title: string
           updated_at?: string
@@ -44,6 +206,7 @@ export type Database = {
           image_path?: string | null
           lesson_id?: string
           pdf_path?: string | null
+          video_path?: string | null
           sort_order?: number
           title?: string
           updated_at?: string
@@ -127,6 +290,149 @@ export type Database = {
         }
         Relationships: []
       }
+      question_answers: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          question_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          question_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          question_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_answers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          lesson_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          lesson_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_contributions: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          image_path: string | null
+          pdf_path: string | null
+          video_path: string | null
+          status: string
+          student_id: string
+          subject_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          pdf_path?: string | null
+          video_path?: string | null
+          status?: string
+          student_id: string
+          subject_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          image_path?: string | null
+          pdf_path?: string | null
+          video_path?: string | null
+          status?: string
+          student_id?: string
+          subject_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_contributions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_contributions_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subjects: {
         Row: {
           created_at: string
@@ -156,6 +462,50 @@ export type Database = {
           {
             foreignKeyName: "subjects_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suggestions: {
+        Row: {
+          admin_reply: string | null
+          category: string
+          content: string
+          created_at: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_reply?: string | null
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_reply?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestions_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

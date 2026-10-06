@@ -17,11 +17,13 @@ export interface ContributionItem {
   content: string
   image_path: string | null
   pdf_path: string | null
+  video_path: string | null
   status: string
   created_at: string
   updated_at: string
   imageUrl?: string | null
   pdfUrl?: string | null
+  videoUrl?: string | null
   student?: ContributionStudent | null
   subject?: ContributionSubject | null
 }
@@ -32,6 +34,7 @@ export interface CreateContributionInput {
   content: string
   image_path?: string | null
   pdf_path?: string | null
+  video_path?: string | null
 }
 
 export interface ContributionActionResult {

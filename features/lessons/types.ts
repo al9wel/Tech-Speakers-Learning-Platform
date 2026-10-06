@@ -5,9 +5,11 @@ export interface LessonSectionItem {
   content: string
   image_path: string | null
   pdf_path: string | null
+  video_path: string | null
   sort_order: number
   imageUrl?: string | null
   pdfUrl?: string | null
+  videoUrl?: string | null
   created_at?: string
   updated_at?: string
 }
@@ -35,6 +37,7 @@ export interface LessonSectionInput {
   content: string
   image_path?: string | null
   pdf_path?: string | null
+  video_path?: string | null
   sort_order: number
 }
 

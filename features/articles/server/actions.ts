@@ -56,7 +56,7 @@ export async function createArticleAction(
       }
     }
 
-    const { title, content, category, image_path, pdf_path } = validated.data
+    const { title, content, category, image_path, pdf_path, video_path } = validated.data
 
     const { data: newArticle, error } = await supabase
       .from('articles')
@@ -67,6 +67,7 @@ export async function createArticleAction(
         category: category || 'خبر',
         image_path: image_path || null,
         pdf_path: pdf_path || null,
+        video_path: video_path || null,
       })
       .select(`
         *,
@@ -88,6 +89,7 @@ export async function createArticleAction(
 
     let imageUrl: string | null = null
     let pdfUrl: string | null = null
+    let videoUrl: string | null = null
 
     if (newArticle.image_path) {
       const { data: signedImg } = await supabase.storage
@@ -103,6 +105,13 @@ export async function createArticleAction(
       pdfUrl = signedPdf?.signedUrl ?? null
     }
 
+    if (newArticle.video_path) {
+      const { data: signedVideo } = await supabase.storage
+        .from(BUCKET_NAME)
+        .createSignedUrl(newArticle.video_path, 3600 * 24)
+      videoUrl = signedVideo?.signedUrl ?? null
+    }
+
     revalidateAllArticlePaths()
 
     return {
@@ -112,6 +121,7 @@ export async function createArticleAction(
         ...newArticle,
         imageUrl,
         pdfUrl,
+        videoUrl,
       },
     }
   } catch (err) {
@@ -157,7 +167,30 @@ export async function updateArticleAction(
       }
     }
 
-    const { title, content, category, image_path, pdf_path } = validated.data
+    const { title, content, category, image_path, pdf_path, video_path } = validated.data
+
+    // Check old files to remove replaced ones
+    const { data: existing } = await supabase
+      .from('articles')
+      .select('id, image_path, pdf_path, video_path')
+      .eq('id', input.id)
+      .single()
+
+    if (existing) {
+      const oldFilesToRemove: string[] = []
+      if (existing.image_path && existing.image_path !== image_path) {
+        oldFilesToRemove.push(existing.image_path)
+      }
+      if (existing.pdf_path && existing.pdf_path !== pdf_path) {
+        oldFilesToRemove.push(existing.pdf_path)
+      }
+      if (existing.video_path && existing.video_path !== video_path) {
+        oldFilesToRemove.push(existing.video_path)
+      }
+      if (oldFilesToRemove.length > 0) {
+        await supabase.storage.from(BUCKET_NAME).remove(oldFilesToRemove)
+      }
+    }
 
     const { data: updatedArticle, error } = await supabase
       .from('articles')
@@ -167,6 +200,7 @@ export async function updateArticleAction(
         category: category || 'خبر',
         image_path: image_path || null,
         pdf_path: pdf_path || null,
+        video_path: video_path || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', input.id)
@@ -187,6 +221,7 @@ export async function updateArticleAction(
 
     let imageUrl: string | null = null
     let pdfUrl: string | null = null
+    let videoUrl: string | null = null
 
     if (updatedArticle.image_path) {
       const { data: signedImg } = await supabase.storage
@@ -202,6 +237,13 @@ export async function updateArticleAction(
       pdfUrl = signedPdf?.signedUrl ?? null
     }
 
+    if (updatedArticle.video_path) {
+      const { data: signedVideo } = await supabase.storage
+        .from(BUCKET_NAME)
+        .createSignedUrl(updatedArticle.video_path, 3600 * 24)
+      videoUrl = signedVideo?.signedUrl ?? null
+    }
+
     revalidateAllArticlePaths()
 
     return {
@@ -211,6 +253,7 @@ export async function updateArticleAction(
         ...updatedArticle,
         imageUrl,
         pdfUrl,
+        videoUrl,
       },
     }
   } catch (err) {
@@ -247,7 +290,7 @@ export async function deleteArticleAction(
 
     const { data: existing } = await supabase
       .from('articles')
-      .select('id, image_path, pdf_path')
+      .select('id, image_path, pdf_path, video_path')
       .eq('id', id)
       .single()
 
@@ -259,6 +302,7 @@ export async function deleteArticleAction(
     const filesToRemove: string[] = []
     if (existing.image_path) filesToRemove.push(existing.image_path)
     if (existing.pdf_path) filesToRemove.push(existing.pdf_path)
+    if (existing.video_path) filesToRemove.push(existing.video_path)
 
     if (filesToRemove.length > 0) {
       await supabase.storage.from(BUCKET_NAME).remove(filesToRemove)

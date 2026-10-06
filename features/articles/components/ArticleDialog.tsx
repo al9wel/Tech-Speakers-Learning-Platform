@@ -8,6 +8,7 @@ import {
   Upload,
   Image as ImageIcon,
   FileText,
+  Video,
   Trash2,
   Loader2,
   Sparkles,
@@ -25,7 +26,9 @@ import type { ArticleItem, ArticleCategory } from '../types'
 const BUCKET_NAME = 'lesson-media'
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
 const MAX_PDF_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_VIDEO_SIZE = 20 * 1024 * 1024 // 20MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
 
 const CATEGORIES: ArticleCategory[] = ['خبر', 'مقال', 'إعلان', 'توجيه تربوي']
 
@@ -48,7 +51,9 @@ export function ArticleDialog({
   const [submitting, setSubmitting] = useState(false)
   const [uploadingMedia, setUploadingMedia] = useState(false)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [previewVideo, setPreviewVideo] = useState<string | null>(null)
   const [pdfFileName, setPdfFileName] = useState<string | null>(null)
+  const [videoFileName, setVideoFileName] = useState<string | null>(null)
 
   const {
     register,
@@ -65,6 +70,7 @@ export function ArticleDialog({
       category: initialArticle?.category || 'خبر',
       image_path: initialArticle?.image_path || null,
       pdf_path: initialArticle?.pdf_path || null,
+      video_path: initialArticle?.video_path || null,
     },
   })
 
@@ -76,9 +82,12 @@ export function ArticleDialog({
         category: initialArticle.category || 'خبر',
         image_path: initialArticle.image_path || null,
         pdf_path: initialArticle.pdf_path || null,
+        video_path: initialArticle.video_path || null,
       })
       setPreviewImage(initialArticle.imageUrl || null)
+      setPreviewVideo(initialArticle.videoUrl || null)
       setPdfFileName(initialArticle.pdf_path ? 'ملف PDF المرفق حالياً' : null)
+      setVideoFileName(initialArticle.video_path ? 'مقطع الفيديو المرفق حالياً' : null)
     } else {
       reset({
         title: '',
@@ -86,21 +95,25 @@ export function ArticleDialog({
         category: 'خبر',
         image_path: null,
         pdf_path: null,
+        video_path: null,
       })
       setPreviewImage(null)
+      setPreviewVideo(null)
       setPdfFileName(null)
+      setVideoFileName(null)
     }
   }, [initialArticle, reset])
 
   const watchedImagePath = watch('image_path')
   const watchedPdfPath = watch('pdf_path')
+  const watchedVideoPath = watch('video_path')
   const watchedCategory = watch('category')
 
   if (!isOpen) return null
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: 'image' | 'pdf'
+    type: 'image' | 'pdf' | 'video'
   ) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -114,7 +127,7 @@ export function ArticleDialog({
         toast.error('حجم الصورة يجب ألا يتجاوز 5 ميجابايت')
         return
       }
-    } else {
+    } else if (type === 'pdf') {
       if (file.type !== 'application/pdf') {
         toast.error('يرجى اختيار ملف PDF صالح')
         return
@@ -123,12 +136,26 @@ export function ArticleDialog({
         toast.error('حجم الملف يجب ألا يتجاوز 10 ميجابايت')
         return
       }
+    } else if (type === 'video') {
+      if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+        toast.error('صيغة الفيديو غير مدعومة (يرجى رفع MP4 أو WebM أو QuickTime)')
+        return
+      }
+      if (file.size > MAX_VIDEO_SIZE) {
+        toast.error('حجم الفيديو يجب ألا يتجاوز 20 ميجابايت')
+        return
+      }
     }
 
     setUploadingMedia(true)
     try {
       const supabase = createClient()
-      const ext = type === 'image' ? file.name.split('.').pop() || 'png' : 'pdf'
+      const ext =
+        type === 'image'
+          ? file.name.split('.').pop() || 'png'
+          : type === 'pdf'
+          ? 'pdf'
+          : file.name.split('.').pop() || 'mp4'
       const storagePath = `${currentUserId}/articles/${Date.now()}.${ext}`
 
       const { error: uploadError } = await supabase.storage
@@ -147,13 +174,27 @@ export function ArticleDialog({
       if (type === 'image') {
         setValue('image_path', storagePath)
         setValue('pdf_path', null)
+        setValue('video_path', null)
         setPdfFileName(null)
+        setVideoFileName(null)
+        setPreviewVideo(null)
         setPreviewImage(URL.createObjectURL(file))
-      } else {
+      } else if (type === 'pdf') {
         setValue('pdf_path', storagePath)
         setValue('image_path', null)
+        setValue('video_path', null)
         setPreviewImage(null)
+        setPreviewVideo(null)
+        setVideoFileName(null)
         setPdfFileName(file.name)
+      } else if (type === 'video') {
+        setValue('video_path', storagePath)
+        setValue('image_path', null)
+        setValue('pdf_path', null)
+        setPreviewImage(null)
+        setPdfFileName(null)
+        setVideoFileName(file.name)
+        setPreviewVideo(URL.createObjectURL(file))
       }
 
       toast.success('تم رفع الملف بنجاح')
@@ -169,8 +210,11 @@ export function ArticleDialog({
   const removeMedia = () => {
     setValue('image_path', null)
     setValue('pdf_path', null)
+    setValue('video_path', null)
     setPreviewImage(null)
+    setPreviewVideo(null)
     setPdfFileName(null)
+    setVideoFileName(null)
   }
 
   const onSubmit = async (values: ArticleFormValues) => {
@@ -307,10 +351,10 @@ export function ArticleDialog({
           {/* Media Attachments */}
           <div>
             <label className="block text-xs font-bold text-ink-700 mb-1.5">
-              إرفاق صورة أو مستند (اختياري)
+              إرفاق وسائط أو مستند (اختياري)
             </label>
 
-            {previewImage || pdfFileName || watchedImagePath || watchedPdfPath ? (
+            {previewImage || previewVideo || pdfFileName || videoFileName || watchedImagePath || watchedPdfPath || watchedVideoPath ? (
               <div className="p-3.5 rounded-xl border border-gold/30 bg-gold/5 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 truncate">
                   {previewImage || watchedImagePath ? (
@@ -325,6 +369,17 @@ export function ArticleDialog({
                         <ImageIcon className="w-5 h-5 text-gold" />
                       )}
                     </div>
+                  ) : previewVideo || watchedVideoPath ? (
+                    <div className="w-10 h-10 rounded-lg bg-amber-500/15 text-amber-600 flex items-center justify-center shrink-0 overflow-hidden">
+                      {previewVideo ? (
+                        <video
+                          src={previewVideo}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Video className="w-5 h-5" />
+                      )}
+                    </div>
                   ) : (
                     <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
                       <FileText className="w-5 h-5" />
@@ -332,7 +387,13 @@ export function ArticleDialog({
                   )}
                   <div className="truncate">
                     <p className="text-xs font-bold text-ink-900 truncate">
-                      {pdfFileName || 'تم إرفاق صورة للمنشور'}
+                      {videoFileName
+                        ? videoFileName
+                        : pdfFileName
+                        ? pdfFileName
+                        : previewVideo || watchedVideoPath
+                        ? 'مقطع فيديو مرفق'
+                        : 'تم إرفاق صورة للمنشور'}
                     </p>
                     <p className="text-[11px] text-emerald-600 font-medium">جاهز للنشر</p>
                   </div>
@@ -348,8 +409,9 @@ export function ArticleDialog({
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2.5">
-                <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+              <div className="grid grid-cols-3 gap-2">
+                {/* Upload Image Option */}
+                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
                   <input
                     type="file"
                     accept="image/*"
@@ -357,16 +419,17 @@ export function ArticleDialog({
                     disabled={uploadingMedia}
                     className="sr-only"
                   />
-                  <div className="w-8 h-8 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1.5 shadow-2xs transition-colors">
-                    <ImageIcon className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                    <ImageIcon className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold">
-                    رفع صورة
+                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                    صورة
                   </span>
-                  <span className="text-[10px] text-ink-400">JPG, PNG (حتى 5MB)</span>
+                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 5MB</span>
                 </label>
 
-                <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+                {/* Upload PDF Option */}
+                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
                   <input
                     type="file"
                     accept="application/pdf"
@@ -374,13 +437,31 @@ export function ArticleDialog({
                     disabled={uploadingMedia}
                     className="sr-only"
                   />
-                  <div className="w-8 h-8 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1.5 shadow-2xs transition-colors">
-                    <FileText className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                    <FileText className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold">
-                    ملف PDF
+                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                    مستند PDF
                   </span>
-                  <span className="text-[10px] text-ink-400">مستند (حتى 10MB)</span>
+                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 10MB</span>
+                </label>
+
+                {/* Upload Video Option */}
+                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/ogg,video/quicktime"
+                    onChange={(e) => handleFileUpload(e, 'video')}
+                    disabled={uploadingMedia}
+                    className="sr-only"
+                  />
+                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                    <Video className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                    مقطع فيديو
+                  </span>
+                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 20MB</span>
                 </label>
               </div>
             )}

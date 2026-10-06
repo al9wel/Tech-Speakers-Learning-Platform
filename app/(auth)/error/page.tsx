@@ -1,5 +1,10 @@
 import Link from 'next/link'
 import { AlertTriangle, ArrowLeft, Home } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'خطأ في المصادقة',
+}
 
 export default function ErrorPage() {
   return (

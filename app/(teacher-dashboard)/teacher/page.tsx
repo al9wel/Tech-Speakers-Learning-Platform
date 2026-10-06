@@ -9,8 +9,14 @@ import {
   ArrowLeft,
   UserCheck,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'لوحة تحكم المعلم',
+  description: 'إدارة الدروس التعليمية والمحتوى الدراسي ومتابعة استفسارات الطلاب',
+}
 
 export default async function TeacherPage() {
   const { user, supabase } = await requireRole('teacher')

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Newspaper, UserCheck } from 'lucide-react'
+import { LayoutDashboard, Newspaper, UserCheck, MessageSquareText } from 'lucide-react'
 
 const counselorNavItems = [
   {
@@ -10,6 +10,12 @@ const counselorNavItems = [
     label: 'لوحة المستشار',
     icon: LayoutDashboard,
     exact: true,
+  },
+  {
+    href: '/counselor/students',
+    label: 'التواصل مع الطلاب',
+    icon: MessageSquareText,
+    exact: false,
   },
   {
     href: '/counselor/articles',

@@ -9,6 +9,7 @@ export const sectionFormSchema = z.object({
   content: z.string().min(5, 'محتوى القسم يجب أن يتكون من 5 أحرف على الأقل'),
   image_path: z.string().nullable().optional(),
   pdf_path: z.string().nullable().optional(),
+  video_path: z.string().nullable().optional(),
   sort_order: z.number().int().min(0),
 })
 
@@ -47,6 +48,7 @@ export const createLessonActionSchema = z.object({
         content: z.string().min(5),
         image_path: z.string().nullable().optional(),
         pdf_path: z.string().nullable().optional(),
+        video_path: z.string().nullable().optional(),
         sort_order: z.number().int().default(0),
       })
     )
@@ -67,6 +69,7 @@ export const updateLessonActionSchema = z.object({
         content: z.string().min(5),
         image_path: z.string().nullable().optional(),
         pdf_path: z.string().nullable().optional(),
+        video_path: z.string().nullable().optional(),
         sort_order: z.number().int().default(0),
       })
     )

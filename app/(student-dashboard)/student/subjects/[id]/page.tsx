@@ -1,13 +1,24 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/require-role'
+import { createClient } from '@/lib/supabase/server'
 import { SubjectLessonsExplorer, type SubjectLessonItem } from '@/features/subjects/components/SubjectLessonsExplorer'
 import { BookOpen, ArrowRight, ChevronRight } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: subject } = await supabase.from('subjects').select('name').eq('id', id).single()
+  return {
+    title: subject?.name ? `مادة ${subject.name}` : 'تفاصيل المادة الدراسية',
+  }
 }
 
 export default async function StudentSubjectLessonsPage({ params }: PageProps) {

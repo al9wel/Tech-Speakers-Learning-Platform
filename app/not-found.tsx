@@ -1,5 +1,10 @@
 import Link from 'next/link'
 import { FileQuestion, Home } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'الصفحة غير موجودة (404)',
+}
 
 export default function NotFound() {
   return (

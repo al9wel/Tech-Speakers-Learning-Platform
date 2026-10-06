@@ -121,8 +121,20 @@ export function ContributionCard({
         </div>
 
         {/* Media Attachments */}
-        {(contribution.imageUrl || contribution.pdfUrl) && (
-          <div className="mt-5 pt-4 border-t border-ink-100/70">
+        {(contribution.imageUrl || contribution.pdfUrl || contribution.videoUrl) && (
+          <div className="mt-5 pt-4 border-t border-ink-100/70 space-y-3">
+            {contribution.videoUrl && (
+              <div className="rounded-2xl overflow-hidden border border-ink-200/80 bg-ink-950 shadow-inner">
+                <video
+                  src={contribution.videoUrl}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full max-h-72 object-contain bg-black"
+                />
+              </div>
+            )}
+
             {contribution.imageUrl && (
               <div
                 onClick={() => setShowImageModal(true)}
@@ -153,7 +165,7 @@ export function ContributionCard({
                 href={contribution.pdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center justify-between w-full p-3 rounded-2xl bg-red-50/60 border border-red-200/60 hover:bg-red-100/60 transition-colors group/pdf cursor-pointer"
+                className="inline-flex items-center justify-between w-full p-3 rounded-2xl bg-red-50/60 border border-red-200/60 hover:bg-red-100/60 transition-colors group/pdf cursor-pointer"
               >
                 <div className="flex items-center gap-2.5 truncate">
                   <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-2xs">

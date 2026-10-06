@@ -1,8 +1,14 @@
 import Link from 'next/link'
 import { requireRole } from '@/lib/auth/require-role'
 import { BookOpen, ArrowRight, Layers, ArrowLeft } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'المواد الدراسية',
+  description: 'استكشف المناهج والمواد الدراسية وتصفح الدروس التعليمية المقررة',
+}
 
 export default async function StudentSubjectsPage() {
   const { supabase } = await requireRole('student')

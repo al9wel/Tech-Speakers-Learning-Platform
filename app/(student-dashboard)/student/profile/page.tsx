@@ -1,5 +1,11 @@
 import { requireRole } from '@/lib/auth/require-role'
 import { ProfilePage } from '@/features/profile/components/ProfilePage'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'الملف الشخصي',
+  description: 'إدارة وتعديل بيانات الحساب الشخصي',
+}
 
 interface PageProps {
     searchParams: Promise<{ error?: string; success?: string }>

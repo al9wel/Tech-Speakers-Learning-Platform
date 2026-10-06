@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/require-role'
+import { createClient } from '@/lib/supabase/server'
 import { LessonQuestionsSection } from '@/features/questions/components/LessonQuestionsSection'
 import type { QuestionItem } from '@/features/questions/types'
 import {
@@ -13,11 +14,31 @@ import {
   Layers,
   GraduationCap,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: lesson } = await supabase
+    .from('lessons')
+    .select('title, subject:subjects(name)')
+    .eq('id', id)
+    .single()
+  const subjectName = (lesson?.subject as any)?.name
+  const title = lesson?.title
+    ? subjectName
+      ? `${lesson.title} - ${subjectName}`
+      : lesson.title
+    : 'درس تعليمي'
+  return {
+    title,
+  }
 }
 
 export default async function StudentLessonViewPage({ params }: PageProps) {
@@ -53,11 +74,12 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
     .eq('lesson_id', lessonId)
     .order('sort_order', { ascending: true })
 
-  // Generate signed URLs in parallel for section images and PDFs
+  // Generate signed URLs in parallel for section images, PDFs, and videos
   const sections = await Promise.all(
     (rawSections ?? []).map(async (sec) => {
       let imageUrl: string | null = null
       let pdfUrl: string | null = null
+      let videoUrl: string | null = null
 
       if (sec.image_path) {
         const { data: signedImg } = await supabase.storage
@@ -73,10 +95,18 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
         pdfUrl = signedPdf?.signedUrl ?? null
       }
 
+      if (sec.video_path) {
+        const { data: signedVideo } = await supabase.storage
+          .from('lesson-media')
+          .createSignedUrl(sec.video_path, 3600 * 24)
+        videoUrl = signedVideo?.signedUrl ?? null
+      }
+
       return {
         ...sec,
         imageUrl,
         pdfUrl,
+        videoUrl,
       }
     })
   )
@@ -243,7 +273,19 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
                   {section.content}
                 </div>
 
-                {/* Optional Media (Image OR PDF) */}
+                {/* Optional Media (Video, Image, OR PDF) */}
+                {section.videoUrl && (
+                  <div className="mt-4 rounded-2xl overflow-hidden border border-ink-200/80 bg-ink-950 shadow-inner">
+                    <video
+                      src={section.videoUrl}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      className="w-full max-h-[480px] object-contain bg-black mx-auto"
+                    />
+                  </div>
+                )}
+
                 {section.imageUrl && (
                   <div className="mt-4 rounded-2xl overflow-hidden border border-ink-100 bg-cream/20">
                     <img

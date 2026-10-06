@@ -15,8 +15,20 @@ import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "مِداد | المنصة التعليمية اليمنية",
+  title: {
+    default: "مِداد | المنصة التعليمية اليمنية",
+    template: "%s | مِداد",
+  },
   description: "منصة تعليمية يمنية شاملة للطلاب والمعلمين والمستشارين والمشرفين",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
