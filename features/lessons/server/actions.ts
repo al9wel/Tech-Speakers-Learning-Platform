@@ -292,7 +292,11 @@ export async function deleteLessonAction(lessonId: string): Promise<LessonAction
       return { success: false, message: 'الدرس غير موجود أو تم حذفه مسبقاً' }
     }
 
-    if (existingLesson.created_by !== user.id && profile?.role !== 'admin') {
+    if (
+      existingLesson.created_by !== user.id &&
+      profile?.role !== 'admin' &&
+      profile?.role !== 'supervisor'
+    ) {
       return { success: false, message: 'لا تملك صلاحية حذف هذا الدرس' }
     }
 
@@ -323,6 +327,7 @@ export async function deleteLessonAction(lessonId: string): Promise<LessonAction
     }
 
     revalidatePath('/teacher/lessons')
+    revalidatePath('/supervisor/lessons')
     revalidatePath('/student/subjects')
     revalidatePath(`/student/subjects/${existingLesson.subject_id}`)
 

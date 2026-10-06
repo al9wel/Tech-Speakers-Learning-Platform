@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BookOpen, Plus, HelpCircle, UserCheck } from 'lucide-react'
+import { LayoutDashboard, BookOpen, Plus, HelpCircle, Newspaper, UserCheck } from 'lucide-react'
 
 const teacherNavItems = [
   {
@@ -18,15 +18,15 @@ const teacherNavItems = [
     exact: false,
   },
   {
-    href: '/teacher/lessons/new',
-    label: 'إضافة درس جديد',
-    icon: Plus,
-    exact: true,
-  },
-  {
     href: '/teacher/questions',
     label: 'بنك الأسئلة',
     icon: HelpCircle,
+    exact: false,
+  },
+  {
+    href: '/teacher/articles',
+    label: 'الأخبار والمقالات',
+    icon: Newspaper,
     exact: false,
   },
   {
@@ -44,7 +44,7 @@ export function TeacherSubNav() {
     <div className="bg-white/95 backdrop-blur-md border-b border-ink-100 sticky top-16 z-30 shadow-2xs">
       <div className="container-page">
         <nav
-          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto no-scrollbar"
+          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto md:overflow-visible md:flex-wrap no-scrollbar"
           aria-label="أقسام واجهة المعلم"
         >
           {teacherNavItems.map((item) => {

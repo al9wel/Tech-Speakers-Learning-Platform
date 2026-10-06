@@ -11,7 +11,6 @@ import {
   FileDown,
   ExternalLink,
   Layers,
-  Pencil,
   Sparkles,
   GraduationCap,
 } from 'lucide-react'
@@ -22,9 +21,9 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
-export default async function TeacherLessonViewPage({ params }: PageProps) {
+export default async function SupervisorLessonViewPage({ params }: PageProps) {
   const { id: lessonId } = await params
-  const { user, profile, supabase } = await requireRole('teacher')
+  const { user, supabase } = await requireRole('supervisor')
 
   // Fetch lesson with subject and creator
   const { data: lesson, error: lessonError } = await supabase
@@ -46,19 +45,6 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
 
   if (lessonError || !lesson) {
     notFound()
-  }
-
-  // Ensure the teacher owns this lesson (or is admin)
-  if (lesson.created_by !== user.id) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      notFound()
-    }
   }
 
   // Fetch sections of this lesson ordered by sort_order
@@ -137,11 +123,13 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
     content: q.content,
     created_at: q.created_at,
     updated_at: q.updated_at,
-    author: q.author ? {
-      id: q.author.id,
-      full_name: q.author.full_name,
-      role: q.author.role,
-    } : undefined,
+    author: q.author
+      ? {
+          id: q.author.id,
+          full_name: q.author.full_name,
+          role: q.author.role,
+        }
+      : undefined,
     answers: (q.question_answers ?? []).map((ans: any) => ({
       id: ans.id,
       question_id: ans.question_id,
@@ -149,11 +137,13 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
       content: ans.content,
       created_at: ans.created_at,
       updated_at: ans.updated_at,
-      author: ans.author ? {
-        id: ans.author.id,
-        full_name: ans.author.full_name,
-        role: ans.author.role,
-      } : undefined,
+      author: ans.author
+        ? {
+            id: ans.author.id,
+            full_name: ans.author.full_name,
+            role: ans.author.role,
+          }
+        : undefined,
     })),
     answersCount: (q.question_answers ?? []).length,
   }))
@@ -163,48 +153,39 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
 
   return (
     <div className="container-page py-8 animate-page">
-      {/* Teacher Preview Banner */}
-      <div className="mb-6 p-3 sm:p-4 rounded-2xl bg-gold/10 border border-gold/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      {/* Supervisor Preview Banner */}
+      <div className="mb-6 p-4 rounded-3xl bg-gold/10 border border-gold/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gold/20 text-gold-dark flex items-center justify-center shrink-0">
-            <Sparkles className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-xl bg-gold/20 text-gold flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <p className="font-heading font-bold text-xs sm:text-sm text-ink-900">
-              معاينة الدرس (كما يظهر للطلاب)
+            <p className="font-heading font-bold text-sm text-ink-900">
+              معاينة الدرس (لوحة الإشراف)
             </p>
-            <p className="text-[11px] text-ink-600">
-              هذه الصفحة تعرض المظهر النهائي للدرس الذي يشاهده الطالب عند دراسته للمادة.
+            <p className="text-xs text-ink-600 font-medium">
+              الاطلاع على كامل تفاصيل الدرس ومحتواه وأسئلته للتقييم والتوجيه التربوي.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-          <Link
-            href={`/teacher/lessons/${lesson.id}/edit`}
-            className="btn-gold text-xs py-1.5 px-3 flex items-center gap-1.5 shadow-soft"
-          >
-            <Pencil className="w-3.5 h-3.5" />
-            <span>تعديل هذا الدرس</span>
-          </Link>
-          <Link
-            href="/teacher/lessons"
-            className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1 hover:bg-ink-50 bg-white"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            <span>قائمة الدروس</span>
-          </Link>
-        </div>
+        <Link
+          href="/supervisor/lessons"
+          className="btn-outline text-xs py-2 px-3.5 flex items-center gap-1.5 hover:bg-ink-100 bg-white cursor-pointer shrink-0"
+        >
+          <ArrowRight className="w-3.5 h-3.5" />
+          <span>العودة للدروس</span>
+        </Link>
       </div>
 
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs text-ink-500 mb-6 flex-wrap">
-        <Link href="/teacher" className="hover:text-ink-900 transition">
-          لوحة التحكم
+        <Link href="/supervisor" className="hover:text-ink-900 transition">
+          لوحة الإشراف
         </Link>
         <ChevronRight className="w-3.5 h-3.5 rotate-180 text-ink-300" />
-        <Link href="/teacher/lessons" className="hover:text-ink-900 transition">
-          دروسي التعليمية
+        <Link href="/supervisor/lessons" className="hover:text-ink-900 transition">
+          الدروس
         </Link>
         <ChevronRight className="w-3.5 h-3.5 rotate-180 text-ink-300" />
         <span className="text-ink-900 font-bold truncate max-w-xs">{lesson.title}</span>
@@ -243,7 +224,7 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Dynamic Sections Section */}
+      {/* Dynamic Sections */}
       <div className="space-y-6">
         <div className="flex items-center justify-between pb-2 border-b border-ink-100">
           <div className="flex items-center gap-2">
@@ -252,15 +233,6 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
               محتوى وأقسام الدرس ({sections.length})
             </h2>
           </div>
-
-          {sections.length === 0 && (
-            <Link
-              href={`/teacher/lessons/${lesson.id}/edit`}
-              className="text-xs text-gold-dark hover:underline font-bold"
-            >
-              + إضافة أقسام تفصيلية
-            </Link>
-          )}
         </div>
 
         {sections.length > 0 ? (
@@ -308,7 +280,7 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
                           ملف توضيحي مرفق (PDF)
                         </p>
                         <p className="text-[11px] text-ink-500">
-                          يمكن للطالب قراءة الملف أو تحميله للمراجعة
+                          يمكن معاينة وقراءة الملف المرفق
                         </p>
                       </div>
                     </div>
@@ -318,18 +290,18 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
                         href={section.pdfUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 bg-white"
+                        className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 hover:bg-ink-100 bg-white cursor-pointer"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
-                        <span>فتح في تبويب</span>
+                        <span>معاينة</span>
                       </a>
                       <a
                         href={section.pdfUrl}
                         download
-                        className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5"
+                        className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5 cursor-pointer"
                       >
                         <FileDown className="w-3.5 h-3.5" />
-                        <span>تحميل الملف</span>
+                        <span>تحميل</span>
                       </a>
                     </div>
                   </div>
@@ -338,53 +310,21 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
             ))}
           </div>
         ) : (
-          <div className="card p-8 bg-cream/30 border-dashed border-2 border-ink-200 text-center rounded-2xl">
-            <div className="w-12 h-12 rounded-2xl bg-ink-100 text-ink-400 flex items-center justify-center mx-auto mb-3">
-              <Layers className="w-6 h-6" />
-            </div>
-            <h3 className="font-heading font-bold text-sm text-ink-800 mb-1">
-              لا توجد أقسام فرعية لهذا الدرس
-            </h3>
-            <p className="text-xs text-ink-500 max-w-sm mx-auto mb-4 leading-relaxed">
-              تم إنشاء هذا الدرس بالشرح التمهيدي فقط. بإمكانك إضافة أقسام تفاعلية في أي وقت عبر زر التعديل.
-            </p>
-            <Link
-              href={`/teacher/lessons/${lesson.id}/edit`}
-              className="btn-outline text-xs py-2 px-4 inline-flex items-center gap-2 hover:bg-gold/10 hover:border-gold bg-white"
-            >
-              <Pencil className="w-3.5 h-3.5 text-gold-dark" />
-              <span>إضافة أقسام للدرس الآن</span>
-            </Link>
+          <div className="card p-8 bg-white text-center border-dashed border-ink-200">
+            <p className="text-sm text-ink-500">لا توجد أقسام تفصيلية في هذا الدرس بعد.</p>
           </div>
         )}
       </div>
 
-      {/* Lesson Questions & Discussions Section */}
-      <LessonQuestionsSection
-        lessonId={lessonId}
-        lessonTitle={lesson.title}
-        initialQuestions={questions}
-        currentUserId={user.id}
-        currentUserRole={profile.role}
-      />
-
-      {/* Footer Navigation */}
-      <div className="pt-8 mt-8 border-t border-ink-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <Link
-          href="/teacher/lessons"
-          className="btn-outline text-sm flex items-center gap-2 hover:bg-ink-50"
-        >
-          <ArrowRight className="w-4 h-4" />
-          <span>العودة لقائمة جميع الدروس</span>
-        </Link>
-
-        <Link
-          href={`/teacher/lessons/${lesson.id}/edit`}
-          className="btn-gold text-sm flex items-center gap-2"
-        >
-          <Pencil className="w-4 h-4" />
-          <span>تعديل هذا الدرس</span>
-        </Link>
+      {/* Lesson Questions & Discussion Section */}
+      <div className="mt-12">
+        <LessonQuestionsSection
+          lessonId={lessonId}
+          lessonTitle={lesson.title}
+          initialQuestions={questions}
+          currentUserId={user.id}
+          currentUserRole="supervisor"
+        />
       </div>
     </div>
   )

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, UserCheck } from 'lucide-react'
+import { LayoutDashboard, Newspaper, UserCheck } from 'lucide-react'
 
 const counselorNavItems = [
   {
@@ -10,6 +10,12 @@ const counselorNavItems = [
     label: 'لوحة المستشار',
     icon: LayoutDashboard,
     exact: true,
+  },
+  {
+    href: '/counselor/articles',
+    label: 'الأخبار والمقالات',
+    icon: Newspaper,
+    exact: false,
   },
   {
     href: '/counselor/profile',
@@ -26,7 +32,7 @@ export function CounselorSubNav() {
     <div className="bg-white/95 backdrop-blur-md border-b border-ink-100 sticky top-16 z-30 shadow-2xs">
       <div className="container-page">
         <nav
-          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto no-scrollbar"
+          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto md:overflow-visible md:flex-wrap no-scrollbar"
           aria-label="أقسام لوحة المستشار"
         >
           {counselorNavItems.map((item) => {
