@@ -148,7 +148,7 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
   const teacherName = (lesson.creator as any)?.full_name
 
   return (
-    <div className="container-page py-8 animate-page max-w-4xl mx-auto">
+    <div className="container-page py-8 animate-page">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center gap-2 text-xs text-ink-500 mb-6 flex-wrap">
         <Link href="/student" className="hover:text-ink-900 transition">

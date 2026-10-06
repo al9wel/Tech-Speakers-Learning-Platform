@@ -57,7 +57,7 @@ export function AdminSubNav() {
     <div className="bg-white/95 backdrop-blur-md border-b border-ink-100 sticky top-16 z-30 shadow-2xs">
       <div className="container-page">
         <nav
-          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto no-scrollbar"
+          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto md:overflow-visible md:flex-wrap no-scrollbar"
           aria-label="أقسام لوحة الإدارة"
         >
           {adminNavItems.map((item) => {

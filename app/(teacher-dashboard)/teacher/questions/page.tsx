@@ -133,7 +133,7 @@ export default async function TeacherQuestionsPage() {
   }))
 
   return (
-    <div className="container-page py-8 animate-page max-w-5xl mx-auto">
+    <div className="container-page py-8 animate-page">
       <TeacherQuestionsManager
         initialQuestions={questions}
         lessons={lessonsOptions}

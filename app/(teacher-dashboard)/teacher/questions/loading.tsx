@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="container-page py-8 animate-pulse max-w-5xl mx-auto space-y-8">
+    <div className="container-page py-8 animate-pulse space-y-8">
       {/* Header skeleton */}
       <div className="rounded-3xl border border-ink-100 bg-white p-4 sm:p-8 space-y-6 overflow-hidden">
         <div className="flex flex-col sm:flex-row justify-between gap-4">

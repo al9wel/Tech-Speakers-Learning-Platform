@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BookOpen, UserCheck } from 'lucide-react'
+import { LayoutDashboard, BookOpen, UserCheck, Sparkles, MessageSquareText, Newspaper } from 'lucide-react'
 
 const studentNavItems = [
   {
@@ -15,6 +15,24 @@ const studentNavItems = [
     href: '/student/subjects',
     label: 'المواد الدراسية',
     icon: BookOpen,
+    exact: false,
+  },
+  {
+    href: '/student/contributions',
+    label: 'مساهمات الطلاب',
+    icon: Sparkles,
+    exact: false,
+  },
+  {
+    href: '/student/suggestions',
+    label: 'المقترحات',
+    icon: MessageSquareText,
+    exact: false,
+  },
+  {
+    href: '/student/articles',
+    label: 'الأخبار والمقالات',
+    icon: Newspaper,
     exact: false,
   },
   {
@@ -32,7 +50,7 @@ export function StudentSubNav() {
     <div className="bg-white/95 backdrop-blur-md border-b border-ink-100 sticky top-16 z-30 shadow-2xs">
       <div className="container-page">
         <nav
-          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto no-scrollbar"
+          className="flex items-center gap-2 sm:gap-2.5 py-3 sm:py-3.5 overflow-x-auto md:overflow-visible md:flex-wrap no-scrollbar"
           aria-label="أقسام واجهة الطالب"
         >
           {studentNavItems.map((item) => {
