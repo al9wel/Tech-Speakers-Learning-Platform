@@ -5,7 +5,7 @@ import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'إدارة الدروس | لوحة الإشراف',
+  title: 'إدارة ومراجعة الدروس',
   description: 'استعراض ومتابعة وحذف الدروس المنشورة في المنصة',
 }
 

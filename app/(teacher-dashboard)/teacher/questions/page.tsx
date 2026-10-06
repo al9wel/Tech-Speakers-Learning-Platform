@@ -3,8 +3,14 @@ import { requireRole } from '@/lib/auth/require-role'
 import { TeacherQuestionsManager } from '@/features/questions/components/TeacherQuestionsManager'
 import type { QuestionItem } from '@/features/questions/types'
 import { HelpCircle, ArrowRight, AlertTriangle } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'استفسارات وأسئلة الدروس',
+  description: 'إدارة وتوجيه أسئلة ونقاشات الطلاب حول الدروس',
+}
 
 export default async function TeacherQuestionsPage() {
   const { user, supabase } = await requireRole('teacher')

@@ -5,7 +5,7 @@ import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'مساهمات الطلاب | لوحة الإشراف',
+  title: 'المساهمات الطلابية',
   description: 'إدارة ومتابعة مساهمات الطلاب والمشاريع وتصفيتها وحذفها',
 }
 
@@ -46,6 +46,7 @@ export default async function SupervisorContributionsPage() {
     (rawContributions ?? []).map(async (c) => {
       let imageUrl: string | null = null
       let pdfUrl: string | null = null
+      let videoUrl: string | null = null
 
       if (c.image_path) {
         const { data: signedImg } = await supabase.storage
@@ -61,10 +62,18 @@ export default async function SupervisorContributionsPage() {
         pdfUrl = signedPdf?.signedUrl ?? null
       }
 
+      if (c.video_path) {
+        const { data: signedVid } = await supabase.storage
+          .from(BUCKET_NAME)
+          .createSignedUrl(c.video_path, 3600 * 24)
+        videoUrl = signedVid?.signedUrl ?? null
+      }
+
       return {
         ...c,
         imageUrl,
         pdfUrl,
+        videoUrl,
       }
     })
   )

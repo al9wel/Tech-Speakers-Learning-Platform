@@ -1,12 +1,23 @@
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/require-role'
+import { createClient } from '@/lib/supabase/server'
 import { LessonForm } from '@/features/lessons/components/LessonForm'
 import type { LessonItem, LessonSectionItem } from '@/features/lessons/types'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: lesson } = await supabase.from('lessons').select('title').eq('id', id).single()
+  return {
+    title: lesson?.title ? `تعديل: ${lesson.title}` : 'تعديل الدرس',
+  }
 }
 
 export default async function EditLessonPage({ params }: PageProps) {
@@ -40,6 +51,7 @@ export default async function EditLessonPage({ params }: PageProps) {
     (rawSections ?? []).map(async (sec) => {
       let imageUrl: string | null = null
       let pdfUrl: string | null = null
+      let videoUrl: string | null = null
 
       if (sec.image_path) {
         const { data: signedImg } = await supabase.storage
@@ -55,10 +67,18 @@ export default async function EditLessonPage({ params }: PageProps) {
         pdfUrl = signedPdf?.signedUrl ?? null
       }
 
+      if (sec.video_path) {
+        const { data: signedVideo } = await supabase.storage
+          .from('lesson-media')
+          .createSignedUrl(sec.video_path, 3600 * 24)
+        videoUrl = signedVideo?.signedUrl ?? null
+      }
+
       return {
         ...sec,
         imageUrl,
         pdfUrl,
+        videoUrl,
       }
     })
   )

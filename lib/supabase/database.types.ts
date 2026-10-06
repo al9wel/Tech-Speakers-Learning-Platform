@@ -23,6 +23,7 @@ export type Database = {
           id: string
           image_path: string | null
           pdf_path: string | null
+          video_path: string | null
           title: string
           updated_at: string
         }
@@ -34,6 +35,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           pdf_path?: string | null
+          video_path?: string | null
           title: string
           updated_at?: string
         }
@@ -45,6 +47,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           pdf_path?: string | null
+          video_path?: string | null
           title?: string
           updated_at?: string
         }
@@ -179,6 +182,7 @@ export type Database = {
           image_path: string | null
           lesson_id: string
           pdf_path: string | null
+          video_path: string | null
           sort_order: number
           title: string
           updated_at: string
@@ -190,6 +194,7 @@ export type Database = {
           image_path?: string | null
           lesson_id: string
           pdf_path?: string | null
+          video_path?: string | null
           sort_order?: number
           title: string
           updated_at?: string
@@ -201,6 +206,7 @@ export type Database = {
           image_path?: string | null
           lesson_id?: string
           pdf_path?: string | null
+          video_path?: string | null
           sort_order?: number
           title?: string
           updated_at?: string
@@ -377,6 +383,7 @@ export type Database = {
           id: string
           image_path: string | null
           pdf_path: string | null
+          video_path: string | null
           status: string
           student_id: string
           subject_id: string
@@ -389,6 +396,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           pdf_path?: string | null
+          video_path?: string | null
           status?: string
           student_id: string
           subject_id: string
@@ -401,6 +409,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           pdf_path?: string | null
+          video_path?: string | null
           status?: string
           student_id?: string
           subject_id?: string

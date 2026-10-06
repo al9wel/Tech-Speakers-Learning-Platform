@@ -12,6 +12,7 @@ export const contributionFormSchema = z.object({
     .max(4000, 'شرح وتفاصيل المساهمة طويل جداً'),
   image_path: z.string().nullable().optional(),
   pdf_path: z.string().nullable().optional(),
+  video_path: z.string().nullable().optional(),
 })
 
 export type ContributionFormValues = z.infer<typeof contributionFormSchema>

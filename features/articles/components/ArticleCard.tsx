@@ -16,6 +16,7 @@ import {
   FileDown,
   Sparkles,
   ArrowLeft,
+  Video,
 } from 'lucide-react'
 import type { ArticleItem } from '../types'
 
@@ -156,6 +157,13 @@ export function ArticleCard({
               <span className={`w-1.5 h-1.5 rounded-full ${categoryStyle.dot}`} />
               <span>{article.category || 'خبر'}</span>
             </span>
+
+            {article.videoUrl && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-xs bg-black/40 text-amber-200 border border-white/15 shadow-sm">
+                <Video className="w-3 h-3 text-amber-300" />
+                <span>مقطع فيديو</span>
+              </span>
+            )}
 
             {article.pdfUrl && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-xs bg-black/40 text-red-200 border border-white/15 shadow-sm">
@@ -377,6 +385,19 @@ export function ArticleCard({
               <div className="prose prose-sm max-w-none text-ink-800 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
                 {article.content}
               </div>
+
+              {/* Video Player (if available) */}
+              {article.videoUrl && (
+                <div className="rounded-2xl overflow-hidden border border-ink-200/80 bg-ink-950 shadow-inner">
+                  <video
+                    src={article.videoUrl}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="w-full max-h-96 object-contain bg-black mx-auto"
+                  />
+                </div>
+              )}
 
               {/* PDF Attachment (if available) */}
               {article.pdfUrl && (

@@ -31,7 +31,7 @@ export async function createContributionAction(
       }
     }
 
-    const { subject_id, title, content, image_path, pdf_path } = validated.data
+    const { subject_id, title, content, image_path, pdf_path, video_path } = validated.data
 
     const { data: newContribution, error } = await supabase
       .from('student_contributions')
@@ -42,6 +42,7 @@ export async function createContributionAction(
         content,
         image_path: image_path || null,
         pdf_path: pdf_path || null,
+        video_path: video_path || null,
         status: 'approved',
       })
       .select(`
@@ -66,6 +67,7 @@ export async function createContributionAction(
     // Generate signed URLs if files were uploaded
     let imageUrl: string | null = null
     let pdfUrl: string | null = null
+    let videoUrl: string | null = null
 
     if (newContribution.image_path) {
       const { data: imgData } = await supabase.storage
@@ -81,7 +83,15 @@ export async function createContributionAction(
       pdfUrl = pdfData?.signedUrl ?? null
     }
 
+    if (newContribution.video_path) {
+      const { data: vidData } = await supabase.storage
+        .from(BUCKET_NAME)
+        .createSignedUrl(newContribution.video_path, 3600 * 24)
+      videoUrl = vidData?.signedUrl ?? null
+    }
+
     revalidatePath('/student/contributions')
+    revalidatePath('/supervisor/contributions')
 
     return {
       success: true,
@@ -90,6 +100,7 @@ export async function createContributionAction(
         ...newContribution,
         imageUrl,
         pdfUrl,
+        videoUrl,
       },
     }
   } catch (err) {
@@ -113,7 +124,7 @@ export async function deleteContributionAction(
 
     const { data: existing } = await supabase
       .from('student_contributions')
-      .select('id, student_id, image_path, pdf_path')
+      .select('id, student_id, image_path, pdf_path, video_path')
       .eq('id', id)
       .single()
 
@@ -138,6 +149,7 @@ export async function deleteContributionAction(
     const filesToRemove: string[] = []
     if (existing.image_path) filesToRemove.push(existing.image_path)
     if (existing.pdf_path) filesToRemove.push(existing.pdf_path)
+    if (existing.video_path) filesToRemove.push(existing.video_path)
 
     if (filesToRemove.length > 0) {
       await supabase.storage.from(BUCKET_NAME).remove(filesToRemove)

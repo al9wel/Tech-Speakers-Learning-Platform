@@ -21,13 +21,16 @@ import {
   ChevronDown,
   Layers,
   FileCheck,
+  Video,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
 const BUCKET_NAME = 'lesson-media'
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
 const MAX_PDF_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_VIDEO_SIZE = 20 * 1024 * 1024 // 20MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']
 
 interface SubjectOption {
   id: string
@@ -42,6 +45,7 @@ interface LessonFormProps {
 
 interface SectionMediaState {
   previewUrl?: string | null
+  previewVideoUrl?: string | null
   fileName?: string | null
   fileSize?: string | null
   isUploading?: boolean
@@ -60,7 +64,12 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
       initialLesson.sections.forEach((sec, idx) => {
         initialStates[idx] = {
           previewUrl: sec.imageUrl || null,
-          fileName: sec.pdf_path ? 'ملف PDF المرفق حالياً' : null,
+          previewVideoUrl: sec.videoUrl || null,
+          fileName: sec.video_path
+            ? 'مقطع فيديو مرفق حالياً'
+            : sec.pdf_path
+            ? 'ملف PDF المرفق حالياً'
+            : null,
           isUploading: false,
         }
       })
@@ -91,6 +100,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
         content: s.content,
         image_path: s.image_path,
         pdf_path: s.pdf_path,
+        video_path: s.video_path,
         sort_order: s.sort_order ?? idx + 1,
       })) || [],
     },
@@ -107,7 +117,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
   const handleFileUpload = async (
     index: number,
     file: File,
-    type: 'image' | 'pdf'
+    type: 'image' | 'pdf' | 'video'
   ) => {
     const supabase = createClient()
     const sectionId = watchedSections[index]?.id || crypto.randomUUID()
@@ -121,13 +131,22 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
         toast.error('حجم الصورة يجب ألا يتجاوز 5 ميجابايت')
         return
       }
-    } else {
+    } else if (type === 'pdf') {
       if (file.type !== 'application/pdf') {
         toast.error('يرجى اختيار ملف PDF صالح')
         return
       }
       if (file.size > MAX_PDF_SIZE) {
         toast.error('حجم ملف PDF يجب ألا يتجاوز 10 ميجابايت')
+        return
+      }
+    } else if (type === 'video') {
+      if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+        toast.error('صيغة الفيديو غير مدعومة (MP4, WebM, QuickTime)')
+        return
+      }
+      if (file.size > MAX_VIDEO_SIZE) {
+        toast.error('حجم الفيديو يجب ألا يتجاوز 20 ميجابايت')
         return
       }
     }
@@ -139,7 +158,12 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
     setGlobalUploading(true)
 
     try {
-      const ext = type === 'image' ? file.name.split('.').pop() || 'png' : 'pdf'
+      const ext =
+        type === 'image'
+          ? file.name.split('.').pop() || 'png'
+          : type === 'pdf'
+          ? 'pdf'
+          : file.name.split('.').pop() || 'mp4'
       const storagePath = `${currentUserId}/lessons/${lessonId}/sections/${sectionId}/${Date.now()}.${ext}`
 
       const { error: uploadError } = await supabase.storage
@@ -161,23 +185,42 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
       if (type === 'image') {
         setValue(`sections.${index}.image_path`, storagePath)
         setValue(`sections.${index}.pdf_path`, null)
+        setValue(`sections.${index}.video_path`, null)
         const objectUrl = URL.createObjectURL(file)
         setMediaStates((prev) => ({
           ...prev,
           [index]: {
             previewUrl: objectUrl,
+            previewVideoUrl: null,
             fileName: file.name,
             fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
             isUploading: false,
           },
         }))
-      } else {
+      } else if (type === 'pdf') {
         setValue(`sections.${index}.pdf_path`, storagePath)
         setValue(`sections.${index}.image_path`, null)
+        setValue(`sections.${index}.video_path`, null)
         setMediaStates((prev) => ({
           ...prev,
           [index]: {
             previewUrl: null,
+            previewVideoUrl: null,
+            fileName: file.name,
+            fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+            isUploading: false,
+          },
+        }))
+      } else if (type === 'video') {
+        setValue(`sections.${index}.video_path`, storagePath)
+        setValue(`sections.${index}.image_path`, null)
+        setValue(`sections.${index}.pdf_path`, null)
+        const objectUrl = URL.createObjectURL(file)
+        setMediaStates((prev) => ({
+          ...prev,
+          [index]: {
+            previewUrl: null,
+            previewVideoUrl: objectUrl,
             fileName: file.name,
             fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
             isUploading: false,
@@ -185,7 +228,13 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
         }))
       }
 
-      toast.success(type === 'image' ? 'تم رفع الصورة بنجاح' : 'تم رفع ملف PDF بنجاح')
+      toast.success(
+        type === 'image'
+          ? 'تم رفع الصورة بنجاح'
+          : type === 'pdf'
+          ? 'تم رفع ملف PDF بنجاح'
+          : 'تم رفع مقطع الفيديو بنجاح'
+      )
     } catch {
       toast.error('حدث خطأ أثناء رفع الملف')
     } finally {
@@ -200,10 +249,12 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
   const handleClearMedia = (index: number) => {
     setValue(`sections.${index}.image_path`, null)
     setValue(`sections.${index}.pdf_path`, null)
+    setValue(`sections.${index}.video_path`, null)
     setMediaStates((prev) => ({
       ...prev,
       [index]: {
         previewUrl: null,
+        previewVideoUrl: null,
         fileName: null,
         fileSize: null,
         isUploading: false,
@@ -233,6 +284,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
             content: s.content,
             image_path: s.image_path || null,
             pdf_path: s.pdf_path || null,
+            video_path: s.video_path || null,
             sort_order: s.sort_order || idx + 1,
           })),
         })
@@ -258,6 +310,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
             content: s.content,
             image_path: s.image_path || null,
             pdf_path: s.pdf_path || null,
+            video_path: s.video_path || null,
             sort_order: s.sort_order || idx + 1,
           })),
         })
@@ -458,6 +511,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
                   content: '',
                   image_path: null,
                   pdf_path: null,
+                  video_path: null,
                   sort_order: 1,
                 })
               }
@@ -471,12 +525,14 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
         ) : (
           fields.map((field, index) => {
             const sectionState = mediaStates[index] || {}
-          const currentImagePath = watchedSections[index]?.image_path
-          const currentPdfPath = watchedSections[index]?.pdf_path
-          const hasImage = Boolean(currentImagePath || sectionState.previewUrl)
-          const hasPdf = Boolean(currentPdfPath)
+            const currentImagePath = watchedSections[index]?.image_path
+            const currentPdfPath = watchedSections[index]?.pdf_path
+            const currentVideoPath = watchedSections[index]?.video_path
+            const hasImage = Boolean(currentImagePath || sectionState.previewUrl)
+            const hasPdf = Boolean(currentPdfPath)
+            const hasVideo = Boolean(currentVideoPath || sectionState.previewVideoUrl)
 
-          return (
+            return (
             <div
               key={field.id}
               className="card p-6 bg-white shadow-card border-ink-100/90 relative space-y-4"
@@ -557,16 +613,50 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
                 )}
               </div>
 
-              {/* Section Media (Image OR PDF OR None) */}
+              {/* Section Media (Image, PDF, Video, or None) */}
               <div className="pt-2">
                 <label className="block text-xs font-bold text-ink-700 mb-2">
-                  الملف المرفق بالقسم (صورة أو PDF فقط):
+                  الملف المرفق بالقسم (صورة، مستند PDF، أو فيديو):
                 </label>
 
                 {sectionState.isUploading ? (
                   <div className="p-4 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center gap-2 text-gold-dark text-xs font-bold">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     <span>جاري رفع الملف إلى التخزين السحابي...</span>
+                  </div>
+                ) : hasVideo ? (
+                  /* Video Attached Preview */
+                  <div className="p-3 rounded-2xl bg-cream/30 border border-ink-100 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-ink-950 shrink-0 border border-ink-100 flex items-center justify-center">
+                        {sectionState.previewVideoUrl ? (
+                          <video
+                            src={sectionState.previewVideoUrl}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Video className="w-6 h-6 text-gold" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-ink-900">
+                          {sectionState.fileName || 'مقطع فيديو مرفق'}
+                        </p>
+                        <p className="text-[11px] text-ink-500">
+                          {sectionState.fileSize || 'مخزن في السحابة'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleClearMedia(index)}
+                      disabled={isPending}
+                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition cursor-pointer"
+                      title="إزالة الفيديو"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 ) : hasImage ? (
                   /* Image Attached Preview */
@@ -597,7 +687,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
                       type="button"
                       onClick={() => handleClearMedia(index)}
                       disabled={isPending}
-                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition"
+                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition cursor-pointer"
                       title="إزالة الصورة"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -624,21 +714,21 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
                       type="button"
                       onClick={() => handleClearMedia(index)}
                       disabled={isPending}
-                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition"
+                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition cursor-pointer"
                       title="إزالة ملف PDF"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 ) : (
-                  /* Upload Picker (Image or PDF) */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  /* Upload Picker (Image, PDF, or Video) */
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {/* Upload Image Option */}
-                    <label className="border border-dashed border-ink-200 hover:border-gold rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-cream/15 hover:bg-cream/35 flex items-center justify-center gap-2.5">
-                      <ImageIcon className="w-5 h-5 text-gold-dark" />
-                      <div className="text-right">
-                        <p className="text-xs font-bold text-ink-800">إرفاق صورة توضيحية</p>
-                        <p className="text-[10px] text-ink-400">PNG أو JPG (بحد أقصى 5MB)</p>
+                    <label className="border border-dashed border-ink-200 hover:border-gold rounded-xl p-3 text-center cursor-pointer transition-colors bg-cream/15 hover:bg-cream/35 flex items-center justify-center gap-2">
+                      <ImageIcon className="w-4 h-4 text-gold-dark shrink-0" />
+                      <div className="text-right truncate">
+                        <p className="text-xs font-bold text-ink-800 truncate">صورة توضيحية</p>
+                        <p className="text-[10px] text-ink-400">PNG, JPG (5MB)</p>
                       </div>
                       <input
                         type="file"
@@ -653,11 +743,11 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
                     </label>
 
                     {/* Upload PDF Option */}
-                    <label className="border border-dashed border-ink-200 hover:border-red-300 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-cream/15 hover:bg-red-50/30 flex items-center justify-center gap-2.5">
-                      <FileText className="w-5 h-5 text-red-600" />
-                      <div className="text-right">
-                        <p className="text-xs font-bold text-ink-800">إرفاق ملف مستند (PDF)</p>
-                        <p className="text-[10px] text-ink-400">PDF فقط (بحد أقصى 10MB)</p>
+                    <label className="border border-dashed border-ink-200 hover:border-red-300 rounded-xl p-3 text-center cursor-pointer transition-colors bg-cream/15 hover:bg-red-50/30 flex items-center justify-center gap-2">
+                      <FileText className="w-4 h-4 text-red-600 shrink-0" />
+                      <div className="text-right truncate">
+                        <p className="text-xs font-bold text-ink-800 truncate">مستند PDF</p>
+                        <p className="text-[10px] text-ink-400">PDF فقط (10MB)</p>
                       </div>
                       <input
                         type="file"
@@ -667,6 +757,25 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
                         onChange={(e) => {
                           const f = e.target.files?.[0]
                           if (f) handleFileUpload(index, f, 'pdf')
+                        }}
+                      />
+                    </label>
+
+                    {/* Upload Video Option */}
+                    <label className="border border-dashed border-ink-200 hover:border-gold rounded-xl p-3 text-center cursor-pointer transition-colors bg-cream/15 hover:bg-gold/10 flex items-center justify-center gap-2">
+                      <Video className="w-4 h-4 text-gold-dark shrink-0" />
+                      <div className="text-right truncate">
+                        <p className="text-xs font-bold text-ink-800 truncate">مقطع فيديو</p>
+                        <p className="text-[10px] text-ink-400">MP4, WebM (20MB)</p>
+                      </div>
+                      <input
+                        type="file"
+                        accept="video/mp4,video/webm,video/ogg,video/quicktime"
+                        disabled={isPending}
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0]
+                          if (f) handleFileUpload(index, f, 'video')
                         }}
                       />
                     </label>
@@ -688,6 +797,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
                 content: '',
                 image_path: null,
                 pdf_path: null,
+                video_path: null,
                 sort_order: fields.length + 1,
               })
             }

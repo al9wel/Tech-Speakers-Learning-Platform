@@ -5,7 +5,7 @@ import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'الأخبار والمقالات | منصة التعلّم',
+  title: 'الأخبار والمقالات',
   description: 'متابعة وقراءة آخر الأخبار والمقالات والإعلانات التربوية',
 }
 
@@ -30,6 +30,7 @@ export default async function StudentArticlesPage() {
     (rawArticles ?? []).map(async (art) => {
       let imageUrl: string | null = null
       let pdfUrl: string | null = null
+      let videoUrl: string | null = null
 
       if (art.image_path) {
         const { data: signedImg } = await supabase.storage
@@ -45,10 +46,18 @@ export default async function StudentArticlesPage() {
         pdfUrl = signedPdf?.signedUrl ?? null
       }
 
+      if (art.video_path) {
+        const { data: signedVideo } = await supabase.storage
+          .from(BUCKET_NAME)
+          .createSignedUrl(art.video_path, 3600 * 24)
+        videoUrl = signedVideo?.signedUrl ?? null
+      }
+
       return {
         ...art,
         imageUrl,
         pdfUrl,
+        videoUrl,
       }
     })
   )

@@ -10,8 +10,14 @@ import {
   MessageSquareText,
   Clock3,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'لوحة تحكم المستشار التربوي',
+  description: 'متابعة طلبات الإرشاد واستشارات الطلاب النفسية والتربوية والرد عليها',
+}
 
 export default async function CounselorPage() {
   const { user, supabase } = await requireRole('counselor')

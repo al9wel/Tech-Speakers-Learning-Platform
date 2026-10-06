@@ -4,8 +4,14 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { CounselorsTable } from '@/features/counselors/components/CounselorsTable'
 import type { UserItem } from '@/features/users/components/UserDialog'
 import { Heart, ArrowRight } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'إدارة المستشارين',
+  description: 'إدارة ومتابعة حسابات المستشارين النفسيين والتربويين في المنصة',
+}
 
 export default async function AdminCounselorsPage() {
   const { user: currentAdmin } = await requireRole('admin')

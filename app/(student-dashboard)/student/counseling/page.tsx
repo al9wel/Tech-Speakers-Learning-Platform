@@ -5,7 +5,7 @@ import type { Metadata } from 'next'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'المستشار النفسي والتربوي | منصة التعلّم',
+  title: 'المستشار النفسي والتربوي',
   description: 'التواصل والاستشارات النفسية والتربوية مع نخبة من المستشارين المعتمدين',
 }
 

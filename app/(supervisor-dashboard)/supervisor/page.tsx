@@ -8,8 +8,14 @@ import {
   ArrowLeft,
   UserCheck,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'لوحة تحكم المشرف التربوي',
+  description: 'متابعة المناهج والدروس والمساهمات والمقترحات التربوية في المنصة',
+}
 
 export default async function SupervisorPage() {
   const { supabase } = await requireRole('supervisor')

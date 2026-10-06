@@ -3,8 +3,14 @@ import { requireRole } from '@/lib/auth/require-role'
 import { LessonsTable } from '@/features/lessons/components/LessonsTable'
 import type { LessonItem } from '@/features/lessons/types'
 import { BookOpen, ArrowRight, AlertTriangle } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'إدارة الدروس التعليمية',
+  description: 'إدارة وتعديل ونشر الدروس التعليمية وأقسامها',
+}
 
 export default async function TeacherLessonsPage() {
   const { user, supabase } = await requireRole('teacher')

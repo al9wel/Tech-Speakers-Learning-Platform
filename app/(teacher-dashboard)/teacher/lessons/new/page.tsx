@@ -2,8 +2,14 @@ import Link from 'next/link'
 import { requireRole } from '@/lib/auth/require-role'
 import { LessonForm } from '@/features/lessons/components/LessonForm'
 import { ArrowRight, AlertCircle } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'إضافة درس جديد',
+  description: 'إنشاء درس تعليمي جديد وإضافة الأقسام والوسائط التوضيحية',
+}
 
 export default async function NewLessonPage() {
   const { user, supabase } = await requireRole('teacher')

@@ -11,8 +11,14 @@ import {
   ArrowLeft,
   UserCheck,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'لوحة تحكم الإدارة',
+  description: 'إحصائيات وإدارة مستخدمي المنصة والصلاحيات',
+}
 
 export default async function AdminPage() {
   await requireRole('admin')

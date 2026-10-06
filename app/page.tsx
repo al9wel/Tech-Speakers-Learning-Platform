@@ -10,8 +10,14 @@ import {
   Heart,
   ShieldCheck,
 } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'الرئيسية',
+  description: 'منصة تعليمية يمنية شاملة للطلاب والمعلمين والمستشارين والمشرفين',
+}
 
 export default async function HomePage() {
   const supabase = await createClient()

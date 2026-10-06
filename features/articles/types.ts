@@ -14,10 +14,12 @@ export interface ArticleItem {
   category: string
   image_path: string | null
   pdf_path: string | null
+  video_path: string | null
   created_at: string
   updated_at: string
   imageUrl?: string | null
   pdfUrl?: string | null
+  videoUrl?: string | null
   author?: ArticleAuthor | null
 }
 
@@ -27,6 +29,7 @@ export interface CreateArticleInput {
   category: string
   image_path?: string | null
   pdf_path?: string | null
+  video_path?: string | null
 }
 
 export interface UpdateArticleInput {
@@ -36,6 +39,7 @@ export interface UpdateArticleInput {
   category: string
   image_path?: string | null
   pdf_path?: string | null
+  video_path?: string | null
 }
 
 export interface ArticleActionResult {

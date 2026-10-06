@@ -5,8 +5,14 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { UsersTable } from '@/features/users/components/UsersTable'
 import type { UserItem } from '@/features/users/components/UserDialog'
 import { Users, ArrowRight } from 'lucide-react'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'إدارة المستخدمين',
+  description: 'إدارة وتعديل حسابات جميع مستخدمي المنصة وتعيين الصلاحيات',
+}
 
 export default async function AdminUsersPage() {
   const { user: currentAdmin } = await requireRole('admin')
