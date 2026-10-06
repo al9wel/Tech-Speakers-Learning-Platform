@@ -90,18 +90,19 @@ export function StudentContributionsFeed({
   return (
     <div className="space-y-6">
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-ink-900 to-ink-800 rounded-3xl p-6 sm:p-8 text-white shadow-soft relative overflow-hidden">
-        <div className="absolute top-0 -left-12 w-64 h-64 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-linear-to-br from-white via-cream/60 to-gold/10 rounded-3xl p-6 sm:p-8 text-ink-900 border border-gold/30 shadow-card relative overflow-hidden">
+        <div className="absolute top-0 -left-12 w-64 h-64 bg-gold/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-sage/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-gold-200 text-xs font-bold backdrop-blur-xs">
-              <Sparkles className="w-3.5 h-3.5 text-gold" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-bold border border-gold/30">
+              <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
               <span>{customBadge || 'مساحة الإبداع والمشاركة'}</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white">
+            <h1 className="text-xl sm:text-2xl font-black text-ink-900">
               {customTitle || 'مساهمات الطلاب'}
             </h1>
-            <p className="text-xs sm:text-sm text-ink-200 max-w-xl font-medium">
+            <p className="text-xs sm:text-sm text-ink-600 max-w-xl font-medium leading-relaxed">
               {customDescription ||
                 'تصفح إبداعات وملخصات ومشاريع زملائك الطلاب عبر مختلف المواد، وشارك إنجازاتك الخاصة لتفيد الجميع.'}
             </p>
@@ -110,7 +111,7 @@ export function StudentContributionsFeed({
           {showCreateButton && (
             <button
               onClick={() => setIsDialogOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gold hover:bg-gold-600 text-white font-bold text-sm shadow-md transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gold hover:bg-gold-dark text-white font-bold text-sm shadow-md hover:shadow-lg transition-all shrink-0 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <Plus className="w-4.5 h-4.5" />
               <span>نشر مساهمة جديدة</span>

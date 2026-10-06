@@ -15,6 +15,7 @@ import {
   GraduationCap,
 } from 'lucide-react'
 import type { Metadata } from 'next'
+import { LessonAiFloatingButton, LessonAiBanner } from '@/features/ai/components/LessonAiFloatingButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -177,6 +178,20 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
   const subjectId = (lesson.subject as any)?.id
   const teacherName = (lesson.creator as any)?.full_name
 
+  const aiLessonData = {
+    lessonId,
+    lessonTitle: lesson.title,
+    subjectName,
+    lessonIntro: lesson.explanation,
+    sections: sections.map((sec) => ({
+      id: sec.id,
+      title: sec.title,
+      content: sec.content,
+      sort_order: sec.sort_order,
+      pdf_path: sec.pdf_path,
+    })),
+  }
+
   return (
     <div className="container-page py-8 animate-page">
       {/* Breadcrumb Navigation */}
@@ -241,6 +256,9 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
           {lesson.explanation}
         </div>
       </div>
+
+      {/* AI Assistant In-Page Hero Banner */}
+      <LessonAiBanner lessonData={aiLessonData} />
 
       {/* Dynamic Sections Section */}
       <div className="space-y-6">
@@ -364,6 +382,9 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
           </Link>
         </div>
       )}
+
+      {/* Floating Action Button for AI Assistant */}
+      <LessonAiFloatingButton lessonData={aiLessonData} />
     </div>
   )
 }

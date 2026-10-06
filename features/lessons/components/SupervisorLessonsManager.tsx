@@ -103,24 +103,25 @@ export function SupervisorLessonsManager({
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-ink-900 to-ink-800 rounded-3xl p-6 sm:p-8 text-white shadow-soft relative overflow-hidden">
-        <div className="absolute top-0 -left-12 w-64 h-64 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-linear-to-br from-white via-cream/60 to-gold/10 rounded-3xl p-6 sm:p-8 text-ink-900 border border-gold/30 shadow-card relative overflow-hidden">
+        <div className="absolute top-0 -left-12 w-64 h-64 bg-gold/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-sage/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-gold-200 text-xs font-bold backdrop-blur-xs">
-              <Sparkles className="w-3.5 h-3.5 text-gold" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-bold border border-gold/30">
+              <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
               <span>الإشراف التربوي على المناهج</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white">
+            <h1 className="text-xl sm:text-2xl font-black text-ink-900">
               إدارة ومتابعة الدروس
             </h1>
-            <p className="text-xs sm:text-sm text-ink-200 max-w-xl font-medium">
+            <p className="text-xs sm:text-sm text-ink-600 max-w-xl font-medium leading-relaxed">
               استعراض كافة الدروس المضافة من قبل المعلمين عبر المواد، والبحث والفلترة ومراجعة المحتوى مع إمكانية الحذف.
             </p>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <span className="px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-md text-xs font-bold text-gold-200 border border-white/10">
+            <span className="px-4 py-2 rounded-2xl bg-white/80 backdrop-blur-md text-xs font-bold text-ink-800 border border-ink-200 shadow-2xs">
               إجمالي الدروس: {lessons.length}
             </span>
           </div>

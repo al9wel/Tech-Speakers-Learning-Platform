@@ -112,18 +112,24 @@ export function ArticleCard({
     }
   }
 
+  const hasImage = Boolean(article.imageUrl)
+
   return (
     <>
       {/* Editorial News Card */}
       <article
         onClick={() => setShowReaderModal(true)}
-        className={`group relative rounded-3xl overflow-hidden border border-white/15 shadow-soft hover:shadow-2xl transition-all duration-300 flex flex-col justify-between cursor-pointer select-none p-4 sm:p-6 ${getMinHeightClass()}`}
+        className={`group relative rounded-3xl overflow-hidden transition-all duration-300 flex flex-col justify-between cursor-pointer select-none p-4 sm:p-6 ${getMinHeightClass()} ${
+          hasImage
+            ? 'border border-white/15 shadow-soft hover:shadow-2xl'
+            : 'bg-linear-to-br from-white via-cream/50 to-gold/10 border border-gold/30 hover:border-gold shadow-card hover:shadow-xl'
+        }`}
       >
         {/* Background Layers */}
-        {article.imageUrl ? (
+        {hasImage ? (
           <>
             <img
-              src={article.imageUrl}
+              src={article.imageUrl || ''}
               alt={article.title}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               loading="lazy"
@@ -133,11 +139,12 @@ export function ArticleCard({
           </>
         ) : (
           <>
-            {/* Rich Editorial Ambient Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#241a14] via-[#35261d] to-[#18110d]" />
-            <div className="absolute top-0 right-0 w-80 h-80 bg-gold/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-sage/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
+            {/* Light Editorial Ambient Background */}
+            <div className="absolute -top-16 -left-16 w-64 h-64 bg-gold/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-sage/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-6 left-6 opacity-[0.05] text-ink-900 pointer-events-none">
+              <FileText className="w-48 h-48 -rotate-12" />
+            </div>
           </>
         )}
 
@@ -159,15 +166,27 @@ export function ArticleCard({
             </span>
 
             {article.videoUrl && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-xs bg-black/40 text-amber-200 border border-white/15 shadow-sm">
-                <Video className="w-3 h-3 text-amber-300" />
+              <span
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-xs border shadow-sm ${
+                  hasImage
+                    ? 'bg-black/40 text-amber-200 border-white/15'
+                    : 'bg-amber-50 text-amber-800 border-amber-200'
+                }`}
+              >
+                <Video className="w-3 h-3 text-amber-500" />
                 <span>مقطع فيديو</span>
               </span>
             )}
 
             {article.pdfUrl && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-xs bg-black/40 text-red-200 border border-white/15 shadow-sm">
-                <FileText className="w-3 h-3 text-red-300" />
+              <span
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-xs border shadow-sm ${
+                  hasImage
+                    ? 'bg-black/40 text-red-200 border-white/15'
+                    : 'bg-red-50 text-red-700 border-red-200'
+                }`}
+              >
+                <FileText className="w-3 h-3 text-red-500" />
                 <span>مرفق مستند</span>
               </span>
             )}
@@ -176,13 +195,21 @@ export function ArticleCard({
           {/* Quick Management Buttons */}
           {canManage && (
             <div
-              className="flex items-center gap-1 backdrop-blur-xs bg-black/40 rounded-2xl p-1 border border-white/15 shadow-sm"
+              className={`flex items-center gap-1 backdrop-blur-xs rounded-2xl p-1 shadow-sm ${
+                hasImage
+                  ? 'bg-black/40 border border-white/15'
+                  : 'bg-white/80 border border-ink-200'
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={() => onEdit?.(article)}
-                className="p-1.5 text-white/80 hover:text-gold-300 hover:bg-white/10 rounded-xl transition-all cursor-pointer"
+                className={`p-1.5 rounded-xl transition-all cursor-pointer ${
+                  hasImage
+                    ? 'text-white/80 hover:text-gold-300 hover:bg-white/10'
+                    : 'text-ink-600 hover:text-ink-900 hover:bg-ink-100'
+                }`}
                 title="تعديل المنشور"
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -190,7 +217,11 @@ export function ArticleCard({
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-1.5 text-white/80 hover:text-red-300 hover:bg-red-500/20 rounded-xl transition-all cursor-pointer"
+                className={`p-1.5 rounded-xl transition-all cursor-pointer ${
+                  hasImage
+                    ? 'text-white/80 hover:text-red-300 hover:bg-red-500/20'
+                    : 'text-ink-600 hover:text-red-600 hover:bg-red-50'
+                }`}
                 title="حذف المنشور"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -199,33 +230,71 @@ export function ArticleCard({
           )}
         </div>
 
-        {/* Bottom Content Area: Subtle Frosted Glass Veil */}
-        <div className="relative z-10 p-4 sm:p-5 rounded-2xl bg-black/25 backdrop-blur-xs border border-white/10 shadow-sm space-y-3 mt-auto transition-colors duration-300 group-hover:bg-black/35">
+        {/* Bottom Content Area */}
+        <div
+          className={`relative z-10 p-4 sm:p-5 rounded-2xl backdrop-blur-xs space-y-3 mt-auto transition-colors duration-300 ${
+            hasImage
+              ? 'bg-black/25 border border-white/10 shadow-sm group-hover:bg-black/35'
+              : 'bg-white/85 border border-ink-150/80 shadow-card group-hover:bg-white'
+          }`}
+        >
           {/* Metadata Row: Author & Date */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-ink-200">
+          <div
+            className={`flex flex-wrap items-center gap-2 sm:gap-3 text-xs ${
+              hasImage ? 'text-ink-200' : 'text-ink-500'
+            }`}
+          >
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-gold/25 border border-gold/40 text-gold-200 flex items-center justify-center font-bold text-[11px] shrink-0 shadow-2xs">
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] shrink-0 shadow-2xs ${
+                  hasImage
+                    ? 'bg-gold/25 border border-gold/40 text-gold-200'
+                    : 'bg-gold/15 border border-gold/30 text-gold-dark'
+                }`}
+              >
                 <User className="w-3 h-3" />
               </div>
-              <span className="font-bold text-white text-xs truncate max-w-[120px] sm:max-w-[160px]">
+              <span
+                className={`font-bold text-xs truncate max-w-[120px] sm:max-w-[160px] ${
+                  hasImage ? 'text-white' : 'text-ink-900'
+                }`}
+              >
                 {authorName}
               </span>
-              <span className="px-1.5 py-0.5 rounded-md bg-white/10 text-gold-200 text-[10px] font-bold">
+              <span
+                className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                  hasImage
+                    ? 'bg-white/10 text-gold-200'
+                    : 'bg-gold/10 text-gold-dark border border-gold/20'
+                }`}
+              >
                 مشرف
               </span>
             </div>
 
-            <span className="text-white/30 hidden sm:inline">•</span>
+            <span
+              className={
+                hasImage ? 'text-white/30 hidden sm:inline' : 'text-ink-300 hidden sm:inline'
+              }
+            >
+              •
+            </span>
 
-            <div className="flex items-center gap-1 text-[11px] text-ink-300 font-medium">
-              <Calendar className="w-3 h-3 text-gold-300" />
-              <span>{formatDate(article.created_at)}</span>
+            <div className="flex items-center gap-1 text-[11px] font-medium">
+              <Calendar className={`w-3 h-3 ${hasImage ? 'text-gold-300' : 'text-gold-dark'}`} />
+              <span className={hasImage ? 'text-ink-300' : 'text-ink-500'}>
+                {formatDate(article.created_at)}
+              </span>
             </div>
           </div>
 
           {/* Headline */}
           <h2
-            className={`font-black text-white leading-tight drop-shadow-sm group-hover:text-gold-200 transition-colors ${
+            className={`font-black leading-tight transition-colors ${
+              hasImage
+                ? 'text-white drop-shadow-sm group-hover:text-gold-200'
+                : 'text-ink-900 group-hover:text-gold-dark'
+            } ${
               variant === 'hero'
                 ? 'text-xl sm:text-2xl md:text-3xl line-clamp-2 sm:line-clamp-3'
                 : variant === 'wide'
@@ -240,11 +309,13 @@ export function ArticleCard({
 
           {/* Excerpt */}
           <p
-            className={`text-ink-100/90 leading-relaxed font-normal ${
+            className={`leading-relaxed font-normal ${
+              hasImage ? 'text-ink-100/90' : 'text-ink-600'
+            } ${
               variant === 'hero'
                 ? 'text-xs sm:text-sm md:text-base line-clamp-3'
                 : variant === 'compact'
-                ? 'text-xs text-ink-100/80 line-clamp-2'
+                ? 'text-xs line-clamp-2'
                 : 'text-xs sm:text-sm line-clamp-2'
             }`}
           >
@@ -252,8 +323,18 @@ export function ArticleCard({
           </p>
 
           {/* Bottom Action Footer */}
-          <div className="pt-2 flex items-center justify-between border-t border-white/10 text-xs">
-            <span className="inline-flex items-center gap-1.5 text-gold-300 group-hover:text-gold-200 font-bold transition-all">
+          <div
+            className={`pt-2 flex items-center justify-between border-t text-xs ${
+              hasImage ? 'border-white/10' : 'border-ink-100'
+            }`}
+          >
+            <span
+              className={`inline-flex items-center gap-1.5 font-bold transition-all ${
+                hasImage
+                  ? 'text-gold-300 group-hover:text-gold-200'
+                  : 'text-gold-dark group-hover:text-gold'
+              }`}
+            >
               <span>قراءة التفاصيل</span>
               <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
             </span>
