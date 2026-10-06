@@ -71,14 +71,14 @@ export default async function TeacherLessonsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gold/15 text-gold-dark border border-gold/30 flex items-center justify-center shrink-0 shadow-soft">
+          <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent border border-accent/20 flex items-center justify-center shrink-0">
             <BookOpen className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="font-heading font-extrabold text-2xl text-ink-900">
+            <h1 className="font-serif font-bold text-2xl text-ink-primary">
               إدارة الدروس التعليمية
             </h1>
-            <p className="text-sm text-ink-500">
+            <p className="text-xs sm:text-sm text-ink-muted">
               قائمة الدروس التي قمت بإعدادها ومشاركتها مع طلابك
             </p>
           </div>

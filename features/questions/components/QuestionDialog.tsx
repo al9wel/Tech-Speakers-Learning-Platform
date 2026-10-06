@@ -120,16 +120,16 @@ export function QuestionDialog({
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 hover:bg-gold/10 hover:border-gold"
+          className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 hover:bg-teal/5 hover:border-teal rounded-md"
         >
-          <Pencil className="w-3.5 h-3.5 text-gold-dark" />
+          <Pencil className="w-3.5 h-3.5 text-teal" />
           <span>تعديل</span>
         </button>
       ) : (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="btn-gold text-xs sm:text-sm font-bold py-2 px-4 flex items-center gap-2 shadow-soft"
+          className="btn-primary text-xs sm:text-sm font-medium py-2 px-4 flex items-center gap-2 rounded-md shadow-xs"
         >
           <Plus className="w-4 h-4" />
           <span>إضافة سؤال جديد</span>
@@ -138,15 +138,15 @@ export function QuestionDialog({
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/40 backdrop-blur-xs animate-fade-in">
-          <div className="card p-6 sm:p-7 bg-white shadow-card border-ink-100 w-full max-w-lg relative animate-scale-in">
+          <div className="card p-6 sm:p-7 bg-paper-light shadow-lg border border-ink-200/80 rounded-lg w-full max-w-lg relative animate-scale-in">
             {/* Header */}
-            <div className="flex items-center justify-between pb-3.5 border-b border-ink-100 mb-5">
+            <div className="flex items-center justify-between pb-3.5 border-b border-ink-200/70 mb-5">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gold/15 text-gold-dark flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-md bg-teal/10 text-teal flex items-center justify-center font-bold">
                   <HelpCircle className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-heading font-extrabold text-base sm:text-lg text-ink-900">
+                  <h3 className="font-serif font-bold text-base sm:text-lg text-ink-900">
                     {isEdit ? 'تعديل السؤال' : 'إضافة سؤال وتطبيق جديد للدرس'}
                   </h3>
                   <p className="text-xs text-ink-500">
@@ -160,7 +160,7 @@ export function QuestionDialog({
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-lg text-ink-400 hover:text-ink-700 hover:bg-ink-100 transition"
+                className="p-1 rounded-md text-ink-400 hover:text-ink-700 hover:bg-ink-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -171,13 +171,13 @@ export function QuestionDialog({
               {/* Select Lesson (if not already locked to a preselected lesson and not edit) */}
               {!preselectedLessonId && !isEdit && lessons.length > 0 && (
                 <div>
-                  <label className="block text-xs font-bold text-ink-700 mb-1">
+                  <label className="block text-xs font-semibold text-ink-700 mb-1">
                     الدرس المستهدف: <span className="text-red-500">*</span>
                   </label>
                   <select
                     {...register('lesson_id')}
                     disabled={isSubmitting}
-                    className="input-field text-xs sm:text-sm bg-white"
+                    className="w-full px-3 py-2 rounded-md border border-ink-200 bg-white text-xs sm:text-sm text-ink-900 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20"
                   >
                     {lessons.map((l) => (
                       <option key={l.id} value={l.id}>
@@ -194,7 +194,7 @@ export function QuestionDialog({
 
               {/* Title */}
               <div>
-                <label className="block text-xs font-bold text-ink-700 mb-1">
+                <label className="block text-xs font-semibold text-ink-700 mb-1">
                   عنوان السؤال أو النشاط: <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -202,7 +202,7 @@ export function QuestionDialog({
                   placeholder="مثال: مسألة تطبيقية على قوانين الحركة"
                   {...register('title')}
                   disabled={isSubmitting}
-                  className="input-field text-sm"
+                  className="w-full px-3 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-900 placeholder-ink-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20"
                 />
                 {errors.title && (
                   <p className="text-red-600 text-xs mt-1">{errors.title.message}</p>
@@ -211,7 +211,7 @@ export function QuestionDialog({
 
               {/* Content / Details */}
               <div>
-                <label className="block text-xs font-bold text-ink-700 mb-1">
+                <label className="block text-xs font-semibold text-ink-700 mb-1">
                   نص وتفاصيل السؤال: <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -219,7 +219,7 @@ export function QuestionDialog({
                   placeholder="اكتب نص السؤال بالتفصيل، والتعليمات المطلوبة من الطلاب للحل والمشاركة..."
                   {...register('content')}
                   disabled={isSubmitting}
-                  className="input-field text-sm resize-y leading-relaxed"
+                  className="w-full px-3 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-900 placeholder-ink-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 resize-y leading-relaxed"
                 />
                 {errors.content && (
                   <p className="text-red-600 text-xs mt-1">{errors.content.message}</p>
@@ -227,12 +227,12 @@ export function QuestionDialog({
               </div>
 
               {/* Buttons */}
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-ink-100">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-ink-200/70">
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
                   disabled={isSubmitting}
-                  className="btn-outline text-xs sm:text-sm py-2 px-4"
+                  className="btn-outline text-xs sm:text-sm py-2 px-4 rounded-md"
                 >
                   إلغاء
                 </button>
@@ -240,7 +240,7 @@ export function QuestionDialog({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-gold text-xs sm:text-sm font-bold py-2 px-5 flex items-center gap-2 shadow-soft"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-teal text-white text-xs sm:text-sm font-medium hover:bg-teal-dark transition shadow-xs"
                 >
                   {isSubmitting ? (
                     <>

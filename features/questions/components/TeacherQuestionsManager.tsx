@@ -92,20 +92,20 @@ export function TeacherQuestionsManager({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Top Header & Stats */}
-      <div className="rounded-3xl border border-ink-100 bg-gradient-to-br from-white via-parchment/30 to-white p-6 sm:p-8 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-ink-100">
+      <div className="rounded-lg border border-ink-200/80 bg-paper-light p-6 sm:p-8 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-ink-200/60">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-semibold mb-3 border border-gold/30">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm bg-teal/10 text-teal-dark text-xs font-semibold mb-2 border border-teal/20">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>إدارة الاختبارات والأسئلة التفاعلية</span>
+              <span>بنك الأسئلة والتقييمات التفاعلية</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-ink-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-ink-900 tracking-tight">
               بنك الأسئلة والنقاشات
             </h1>
-            <p className="text-sm sm:text-base text-ink-600 mt-1 max-w-2xl">
-              اطرح أسئلة واختبارات قصيرة على دروسك لمتابعة استيعاب الطلاب ومناقشة إجاباتهم واستفساراتهم.
+            <p className="text-sm text-ink-600 mt-1 max-w-2xl leading-relaxed">
+              اطرح أسئلة وتطبيقات على دروسك لمتابعة استيعاب الطلاب ومناقشة إجاباتهم واستفساراتهم الأكاديمية.
             </p>
           </div>
 
@@ -121,7 +121,7 @@ export function TeacherQuestionsManager({
               trigger={
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gold text-white font-semibold hover:bg-gold-dark transition shadow-md shadow-gold/20 text-sm"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-teal text-white font-medium hover:bg-teal-dark transition shadow-xs text-sm"
                 >
                   <Plus className="w-4 h-4" />
                   <span>طرح سؤال جديد</span>
@@ -133,34 +133,34 @@ export function TeacherQuestionsManager({
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6">
-          <div className="bg-white rounded-2xl p-4 border border-ink-100 shadow-xs">
-            <div className="flex items-center gap-3 text-gold-dark mb-1">
-              <HelpCircle className="w-5 h-5" />
+          <div className="bg-white rounded-md p-4 border border-ink-200/70 shadow-xs">
+            <div className="flex items-center gap-2 text-amber-700 mb-1.5">
+              <HelpCircle className="w-4 h-4" />
               <span className="text-xs font-medium text-ink-500">إجمالي الأسئلة</span>
             </div>
-            <p className="text-2xl font-bold text-ink-900">{questions.length}</p>
+            <p className="text-2xl font-serif font-bold text-ink-900">{questions.length}</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 border border-ink-100 shadow-xs">
-            <div className="flex items-center gap-3 text-emerald-600 mb-1">
-              <MessageSquare className="w-5 h-5" />
+          <div className="bg-white rounded-md p-4 border border-ink-200/70 shadow-xs">
+            <div className="flex items-center gap-2 text-teal mb-1.5">
+              <MessageSquare className="w-4 h-4" />
               <span className="text-xs font-medium text-ink-500">إجابات وتفاعلات الطلاب</span>
             </div>
-            <p className="text-2xl font-bold text-ink-900">{totalAnswersCount}</p>
+            <p className="text-2xl font-serif font-bold text-ink-900">{totalAnswersCount}</p>
           </div>
 
-          <div className="col-span-2 sm:col-span-1 bg-white rounded-2xl p-4 border border-ink-100 shadow-xs">
-            <div className="flex items-center gap-3 text-indigo-600 mb-1">
-              <BookOpen className="w-5 h-5" />
-              <span className="text-xs font-medium text-ink-500">الدروس المتاحة للأسئلة</span>
+          <div className="col-span-2 sm:col-span-1 bg-white rounded-md p-4 border border-ink-200/70 shadow-xs">
+            <div className="flex items-center gap-2 text-ink-700 mb-1.5">
+              <BookOpen className="w-4 h-4" />
+              <span className="text-xs font-medium text-ink-500">الدروس المتاحة</span>
             </div>
-            <p className="text-2xl font-bold text-ink-900">{lessons.length}</p>
+            <p className="text-2xl font-serif font-bold text-ink-900">{lessons.length}</p>
           </div>
         </div>
       </div>
 
       {/* Filters and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         {/* Search */}
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-ink-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -169,7 +169,7 @@ export function TeacherQuestionsManager({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="ابحث في نصوص الأسئلة، الدروس، أو المواد..."
-            className="w-full pr-10 pl-4 py-2.5 rounded-2xl border border-ink-200 bg-white text-sm text-ink-800 placeholder-ink-400 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold transition"
+            className="w-full pr-10 pl-4 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-800 placeholder-ink-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 transition"
           />
         </div>
 
@@ -179,7 +179,7 @@ export function TeacherQuestionsManager({
           <select
             value={selectedLessonId}
             onChange={(e) => setSelectedLessonId(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-2xl border border-ink-200 bg-white text-sm text-ink-800 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold transition cursor-pointer"
+            className="w-full px-3 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-800 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 transition cursor-pointer"
           >
             <option value="all">جميع الدروس ({questions.length})</option>
             {lessons.map((lesson) => {
@@ -197,15 +197,15 @@ export function TeacherQuestionsManager({
       {/* Questions Feed */}
       <div className="space-y-4">
         {filteredQuestions.length === 0 ? (
-          <div className="text-center py-16 px-4 rounded-3xl border border-dashed border-ink-200 bg-white shadow-xs">
-            <div className="w-16 h-16 rounded-full bg-parchment flex items-center justify-center mx-auto text-ink-400 mb-4">
-              <HelpCircle className="w-8 h-8" />
+          <div className="text-center py-16 px-4 rounded-lg border border-dashed border-ink-200 bg-paper-light">
+            <div className="w-12 h-12 rounded-full bg-ink-100 flex items-center justify-center mx-auto text-ink-400 mb-3">
+              <HelpCircle className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-ink-800 mb-1">لم يتم العثور على أي أسئلة</h3>
-            <p className="text-sm text-ink-500 max-w-md mx-auto mb-6">
+            <h3 className="text-base font-serif font-bold text-ink-900 mb-1">لم يتم العثور على أي أسئلة</h3>
+            <p className="text-xs text-ink-500 max-w-md mx-auto mb-5 leading-relaxed">
               {searchQuery || selectedLessonId !== 'all'
                 ? 'لا توجد نتائج تطابق خيارات البحث والفلترة المحددة. جرب اختيار درس آخر أو مسح البحث.'
-                : 'لم تقم بإضافة أي أسئلة تفاعلية بعد. ابدأ الآن بطرح أول سؤال لطلابك!'}
+                : 'لم تقم بإضافة أي أسئلة تفاعلية بعد. ابدأ الآن بطرح أول سؤال لطلابك.'}
             </p>
             <QuestionDialog
               lessons={lessons}
@@ -218,7 +218,7 @@ export function TeacherQuestionsManager({
               trigger={
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gold text-white font-medium hover:bg-gold-dark transition shadow-sm text-sm"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-teal text-white text-xs font-medium hover:bg-teal-dark transition shadow-xs"
                 >
                   <Plus className="w-4 h-4" />
                   <span>طرح سؤال الآن</span>
@@ -231,8 +231,8 @@ export function TeacherQuestionsManager({
             <div key={question.id} className="relative group">
               {/* Optional Lesson Badge Above Card if viewing all */}
               {question.lesson && (
-                <div className="flex items-center gap-2 mb-1.5 px-2 text-xs text-ink-500 font-medium">
-                  <span className="flex items-center gap-1 text-gold-dark font-semibold">
+                <div className="flex items-center gap-2 mb-1.5 px-1 text-xs text-ink-500 font-medium">
+                  <span className="flex items-center gap-1 text-teal font-semibold">
                     <BookOpen className="w-3.5 h-3.5" />
                     {question.lesson.subject?.name || 'المادة'}
                   </span>

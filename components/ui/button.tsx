@@ -4,24 +4,24 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-gold/50 cursor-pointer active:scale-[0.98]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-150 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 outline-none focus-visible:ring-1 focus-visible:ring-accent cursor-pointer active:scale-[0.99]",
   {
     variants: {
       variant: {
-        default: "bg-ink-700 text-white hover:bg-ink-800 shadow-soft",
-        primary: "bg-ink-700 text-white hover:bg-ink-800 shadow-soft",
-        gold: "bg-gold text-ink-900 hover:bg-gold-dark hover:text-white shadow-soft font-semibold",
-        destructive: "bg-red-600 text-white hover:bg-red-700 shadow-soft",
-        outline: "border border-ink-200 text-ink-700 bg-white/70 hover:bg-ink-50 hover:border-ink-300",
-        secondary: "bg-ink-100 text-ink-800 hover:bg-ink-200",
-        ghost: "text-ink-700 hover:bg-ink-50 hover:text-ink-900",
-        link: "text-ink-700 underline-offset-4 hover:underline",
+        default: "bg-accent text-white hover:bg-accent-light",
+        primary: "bg-accent text-white hover:bg-accent-light",
+        gold: "bg-amber text-white hover:bg-[#8c531d]",
+        destructive: "bg-error text-white hover:bg-[#8a3333]",
+        outline: "border border-border-base bg-bg-surface text-ink-primary hover:bg-bg-alt hover:border-ink-muted/40",
+        secondary: "bg-bg-alt text-ink-primary hover:bg-[#eae4da]",
+        ghost: "text-ink-secondary hover:text-ink-primary hover:bg-bg-alt",
+        link: "text-accent underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 rounded-lg px-3 text-xs",
-        lg: "h-11 rounded-xl px-6 text-base",
-        icon: "size-9 rounded-lg",
+        default: "h-9 px-3.5 py-1.5 text-sm",
+        sm: "h-7 rounded-[4px] px-2.5 text-xs",
+        lg: "h-10 rounded-md px-5 text-sm font-medium",
+        icon: "size-8 rounded-md",
       },
     },
     defaultVariants: {

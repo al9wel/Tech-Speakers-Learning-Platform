@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
-import { Cairo } from "next/font/google";
+import { Tajawal, Amiri } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { NavigationProgressBar } from "@/components/NavigationProgressBar";
 
-const cairo = Cairo({
+const tajawal = Tajawal({
   subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-cairo",
+  weight: ["300", "400", "500", "700"],
+  variable: "--font-tajawal",
+  display: "swap",
+});
+
+const amiri = Amiri({
+  subsets: ["arabic", "latin"],
+  weight: ["400", "700"],
+  variable: "--font-amiri",
   display: "swap",
 });
 
@@ -23,11 +30,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
     ],
-    shortcut: "/favicon.ico",
-    apple: "/favicon.png",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
@@ -37,8 +43,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className={cairo.variable}>
-      <body className="min-h-screen bg-cream text-ink-900 font-sans antialiased flex flex-col selection:bg-gold/30 selection:text-ink-900">
+    <html lang="ar" dir="rtl" className={`${tajawal.variable} ${amiri.variable}`}>
+      <body className="min-h-screen bg-bg-base text-ink-primary font-sans antialiased flex flex-col selection:bg-accent/20 selection:text-ink-primary">
         <Suspense fallback={null}>
           <NavigationProgressBar />
         </Suspense>

@@ -74,40 +74,40 @@ export function SuggestionDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-lg w-full border border-ink-100 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/40 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="bg-bg-surface rounded-lg max-w-lg w-full border border-border-base shadow-xl overflow-hidden animate-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-ink-100 flex items-center justify-between bg-parchment/40">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gold/15 text-gold flex items-center justify-center shadow-2xs">
-              <Sparkles className="w-5 h-5" />
+        <div className="px-6 py-4 border-b border-border-base flex items-center justify-between bg-bg-alt/50">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-md bg-accent/10 text-accent flex items-center justify-center border border-accent/20">
+              <Sparkles className="w-4.5 h-4.5" />
             </div>
             <div>
-              <h3 className="font-bold text-ink-900 text-lg">إرسال مقترح للإدارة</h3>
-              <p className="text-xs text-ink-500 font-medium">شاركنا أفكارك وملاحظاتك لتطوير المنصة والعملية التعليمية</p>
+              <h3 className="font-serif font-bold text-ink-primary text-base sm:text-lg">إرسال مقترح للإدارة</h3>
+              <p className="text-xs text-ink-muted font-normal">شاركنا أفكارك وملاحظاتك لتطوير المنصة والعملية التعليمية</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-ink-400 hover:text-ink-700 hover:bg-ink-100 rounded-xl transition-colors"
+            className="p-1.5 text-ink-muted hover:text-ink-primary hover:bg-bg-alt rounded-md transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4.5">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
           {/* Category */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               تصنيف المقترح
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {CATEGORIES.map((cat) => (
                 <label
                   key={cat}
-                  className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-ink-200 text-xs font-semibold cursor-pointer transition-all hover:border-gold has-checked:border-gold has-checked:bg-gold/10 has-checked:text-gold"
+                  className="flex items-center justify-center gap-1.5 p-2 rounded-md border border-border-base text-xs font-medium cursor-pointer transition-colors hover:border-accent has-checked:border-accent has-checked:bg-accent/10 has-checked:text-accent"
                 >
                   <input
                     type="radio"
@@ -123,43 +123,43 @@ export function SuggestionDialog({
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               عنوان المقترح <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               placeholder="مثال: إضافة اختبارات قصيرة بعد نهاية كل درس"
               {...register('title')}
-              className={`w-full px-4 py-2.5 rounded-xl border text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-gold/30 transition-all ${
-                errors.title ? 'border-red-400 bg-red-50/20' : 'border-ink-200 focus:border-gold'
+              className={`w-full px-3.5 py-2 rounded-md border text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors ${
+                errors.title ? 'border-red-400 bg-red-50/20' : 'border-border-base bg-bg-surface'
               }`}
             />
             {errors.title && (
-              <p className="text-xs text-red-500 mt-1 font-medium">{errors.title.message}</p>
+              <p className="text-xs text-red-500 mt-1 font-normal">{errors.title.message}</p>
             )}
           </div>
 
           {/* Content */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               تفاصيل وشرح المقترح <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={4}
               placeholder="اكتب شرحاً وافياً ومقنعاً لمقترحك وكيف سيساعد الطلاب أو الإدارة..."
               {...register('content')}
-              className={`w-full px-4 py-3 rounded-xl border text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-gold/30 resize-none transition-all ${
-                errors.content ? 'border-red-400 bg-red-50/20' : 'border-ink-200 focus:border-gold'
+              className={`w-full px-3.5 py-2 rounded-md border text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-none transition-colors ${
+                errors.content ? 'border-red-400 bg-red-50/20' : 'border-border-base bg-bg-surface'
               }`}
             />
             {errors.content && (
-              <p className="text-xs text-red-500 mt-1 font-medium">{errors.content.message}</p>
+              <p className="text-xs text-red-500 mt-1 font-normal">{errors.content.message}</p>
             )}
           </div>
 
-          <div className="rounded-xl bg-amber-50/70 border border-amber-200/60 p-3 text-xs text-amber-800 flex items-start gap-2">
-            <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-            <p>
+          <div className="rounded-md bg-bg-alt/70 border border-border-subtle p-3 text-xs text-ink-secondary flex items-start gap-2">
+            <HelpCircle className="w-4 h-4 text-ink-muted shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
               مقترحك سيصل مباشرة إلى إدارة المنصة والمشرفين لمراجعته مع إبراز اسمك الكريم لمتابعة الملاحظات.
             </p>
           </div>
@@ -170,14 +170,14 @@ export function SuggestionDialog({
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-ink-600 hover:bg-ink-100 transition-colors"
+              className="px-4 py-2 rounded-md text-xs sm:text-sm font-medium text-ink-secondary hover:bg-bg-alt border border-border-base transition-colors"
             >
               إلغاء
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-gold hover:bg-gold-600 text-white shadow-soft transition-all flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2 rounded-md text-xs sm:text-sm font-medium bg-accent hover:bg-accent-hover text-white shadow-xs transition-colors flex items-center gap-2 disabled:opacity-50"
             >
               {submitting ? (
                 <>
@@ -186,7 +186,7 @@ export function SuggestionDialog({
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
+                  <Send className="w-3.5 h-3.5" />
                   <span>إرسال المقترح</span>
                 </>
               )}

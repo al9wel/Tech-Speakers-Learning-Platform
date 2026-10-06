@@ -209,40 +209,40 @@ export function CreateContributionDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-lg w-full border border-ink-100 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/40 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-bg-surface rounded-lg max-w-lg w-full border border-border-base shadow-xl overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-ink-100 flex items-center justify-between bg-parchment/40 shrink-0">
+        <div className="px-6 py-4.5 border-b border-border-base flex items-center justify-between bg-bg-alt/40 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gold/15 text-gold flex items-center justify-center shadow-2xs">
+            <div className="w-9 h-9 rounded-md bg-accent/10 text-accent flex items-center justify-center border border-accent/20">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-ink-900 text-lg">مشاركة مساهمة جديدة</h3>
-              <p className="text-xs text-ink-500 font-medium">شارك زملاءك ملخصاً، مشروعاً، أو حلاً متميزاً</p>
+              <h3 className="font-serif font-bold text-ink-primary text-lg">مشاركة مساهمة جديدة</h3>
+              <p className="text-xs text-ink-muted">شارك زملاءك ملخصاً، مشروعاً، أو حلاً متميزاً</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-ink-400 hover:text-ink-700 hover:bg-ink-100 rounded-xl transition-colors cursor-pointer"
+            className="p-1.5 text-ink-muted hover:text-ink-primary hover:bg-bg-alt rounded-md transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Scrollable Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4.5 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4 overflow-y-auto flex-1">
           {/* Subject selection */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               المادة الدراسية التابعة لها المساهمة <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <select
                 {...register('subject_id')}
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm text-ink-900 bg-white focus:outline-none focus:ring-2 focus:ring-gold/30 appearance-none cursor-pointer transition-all ${
-                  errors.subject_id ? 'border-red-400 bg-red-50/20' : 'border-ink-200 focus:border-gold'
+                className={`w-full px-3 py-2 rounded-md border text-sm text-ink-primary bg-bg-surface focus:outline-none focus:border-accent appearance-none cursor-pointer transition-all ${
+                  errors.subject_id ? 'border-error bg-error-bg/20' : 'border-border-base focus:border-accent'
                 }`}
               >
                 {subjects.map((s) => (
@@ -251,62 +251,62 @@ export function CreateContributionDialog({
                   </option>
                 ))}
               </select>
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-ink-400">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-ink-muted">
                 <BookOpen className="w-4 h-4" />
               </div>
             </div>
             {errors.subject_id && (
-              <p className="text-xs text-red-500 mt-1 font-medium">{errors.subject_id.message}</p>
+              <p className="text-xs text-error mt-1">{errors.subject_id.message}</p>
             )}
           </div>
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               عنوان المساهمة <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               placeholder="مثال: خريطة ذهنية لقوانين نيوتن في الحركة"
               {...register('title')}
-              className={`w-full px-4 py-2.5 rounded-xl border text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-gold/30 transition-all ${
-                errors.title ? 'border-red-400 bg-red-50/20' : 'border-ink-200 focus:border-gold'
+              className={`w-full px-3 py-2 rounded-md border text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent transition-all ${
+                errors.title ? 'border-error bg-error-bg/20' : 'border-border-base focus:border-accent'
               }`}
             />
             {errors.title && (
-              <p className="text-xs text-red-500 mt-1 font-medium">{errors.title.message}</p>
+              <p className="text-xs text-error mt-1">{errors.title.message}</p>
             )}
           </div>
 
           {/* Content */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               شرح وتفاصيل المساهمة <span className="text-red-500">*</span>
             </label>
             <textarea
               rows={4}
               placeholder="اكتب شرحاً مفصلاً للمساهمة وأهم النقاط التي تغطيها..."
               {...register('content')}
-              className={`w-full px-4 py-3 rounded-xl border text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-gold/30 resize-none transition-all ${
-                errors.content ? 'border-red-400 bg-red-50/20' : 'border-ink-200 focus:border-gold'
+              className={`w-full px-3 py-2.5 rounded-md border text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent resize-none transition-all ${
+                errors.content ? 'border-error bg-error-bg/20' : 'border-border-base focus:border-accent'
               }`}
             />
             {errors.content && (
-              <p className="text-xs text-red-500 mt-1 font-medium">{errors.content.message}</p>
+              <p className="text-xs text-error mt-1">{errors.content.message}</p>
             )}
           </div>
 
           {/* Media Attachment (Image, PDF, or Video) */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               إرفاق وسائط أو ملف (اختياري)
             </label>
 
             {previewImage || previewVideo || pdfFileName || videoFileName || watchedImagePath || watchedPdfPath || watchedVideoPath ? (
-              <div className="p-3.5 rounded-xl border border-gold/30 bg-gold/5 flex items-center justify-between gap-3">
+              <div className="p-3.5 rounded-md border border-accent/25 bg-accent-bg/50 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 truncate">
                   {previewImage || watchedImagePath ? (
-                    <div className="w-10 h-10 rounded-lg bg-gold/15 flex items-center justify-center shrink-0 overflow-hidden">
+                    <div className="w-10 h-10 rounded-md bg-accent-bg flex items-center justify-center shrink-0 overflow-hidden border border-accent/20">
                       {previewImage ? (
                         <img
                           src={previewImage}
@@ -314,11 +314,11 @@ export function CreateContributionDialog({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <ImageIcon className="w-5 h-5 text-gold" />
+                        <ImageIcon className="w-5 h-5 text-accent" />
                       )}
                     </div>
                   ) : previewVideo || watchedVideoPath ? (
-                    <div className="w-10 h-10 rounded-lg bg-amber-500/15 text-amber-600 flex items-center justify-center shrink-0 overflow-hidden">
+                    <div className="w-10 h-10 rounded-md bg-accent-bg text-accent flex items-center justify-center shrink-0 overflow-hidden border border-accent/20">
                       {previewVideo ? (
                         <video
                           src={previewVideo}
@@ -329,12 +329,12 @@ export function CreateContributionDialog({
                       )}
                     </div>
                   ) : (
-                    <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-md bg-error-bg text-error flex items-center justify-center shrink-0 border border-error/20">
                       <FileText className="w-5 h-5" />
                     </div>
                   )}
                   <div className="truncate">
-                    <p className="text-xs font-bold text-ink-900 truncate">
+                    <p className="text-xs font-semibold text-ink-primary truncate">
                       {videoFileName
                         ? videoFileName
                         : pdfFileName
@@ -343,14 +343,14 @@ export function CreateContributionDialog({
                         ? 'مقطع فيديو مرفق'
                         : 'تم إرفاق صورة للمساهمة'}
                     </p>
-                    <p className="text-[11px] text-emerald-600 font-medium">تم تجهيز الملف للنشر</p>
+                    <p className="text-[11px] text-success font-medium">تم تجهيز الملف للنشر</p>
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={removeMedia}
-                  className="p-1.5 text-ink-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0 cursor-pointer"
+                  className="p-1.5 text-ink-muted hover:text-error hover:bg-error-bg rounded-md transition-colors shrink-0 cursor-pointer"
                   title="إزالة المرفق"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -359,7 +359,7 @@ export function CreateContributionDialog({
             ) : (
               <div className="grid grid-cols-3 gap-2">
                 {/* Upload Image button */}
-                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+                <label className="flex flex-col items-center justify-center p-3 rounded-md border border-dashed border-border-base hover:border-accent bg-bg-alt/50 hover:bg-accent-bg/40 cursor-pointer transition-all text-center group">
                   <input
                     type="file"
                     accept="image/*"
@@ -367,17 +367,17 @@ export function CreateContributionDialog({
                     disabled={uploadingMedia}
                     className="sr-only"
                   />
-                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                  <div className="w-7 h-7 rounded-md bg-bg-surface group-hover:bg-accent group-hover:text-white text-ink-secondary flex items-center justify-center mb-1 shadow-2xs transition-colors">
                     <ImageIcon className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                  <span className="text-xs font-medium text-ink-primary group-hover:text-accent truncate w-full">
                     صورة
                   </span>
-                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 5MB</span>
+                  <span className="text-[10px] text-ink-muted truncate w-full">حتى 5MB</span>
                 </label>
 
                 {/* Upload PDF button */}
-                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+                <label className="flex flex-col items-center justify-center p-3 rounded-md border border-dashed border-border-base hover:border-accent bg-bg-alt/50 hover:bg-accent-bg/40 cursor-pointer transition-all text-center group">
                   <input
                     type="file"
                     accept="application/pdf"
@@ -385,17 +385,17 @@ export function CreateContributionDialog({
                     disabled={uploadingMedia}
                     className="sr-only"
                   />
-                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                  <div className="w-7 h-7 rounded-md bg-bg-surface group-hover:bg-accent group-hover:text-white text-ink-secondary flex items-center justify-center mb-1 shadow-2xs transition-colors">
                     <FileText className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                  <span className="text-xs font-medium text-ink-primary group-hover:text-accent truncate w-full">
                     مستند PDF
                   </span>
-                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 10MB</span>
+                  <span className="text-[10px] text-ink-muted truncate w-full">حتى 10MB</span>
                 </label>
 
                 {/* Upload Video button */}
-                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+                <label className="flex flex-col items-center justify-center p-3 rounded-md border border-dashed border-border-base hover:border-accent bg-bg-alt/50 hover:bg-accent-bg/40 cursor-pointer transition-all text-center group">
                   <input
                     type="file"
                     accept="video/mp4,video/webm,video/ogg,video/quicktime"
@@ -403,19 +403,19 @@ export function CreateContributionDialog({
                     disabled={uploadingMedia}
                     className="sr-only"
                   />
-                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                  <div className="w-7 h-7 rounded-md bg-bg-surface group-hover:bg-accent group-hover:text-white text-ink-secondary flex items-center justify-center mb-1 shadow-2xs transition-colors">
                     <Video className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                  <span className="text-xs font-medium text-ink-primary group-hover:text-accent truncate w-full">
                     مقطع فيديو
                   </span>
-                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 20MB</span>
+                  <span className="text-[10px] text-ink-muted truncate w-full">حتى 20MB</span>
                 </label>
               </div>
             )}
 
             {uploadingMedia && (
-              <div className="flex items-center gap-2 mt-2 text-xs text-gold font-bold">
+              <div className="flex items-center gap-2 mt-2 text-xs text-accent font-medium">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>جارٍ رفع المرفق إلى السحابة...</span>
               </div>
@@ -423,19 +423,19 @@ export function CreateContributionDialog({
           </div>
 
           {/* Submit Actions */}
-          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-ink-100">
+          <div className="pt-3 flex items-center justify-end gap-2.5 border-t border-border-base">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting || uploadingMedia}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-ink-600 hover:bg-ink-100 transition-colors cursor-pointer"
+              className="btn-outline text-xs sm:text-sm py-2 px-3.5"
             >
               إلغاء
             </button>
             <button
               type="submit"
               disabled={submitting || uploadingMedia}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-gold hover:bg-gold-600 text-white shadow-soft transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="btn-primary text-xs sm:text-sm py-2 px-4 shadow-xs"
             >
               {submitting ? (
                 <>

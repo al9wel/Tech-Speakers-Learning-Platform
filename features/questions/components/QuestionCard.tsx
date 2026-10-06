@@ -28,10 +28,10 @@ interface QuestionCardProps {
 }
 
 const roleBadgeMap: Record<string, { label: string; color: string; icon: any }> = {
-  teacher: { label: 'معلم', color: 'bg-gold/20 text-gold-dark border-gold/30', icon: Sparkles },
-  student: { label: 'طالب', color: 'bg-ink-100 text-ink-700 border-ink-200', icon: GraduationCap },
-  admin: { label: 'إدارة', color: 'bg-red-50 text-red-700 border-red-200', icon: Shield },
-  supervisor: { label: 'مشرف', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: Shield },
+  teacher: { label: 'معلم', color: 'bg-amber-bg text-amber border-amber/30', icon: Sparkles },
+  student: { label: 'طالب', color: 'bg-accent-bg text-accent border-accent/30', icon: GraduationCap },
+  admin: { label: 'إدارة', color: 'bg-ink-primary text-white border-transparent', icon: Shield },
+  supervisor: { label: 'مشرف', color: 'bg-[#eef3f7] text-[#2c5270] border-[#c8d8e5]', icon: Shield },
 }
 
 export function QuestionCard({
@@ -79,31 +79,31 @@ export function QuestionCard({
   const RoleIcon = authorRoleInfo.icon
 
   return (
-    <div className="card p-5 sm:p-6 bg-white border-ink-100/90 shadow-card hover:shadow-soft transition-all">
+    <div className="border border-border-base rounded-lg p-4 sm:p-5 bg-bg-surface hover:border-[#c8c4bc] transition-all">
       {/* Question Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-ink-100/70">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-border-subtle">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gold/15 text-gold-dark flex items-center justify-center font-bold text-sm shrink-0">
+          <div className="w-8 h-8 rounded-md bg-accent-bg text-accent flex items-center justify-center font-bold text-xs shrink-0 border border-accent/20">
             <RoleIcon className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-heading font-bold text-xs sm:text-sm text-ink-900">
+              <span className="font-serif font-bold text-xs sm:text-sm text-ink-primary">
                 {question.author?.full_name || 'المعلم'}
               </span>
               <span
-                className={`chip text-[10px] py-0.5 px-2 border font-bold ${authorRoleInfo.color}`}
+                className={`chip text-[10px] py-0 px-1.5 border font-medium ${authorRoleInfo.color}`}
               >
                 {authorRoleInfo.label}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-ink-400 mt-0.5">
+            <div className="flex items-center gap-1.5 text-[11px] text-ink-muted mt-0.5">
               <Calendar className="w-3 h-3" />
               <span>{question.created_at?.substring(0, 10)}</span>
               {question.lesson?.title && (
                 <>
                   <span>•</span>
-                  <span className="text-gold-dark font-medium truncate max-w-[200px]">
+                  <span className="text-accent font-medium truncate max-w-[200px]">
                     الدرس: {question.lesson.title}
                   </span>
                 </>
@@ -120,7 +120,7 @@ export function QuestionCard({
                 <button
                   type="button"
                   onClick={() => onEditQuestion(question)}
-                  className="btn-outline text-xs py-1 px-2.5 hover:bg-gold/10 hover:border-gold"
+                  className="btn-outline text-xs py-1 px-2.5"
                 >
                   تعديل
                 </button>
@@ -129,7 +129,7 @@ export function QuestionCard({
                 <button
                   type="button"
                   onClick={() => onDeleteQuestion(question)}
-                  className="btn-outline text-xs py-1 px-2.5 text-red-600 hover:bg-red-50 border-red-200"
+                  className="btn-outline text-xs py-1 px-2.5 text-error hover:bg-error-bg/60 border-error/30"
                 >
                   حذف
                 </button>
@@ -140,14 +140,14 @@ export function QuestionCard({
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="btn-outline text-xs py-1 px-3 flex items-center gap-1.5 bg-cream/40 hover:bg-cream"
+            className="btn-outline text-xs py-1 px-2.5 flex items-center gap-1.5 bg-bg-alt/50"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-gold-dark" />
+            <MessageSquare className="w-3.5 h-3.5 text-accent" />
             <span>{answersCount} إجابات</span>
             {isExpanded ? (
-              <ChevronUp className="w-3.5 h-3.5 text-ink-400" />
+              <ChevronUp className="w-3.5 h-3.5 text-ink-muted" />
             ) : (
-              <ChevronDown className="w-3.5 h-3.5 text-ink-400" />
+              <ChevronDown className="w-3.5 h-3.5 text-ink-muted" />
             )}
           </button>
         </div>
@@ -155,23 +155,23 @@ export function QuestionCard({
 
       {/* Question Content Body */}
       <div className="pt-3 pb-2">
-        <h3 className="font-heading font-extrabold text-base sm:text-lg text-ink-900 mb-2 leading-snug">
+        <h3 className="font-serif font-bold text-base text-ink-primary mb-1.5 leading-snug">
           {question.title}
         </h3>
-        <p className="text-xs sm:text-sm text-ink-700 leading-relaxed whitespace-pre-line">
+        <p className="text-xs sm:text-sm text-ink-primary leading-relaxed whitespace-pre-line">
           {question.content}
         </p>
       </div>
 
       {/* Answers / Discussion Thread (Expandable) */}
       {isExpanded && (
-        <div className="mt-4 pt-4 border-t border-ink-100 space-y-3 animate-slide-up">
-          <div className="flex items-center justify-between text-xs text-ink-500 font-bold mb-2">
+        <div className="mt-3.5 pt-3.5 border-t border-border-subtle space-y-3 animate-fade-in">
+          <div className="flex items-center justify-between text-xs text-ink-secondary font-medium mb-1">
             <span>إجابات ومشاركات الطلاب ({answers.length})</span>
           </div>
 
           {answers.length > 0 ? (
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {answers.map((ans) => {
                 const ansRole = ans.author?.role || 'student'
                 const ansRoleInfo = roleBadgeMap[ansRole] || roleBadgeMap.student
@@ -181,26 +181,22 @@ export function QuestionCard({
                 return (
                   <div
                     key={ans.id}
-                    className={`p-3.5 rounded-xl border text-xs sm:text-sm transition-all ${
-                      ansRole === 'teacher'
-                        ? 'bg-gold/5 border-gold/30'
-                        : 'bg-cream/30 border-ink-100/80'
-                    }`}
+                    className="p-3 rounded-md border text-xs sm:text-sm bg-bg-alt/40 border-border-subtle"
                   >
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <div className="flex items-center justify-between gap-2 mb-1">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-ink-100 text-ink-800 flex items-center justify-center font-bold text-[10px]">
+                        <div className="w-5 h-5 rounded-full bg-bg-alt text-ink-primary flex items-center justify-center font-bold text-[9px] border border-border-subtle">
                           {(ans.author?.full_name || (ans.author?.role === 'teacher' ? 'م' : 'ط')).charAt(0).toUpperCase()}
                         </div>
-                        <span className="font-heading font-bold text-xs text-ink-900">
+                        <span className="font-serif font-bold text-xs text-ink-primary">
                           {ans.author?.full_name || (ans.author?.role === 'teacher' ? 'المعلم' : 'طالب')}
                         </span>
                         <span
-                          className={`chip text-[9px] py-0 px-1.5 border font-semibold ${ansRoleInfo.color}`}
+                          className={`chip text-[9px] py-0 px-1 border font-medium ${ansRoleInfo.color}`}
                         >
                           {ansRoleInfo.label}
                         </span>
-                        <span className="text-[10px] text-ink-400">
+                        <span className="text-[10px] text-ink-muted">
                           {ans.created_at?.substring(0, 10)}
                         </span>
                       </div>
@@ -210,7 +206,7 @@ export function QuestionCard({
                           type="button"
                           onClick={() => handleDeleteAnswer(ans.id)}
                           disabled={deletingAnswerId === ans.id}
-                          className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition cursor-pointer"
+                          className="text-error hover:bg-error-bg/60 p-1 rounded transition cursor-pointer"
                           title="حذف هذه الإجابة"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -218,7 +214,7 @@ export function QuestionCard({
                       )}
                     </div>
 
-                    <p className="text-xs text-ink-800 leading-relaxed whitespace-pre-line pl-2 pr-8">
+                    <p className="text-xs text-ink-primary leading-relaxed whitespace-pre-line pl-2 pr-7">
                       {ans.content}
                     </p>
                   </div>
@@ -226,7 +222,7 @@ export function QuestionCard({
               })}
             </div>
           ) : (
-            <div className="p-4 rounded-xl bg-cream/30 border border-dashed border-ink-200 text-center text-xs text-ink-500">
+            <div className="p-3.5 rounded-md bg-bg-alt/30 border border-dashed border-border-base text-center text-xs text-ink-muted">
               لا توجد إجابات بعد على هذا السؤال. كن أول من يشارك بإجابته!
             </div>
           )}

@@ -158,8 +158,8 @@ export function Navbar() {
   const dashboardPath = userData?.role ? rolePaths[userData.role] : '/'
 
   return (
-    <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b border-ink-100/80 shadow-xs">
-      <nav className="container-page flex items-center justify-between h-16 gap-3">
+    <header className="sticky top-0 z-40 bg-bg-surface/95 backdrop-blur border-b border-border-base">
+      <nav className="container-page flex items-center justify-between h-14 sm:h-16 gap-3">
         {/* RIGHT SIDE in RTL (Start of layout): Logo */}
         <div className="flex items-center gap-2 shrink-0">
           <Logo showTagline={true} />
@@ -168,7 +168,7 @@ export function Navbar() {
         {/* LEFT SIDE in RTL (End of layout): User controls */}
         <div className="flex items-center gap-2">
           {!isLoaded ? (
-            <div className="h-8 w-24 sm:w-32 bg-ink-100/80 rounded-xl animate-pulse" />
+            <div className="h-8 w-24 sm:w-32 bg-bg-alt rounded-md animate-pulse" />
           ) : userData ? (
             <>
               {/* DESKTOP VIEW (sm:flex): Compact Info & Sign Out */}
@@ -176,15 +176,15 @@ export function Navbar() {
                 {userData.profilePath && (
                   <Link
                     href={userData.profilePath}
-                    className="btn-outline text-xs py-1 px-2.5 bg-white hover:bg-ink-50 flex items-center gap-1.5 shadow-2xs rounded-xl transition"
+                    className="border border-border-base bg-bg-surface hover:bg-bg-alt text-xs py-1.5 px-3 flex items-center gap-2 rounded-md transition text-ink-primary"
                     title="عرض الملف الشخصي"
                   >
-                    <UserIcon className="w-3.5 h-3.5 text-ink-500" />
-                    <span className="font-bold text-ink-800 truncate max-w-[100px] md:max-w-[130px]">
+                    <UserIcon className="w-3.5 h-3.5 text-ink-muted" />
+                    <span className="font-medium text-ink-primary truncate max-w-[100px] md:max-w-[130px]">
                       {userData.fullName || userData.email}
                     </span>
                     {currentRoleInfo && (
-                      <span className="chip bg-gold/15 text-gold-dark text-[10px] py-0.5 px-1.5 font-bold">
+                      <span className="chip bg-bg-alt text-ink-secondary text-[10px] py-0.5 px-1.5 font-medium border border-border-subtle">
                         {currentRoleInfo.label}
                       </span>
                     )}
@@ -195,7 +195,7 @@ export function Navbar() {
                   type="button"
                   onClick={handleSignOut}
                   disabled={isSigningOut}
-                  className="btn-ghost text-xs text-red-600 hover:bg-red-50 hover:text-red-700 py-1 px-2 cursor-pointer flex items-center gap-1 transition"
+                  className="btn-ghost text-xs text-error hover:bg-error-bg/60 py-1.5 px-2.5 rounded-md cursor-pointer flex items-center gap-1 transition"
                   title="تسجيل الخروج من الحساب"
                 >
                   {isSigningOut ? (
@@ -203,8 +203,8 @@ export function Navbar() {
                   ) : (
                     <LogOut className="w-3.5 h-3.5" />
                   )}
-                  <span className="hidden md:inline font-bold">
-                    {isSigningOut ? 'خروج...' : 'تسجيل الخروج'}
+                  <span className="hidden md:inline font-medium">
+                    {isSigningOut ? 'خروج...' : 'خروج'}
                   </span>
                 </button>
               </div>
@@ -214,37 +214,37 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-1.5 p-1.5 rounded-xl border border-ink-200/80 bg-white shadow-2xs hover:bg-ink-50 transition cursor-pointer"
+                  className="flex items-center gap-1.5 p-1.5 rounded-md border border-border-base bg-bg-surface hover:bg-bg-alt transition cursor-pointer"
                   aria-label="قائمة المستخدم"
                   aria-expanded={isMobileMenuOpen}
                 >
-                  <div className="w-7 h-7 rounded-lg bg-gold/15 text-gold-dark flex items-center justify-center font-bold text-xs">
+                  <div className="w-7 h-7 rounded-md bg-accent-bg text-accent flex items-center justify-center font-bold text-xs border border-accent/20">
                     {(userData.fullName || userData.email).charAt(0).toUpperCase()}
                   </div>
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-ink-500 transition-transform ${
-                      isMobileMenuOpen ? 'rotate-180 text-gold-dark' : ''
+                    className={`w-3.5 h-3.5 text-ink-muted transition-transform ${
+                      isMobileMenuOpen ? 'rotate-180 text-accent' : ''
                     }`}
                   />
                 </button>
 
                 {/* Mobile Floating Dropdown Menu */}
                 {isMobileMenuOpen && (
-                  <div className="absolute left-0 mt-2 w-64 rounded-2xl bg-white border border-ink-100 shadow-xl p-3 z-50 animate-scale-in">
+                  <div className="absolute left-0 mt-2 w-64 rounded-lg bg-bg-surface border border-border-base shadow-xl p-3 z-50 animate-fade-in">
                     {/* User Summary Header */}
-                    <div className="flex items-center gap-2.5 pb-3 border-b border-ink-100/80 mb-2">
-                      <div className="w-9 h-9 rounded-xl bg-gold/20 text-gold-dark flex items-center justify-center font-bold text-sm shrink-0">
+                    <div className="flex items-center gap-2.5 pb-3 border-b border-border-subtle mb-2">
+                      <div className="w-8 h-8 rounded-md bg-accent-bg text-accent flex items-center justify-center font-bold text-xs shrink-0 border border-accent/20">
                         {(userData.fullName || userData.email).charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-heading font-bold text-xs text-ink-900 truncate">
+                        <p className="font-serif font-bold text-xs text-ink-primary truncate">
                           {userData.fullName || 'مستخدم'}
                         </p>
-                        <p className="text-[11px] text-ink-400 truncate mb-1">
+                        <p className="text-[11px] text-ink-muted truncate mb-1">
                           {userData.email}
                         </p>
                         {currentRoleInfo && (
-                          <span className="chip bg-gold/15 text-gold-dark text-[10px] py-0 px-1.5 font-bold">
+                          <span className="chip bg-bg-alt text-ink-secondary text-[10px] py-0 px-1.5 font-medium border border-border-subtle">
                             {currentRoleInfo.label}
                           </span>
                         )}
@@ -252,26 +252,26 @@ export function Navbar() {
                     </div>
 
                     {/* Navigation Links */}
-                    <div className="space-y-1 text-xs font-bold">
+                    <div className="space-y-1 text-xs">
                       {userData.profilePath && (
                         <Link
                           href={userData.profilePath}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-ink-700 hover:text-ink-900 hover:bg-ink-50 transition"
+                          className="flex items-center gap-2 px-2.5 py-2 rounded-md text-ink-secondary hover:text-ink-primary hover:bg-bg-alt transition font-medium"
                         >
-                          <UserIcon className="w-4 h-4 text-gold-dark" />
+                          <UserIcon className="w-4 h-4 text-ink-muted" />
                           <span>الملف الشخصي</span>
                         </Link>
                       )}
                     </div>
 
                     {/* Divider & Sign Out */}
-                    <div className="pt-2 mt-2 border-t border-ink-100/80">
+                    <div className="pt-2 mt-2 border-t border-border-subtle">
                       <button
                         type="button"
                         onClick={handleSignOut}
                         disabled={isSigningOut}
-                        className="w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition cursor-pointer"
+                        className="w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-xs font-medium text-error hover:bg-error-bg/60 transition cursor-pointer"
                       >
                         {isSigningOut ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -288,7 +288,7 @@ export function Navbar() {
           ) : (
             <Link
               href="/auth"
-              className="inline-flex items-center justify-center px-4 py-1.5 rounded-xl font-bold text-xs sm:text-sm bg-gold-dark hover:bg-gold text-white shadow-soft transition cursor-pointer"
+              className="btn-primary text-xs sm:text-sm py-1.5 px-4 rounded-md"
             >
               <span>دخول</span>
             </Link>

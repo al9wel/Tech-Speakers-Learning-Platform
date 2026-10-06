@@ -103,32 +103,31 @@ export function SupervisorLessonsManager({
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-ink-900 to-ink-800 rounded-3xl p-6 sm:p-8 text-white shadow-soft relative overflow-hidden">
-        <div className="absolute top-0 -left-12 w-64 h-64 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="rounded-lg border border-ink-200/80 bg-paper-light p-6 sm:p-8 shadow-xs">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-gold-200 text-xs font-bold backdrop-blur-xs">
-              <Sparkles className="w-3.5 h-3.5 text-gold" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm bg-teal/10 text-teal-dark text-xs font-semibold border border-teal/20">
+              <Sparkles className="w-3.5 h-3.5 text-teal" />
               <span>الإشراف التربوي على المناهج</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white">
+            <h1 className="text-xl sm:text-2xl font-serif font-bold text-ink-900">
               إدارة ومتابعة الدروس
             </h1>
-            <p className="text-xs sm:text-sm text-ink-200 max-w-xl font-medium">
+            <p className="text-xs sm:text-sm text-ink-600 max-w-xl leading-relaxed">
               استعراض كافة الدروس المضافة من قبل المعلمين عبر المواد، والبحث والفلترة ومراجعة المحتوى مع إمكانية الحذف.
             </p>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <span className="px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-md text-xs font-bold text-gold-200 border border-white/10">
-              إجمالي الدروس: {lessons.length}
+            <span className="px-3 py-1.5 rounded-md bg-white text-xs font-medium text-ink-700 border border-ink-200 shadow-xs">
+              إجمالي الدروس: <span className="font-serif font-bold text-ink-900">{lessons.length}</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* Search and Filters Bar */}
-      <div className="bg-white rounded-2xl border border-ink-100 p-3.5 sm:p-4 shadow-2xs space-y-3">
+      <div className="bg-paper-light rounded-lg border border-ink-200/80 p-3.5 sm:p-4 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
@@ -137,7 +136,7 @@ export function SupervisorLessonsManager({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحث بعنوان الدرس أو الشرح أو اسم المعلم..."
-              className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-ink-200 bg-ink-50/30 text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:border-gold focus:bg-white transition-all"
+              className="w-full pl-9 pr-10 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20 transition-all"
             />
             <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none">
               <Search className="w-4 h-4" />
@@ -156,16 +155,16 @@ export function SupervisorLessonsManager({
 
         {/* Subject Filter Pills */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1">
-          <span className="text-xs font-bold text-ink-400 flex items-center gap-1 pl-1 shrink-0">
+          <span className="text-xs font-semibold text-ink-500 flex items-center gap-1 pl-1 shrink-0">
             <Filter className="w-3 h-3" /> المادة:
           </span>
           <button
             type="button"
             onClick={() => setSelectedSubjectId('all')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap shrink-0 cursor-pointer ${
               selectedSubjectId === 'all'
-                ? 'bg-ink-900 text-white shadow-2xs'
-                : 'bg-parchment/60 text-ink-600 hover:bg-ink-100 border border-ink-200/50'
+                ? 'bg-ink-900 text-white shadow-xs'
+                : 'bg-white text-ink-700 hover:bg-paper-mid border border-ink-200'
             }`}
           >
             جميع المواد ({lessons.length})
@@ -177,10 +176,10 @@ export function SupervisorLessonsManager({
                 key={s.id}
                 type="button"
                 onClick={() => setSelectedSubjectId(s.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                   selectedSubjectId === s.id
-                    ? 'bg-ink-900 text-white shadow-2xs'
-                    : 'bg-parchment/60 text-ink-600 hover:bg-ink-100 border border-ink-200/50'
+                    ? 'bg-ink-900 text-white shadow-xs'
+                    : 'bg-white text-ink-700 hover:bg-paper-mid border border-ink-200'
                 }`}
               >
                 {s.name} ({count})
@@ -192,12 +191,12 @@ export function SupervisorLessonsManager({
 
       {/* Lessons Grid */}
       {filteredLessons.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-ink-100 p-12 text-center space-y-3 shadow-2xs">
-          <div className="w-14 h-14 rounded-2xl bg-ink-100 text-ink-400 flex items-center justify-center mx-auto">
-            <Inbox className="w-7 h-7" />
+        <div className="bg-paper-light rounded-lg border border-dashed border-ink-200 p-12 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-ink-100 text-ink-400 flex items-center justify-center mx-auto">
+            <Inbox className="w-6 h-6" />
           </div>
-          <h3 className="font-bold text-ink-800 text-base">لا توجد دروس مطابقة</h3>
-          <p className="text-xs text-ink-500 font-medium">
+          <h3 className="font-serif font-bold text-ink-900 text-base">لا توجد دروس مطابقة</h3>
+          <p className="text-xs text-ink-500">
             {searchQuery || selectedSubjectId !== 'all'
               ? 'جرب البحث بكلمات أخرى أو اختر مادة دراسية مختلفة.'
               : 'لم يتم إضافة أي دروس في المنصة بعد.'}
@@ -213,17 +212,17 @@ export function SupervisorLessonsManager({
             return (
               <div
                 key={lesson.id}
-                className="bg-white rounded-3xl border border-ink-100 p-5 shadow-2xs hover:shadow-soft transition-all duration-200 flex flex-col justify-between group"
+                className="bg-paper-light rounded-lg border border-ink-200/80 p-5 shadow-xs hover:border-teal/50 transition-colors flex flex-col justify-between group"
               >
                 <div>
                   {/* Top badges */}
-                  <div className="flex items-center justify-between gap-2 pb-3 border-b border-ink-100/70">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-parchment text-ink-700 text-xs font-bold border border-ink-200/60">
-                      <BookOpen className="w-3.5 h-3.5 text-gold" />
+                  <div className="flex items-center justify-between gap-2 pb-3 border-b border-ink-200/60">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-teal/10 text-teal-dark text-xs font-semibold border border-teal/20">
+                      <BookOpen className="w-3.5 h-3.5 text-teal" />
                       <span>{subjectName}</span>
                     </span>
 
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-ink-50 text-ink-600 text-xs font-bold">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm bg-ink-100 text-ink-600 text-xs">
                       <Layers className="w-3 h-3 text-ink-400" />
                       <span>{sectionsCount} أقسام</span>
                     </span>
@@ -231,33 +230,33 @@ export function SupervisorLessonsManager({
 
                   {/* Title & Explanation */}
                   <div className="mt-3.5 space-y-1.5">
-                    <h3 className="text-base font-bold text-ink-900 group-hover:text-gold-600 transition-colors line-clamp-2">
+                    <h3 className="text-base font-serif font-bold text-ink-900 group-hover:text-teal transition-colors line-clamp-2">
                       {lesson.title}
                     </h3>
-                    <p className="text-xs text-ink-500 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-ink-600 line-clamp-2 leading-relaxed">
                       {lesson.explanation}
                     </p>
                   </div>
 
                   {/* Teacher & Date */}
-                  <div className="mt-4 pt-3 border-t border-ink-100/60 flex items-center justify-between text-xs text-ink-400">
-                    <span className="flex items-center gap-1.5 text-ink-700 font-semibold truncate">
-                      <User className="w-3.5 h-3.5 text-gold shrink-0" />
+                  <div className="mt-4 pt-3 border-t border-ink-200/60 flex items-center justify-between text-xs text-ink-500">
+                    <span className="flex items-center gap-1.5 text-ink-700 font-medium truncate">
+                      <User className="w-3.5 h-3.5 text-teal shrink-0" />
                       <span className="truncate">{teacherName}</span>
                     </span>
 
-                    <span className="flex items-center gap-1 shrink-0">
-                      <Calendar className="w-3 h-3 text-ink-300" />
+                    <span className="flex items-center gap-1 shrink-0 text-ink-400">
+                      <Calendar className="w-3 h-3 text-ink-400" />
                       {formatDate(lesson.created_at)}
                     </span>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="mt-4 pt-3 border-t border-ink-100/70 flex items-center justify-between gap-2">
+                <div className="mt-4 pt-3 border-t border-ink-200/60 flex items-center justify-between gap-2">
                   <Link
                     href={`/supervisor/lessons/${lesson.id}`}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-ink-100 hover:bg-ink-200/80 text-ink-800 text-xs font-bold transition-colors cursor-pointer flex-1 justify-center"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white border border-ink-200 hover:border-teal text-ink-800 text-xs font-medium transition-colors cursor-pointer flex-1 justify-center shadow-xs"
                   >
                     <Eye className="w-3.5 h-3.5 text-ink-600" />
                     <span>معاينة الدرس</span>
@@ -266,7 +265,7 @@ export function SupervisorLessonsManager({
                   <button
                     type="button"
                     onClick={() => setConfirmDeleteLesson(lesson)}
-                    className="p-2 text-ink-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer shrink-0"
+                    className="p-1.5 text-ink-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors cursor-pointer shrink-0"
                     title="حذف الدرس"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -280,14 +279,14 @@ export function SupervisorLessonsManager({
 
       {/* Delete Confirmation Modal */}
       {confirmDeleteLesson && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 border border-ink-100 shadow-2xl animate-in zoom-in-95">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/40 backdrop-blur-xs">
+          <div className="bg-paper-light rounded-lg max-w-sm w-full p-6 text-center space-y-4 border border-ink-200/80 shadow-xl animate-scale-in">
             <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
               <AlertCircle className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-bold text-ink-900">حذف الدرس</h4>
-              <p className="text-xs text-ink-500">
+              <h4 className="font-serif font-bold text-ink-900 text-base">حذف الدرس</h4>
+              <p className="text-xs text-ink-600 leading-relaxed">
                 هل أنت متأكد من رغبتك في حذف درس &quot;{confirmDeleteLesson.title}&quot;؟ سيتم حذف جميع أقسامه وملفاته وأسئلته المرتبطة.
               </p>
             </div>
@@ -296,7 +295,7 @@ export function SupervisorLessonsManager({
                 type="button"
                 onClick={() => setConfirmDeleteLesson(null)}
                 disabled={Boolean(deletingId)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-ink-600 hover:bg-ink-100 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-md text-xs font-medium text-ink-700 hover:bg-ink-100 cursor-pointer border border-ink-200"
               >
                 تراجع
               </button>
@@ -304,7 +303,7 @@ export function SupervisorLessonsManager({
                 type="button"
                 onClick={() => handleDelete(confirmDeleteLesson.id)}
                 disabled={Boolean(deletingId)}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-md text-xs font-medium bg-red-600 hover:bg-red-700 text-white flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 {deletingId ? (
                   <>

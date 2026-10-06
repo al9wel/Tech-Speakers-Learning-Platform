@@ -22,12 +22,12 @@ export default async function NewLessonPage() {
 
   if (error || !subjects || subjects.length === 0) {
     return (
-      <div className="container-page py-12 animate-page">
-        <div className="card p-8 bg-white border-gold/30 text-center max-w-lg mx-auto">
-          <div className="w-12 h-12 rounded-2xl bg-gold/15 text-gold-dark flex items-center justify-center mx-auto mb-3">
+      <div className="container-page py-12 animate-fade-in">
+        <div className="border border-border-base rounded-lg p-8 bg-bg-surface text-center max-w-lg mx-auto">
+          <div className="w-12 h-12 rounded-lg bg-amber-bg text-amber border border-amber/30 flex items-center justify-center mx-auto mb-3">
             <AlertCircle className="w-6 h-6" />
           </div>
-          <h2 className="font-heading font-bold text-xl text-ink-900 mb-2">
+          <h2 className="font-serif font-bold text-xl text-ink-primary mb-2">
             لا توجد مواد دراسية مسجلة حالياً
           </h2>
           <p className="text-sm text-ink-500 mb-6 leading-relaxed">

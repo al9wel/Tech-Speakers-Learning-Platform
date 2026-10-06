@@ -8,7 +8,7 @@ import {
   BookOpen,
   ArrowRight,
   FileText,
-  ChevronRight,
+  ChevronLeft,
   FileDown,
   ExternalLink,
   Layers,
@@ -178,141 +178,137 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
   const teacherName = (lesson.creator as any)?.full_name
 
   return (
-    <div className="container-page py-8 animate-page">
+    <div className="container-page py-6 sm:py-8 max-w-[840px] animate-fade-in">
       {/* Breadcrumb Navigation */}
-      <nav className="flex items-center gap-2 text-xs text-ink-500 mb-6 flex-wrap">
-        <Link href="/student" className="hover:text-ink-900 transition">
+      <nav className="flex items-center gap-1.5 text-xs text-ink-muted mb-5 flex-wrap">
+        <Link href="/student" className="text-ink-secondary hover:text-accent transition-colors font-medium">
           لوحة الطالب
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 rotate-180 text-ink-300" />
-        <Link href="/student/subjects" className="hover:text-ink-900 transition">
+        <ChevronLeft className="w-3 h-3 text-ink-muted" />
+        <Link href="/student/subjects" className="text-ink-secondary hover:text-accent transition-colors font-medium">
           المواد الدراسية
         </Link>
         {subjectId && (
           <>
-            <ChevronRight className="w-3.5 h-3.5 rotate-180 text-ink-300" />
+            <ChevronLeft className="w-3 h-3 text-ink-muted" />
             <Link
               href={`/student/subjects/${subjectId}`}
-              className="hover:text-ink-900 transition"
+              className="text-ink-secondary hover:text-accent transition-colors font-medium"
             >
               {subjectName}
             </Link>
           </>
         )}
-        <ChevronRight className="w-3.5 h-3.5 rotate-180 text-ink-300" />
-        <span className="text-ink-900 font-bold truncate max-w-xs">{lesson.title}</span>
+        <ChevronLeft className="w-3 h-3 text-ink-muted" />
+        <span className="text-ink-primary font-medium truncate max-w-xs">{lesson.title}</span>
       </nav>
 
-      {/* Lesson Header Card */}
-      <div className="card p-6 sm:p-8 bg-white border-ink-100 mb-8">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+      {/* Lesson Typographic Header */}
+      <header className="mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-bold">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>{subjectName}</span>
-            </div>
+            <span className="chip text-[11px] font-semibold text-accent border-accent/20 bg-accent-bg">
+              {subjectName}
+            </span>
 
             {teacherName && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-ink-100 text-ink-700 text-xs font-semibold border border-ink-200">
-                <GraduationCap className="w-3.5 h-3.5 text-gold-dark" />
-                <span>إعداد المعلم: أ. {teacherName}</span>
-              </div>
+              <span className="chip text-[11px] text-ink-secondary">
+                إعداد المعلم: أ. {teacherName}
+              </span>
             )}
           </div>
 
           {subjectId && (
             <Link
               href={`/student/subjects/${subjectId}`}
-              className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1 hover:bg-ink-50"
+              className="btn-outline text-xs py-1 px-2.5 flex items-center gap-1"
             >
-              <ArrowRight className="w-3.5 h-3.5" />
-              <span>فهرس الدروس</span>
+              <ArrowRight className="w-3 h-3" />
+              <span>فهرس المادة</span>
             </Link>
           )}
         </div>
 
-        <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-ink-900 mb-4 leading-snug">
+        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-ink-primary mb-4 leading-tight tracking-tight">
           {lesson.title}
         </h1>
 
-        {/* Lesson Intro / Explanation */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-cream/40 border border-ink-100 text-sm text-ink-700 leading-relaxed whitespace-pre-line">
-          <p className="font-bold text-xs text-ink-500 mb-1">مقدمة وتمهيد الدرس:</p>
-          {lesson.explanation}
-        </div>
-      </div>
+        {/* Lesson Intro / Explanation in Editorial Highlight Callout */}
+        {lesson.explanation && (
+          <div className="p-4 sm:p-5 rounded-md border-r-2 border-accent bg-bg-alt/70 text-sm sm:text-base text-ink-primary leading-relaxed whitespace-pre-line font-serif italic">
+            <p className="font-sans font-semibold text-[11px] text-ink-muted mb-1 not-italic">تمهيد ومقدمة الدرس:</p>
+            {lesson.explanation}
+          </div>
+        )}
+      </header>
 
-      {/* Dynamic Sections Section */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-2 pb-2 border-b border-ink-100">
-          <Layers className="w-4 h-4 text-gold-dark" />
-          <h2 className="font-heading font-bold text-lg text-ink-900">
-            محتوى وأقسام الدرس ({sections.length})
-          </h2>
-        </div>
-
+      {/* Sections in Pure Typographic Flow - NO Card Container */}
+      <article className="prose-lesson mb-12">
+        {/* Dynamic Sections in Seamless Editorial Flow */}
         {sections.length > 0 ? (
-          <div className="space-y-6">
+          <div className="divide-y divide-border-subtle">
             {sections.map((section, index) => (
-              <div
+              <section
                 key={section.id}
-                className="card p-6 sm:p-7 bg-white border-ink-100/90 shadow-card"
+                className={index === 0 ? 'pb-8' : 'py-8'}
               >
-                {/* Section Header */}
+                {/* Editorial Section Heading */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 rounded-lg bg-ink-100 text-ink-700 flex items-center justify-center font-heading font-bold text-xs shrink-0">
+                  <span className="w-7 h-7 rounded-md bg-accent-bg text-accent font-serif font-bold text-xs flex items-center justify-center border border-accent/20 shrink-0">
                     {section.sort_order || index + 1}
-                  </div>
-                  <h3 className="font-heading font-bold text-lg text-ink-900">
+                  </span>
+                  <h2 className="font-serif font-bold text-lg sm:text-xl text-ink-primary m-0">
                     {section.title}
-                  </h3>
+                  </h2>
                 </div>
 
-                {/* Section Content */}
-                <div className="prose prose-sm max-w-none text-ink-700 leading-relaxed whitespace-pre-line mb-6">
+                {/* Section Text Content */}
+                <div className="prose-lesson text-[15px] sm:text-base text-ink-primary leading-relaxed whitespace-pre-line mb-6">
                   {section.content}
                 </div>
 
-                {/* Optional Media (Video, Image, OR PDF) */}
+                {/* Optional Media (Video, Image, or PDF) */}
                 {section.videoUrl && (
-                  <div className="mt-4 rounded-2xl overflow-hidden border border-ink-200/80 bg-ink-950 shadow-inner">
+                  <div className="my-5 rounded-lg overflow-hidden border border-border-base bg-black shadow-xs">
                     <video
                       src={section.videoUrl}
                       controls
                       playsInline
                       preload="metadata"
-                      className="w-full max-h-[480px] object-contain bg-black mx-auto"
+                      className="w-full max-h-[460px] object-contain bg-black mx-auto"
                     />
                   </div>
                 )}
 
                 {section.imageUrl && (
-                  <div className="mt-4 rounded-2xl overflow-hidden border border-ink-100 bg-cream/20">
-                    <img
-                      src={section.imageUrl}
-                      alt={section.title}
-                      className="w-full max-h-96 object-contain mx-auto"
-                    />
-                  </div>
+                  <figure className="my-5">
+                    <div className="rounded-lg overflow-hidden border border-border-base bg-bg-alt">
+                      <img
+                        src={section.imageUrl}
+                        alt={section.title}
+                        className="w-full max-h-96 object-contain mx-auto"
+                      />
+                    </div>
+                  </figure>
                 )}
 
                 {section.pdfUrl && (
-                  <div className="mt-4 p-4 rounded-2xl border border-ink-100 bg-cream/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="my-4 p-4 rounded-md border border-border-base bg-bg-alt/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100">
-                        <FileText className="w-5 h-5" />
+                      <div className="w-9 h-9 rounded-md bg-error-bg text-error flex items-center justify-center shrink-0 border border-error/20">
+                        <FileText className="w-4.5 h-4.5" />
                       </div>
                       <div>
-                        <p className="font-bold text-xs text-ink-900">
+                        <p className="font-medium text-xs sm:text-sm text-ink-primary">
                           ملف توضيحي مرفق (PDF)
                         </p>
-                        <p className="text-[11px] text-ink-500">
-                          يمكنك قراءة الملف أو تحميله للمراجعة دون اتصال
+                        <p className="text-[11px] text-ink-muted">
+                          وثيقة إثرائية للمراجعة والحفظ
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 self-end sm:self-center">
+                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                       <a
                         href={section.pdfUrl}
                         target="_blank"
@@ -320,7 +316,7 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
                         className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
-                        <span>فتح في تبويب</span>
+                        <span>معاينة</span>
                       </a>
                       <a
                         href={section.pdfUrl}
@@ -328,20 +324,20 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
                         className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5"
                       >
                         <FileDown className="w-3.5 h-3.5" />
-                        <span>تحميل الملف</span>
+                        <span>تحميل</span>
                       </a>
                     </div>
                   </div>
                 )}
-              </div>
+              </section>
             ))}
           </div>
         ) : (
-          <div className="card p-8 text-center text-ink-400">
-            <p className="text-xs">لا توجد أقسام تفصيلية في هذا الدرس بعد.</p>
+          <div className="py-12 text-center text-ink-muted">
+            <p className="text-sm">محتوى هذا الدرس قيد الإعداد والإضافة.</p>
           </div>
         )}
-      </div>
+      </article>
 
       {/* Lesson Questions & Discussion Section */}
       <LessonQuestionsSection
@@ -354,10 +350,10 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
 
       {/* Back to Subject Footer */}
       {subjectId && (
-        <div className="pt-8 mt-8 border-t border-ink-100 flex justify-center">
+        <div className="pt-6 mt-8 border-t border-border-subtle flex justify-center">
           <Link
             href={`/student/subjects/${subjectId}`}
-            className="btn-outline text-sm flex items-center gap-2 hover:bg-ink-50"
+            className="btn-outline text-xs sm:text-sm py-2 px-4 flex items-center gap-2"
           >
             <ArrowRight className="w-4 h-4" />
             <span>العودة لقائمة دروس {subjectName}</span>

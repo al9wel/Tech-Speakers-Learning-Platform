@@ -252,19 +252,19 @@ export function ArticleDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-lg w-full border border-ink-100 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/40 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="bg-bg-surface rounded-lg max-w-lg w-full border border-border-base shadow-xl overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-ink-100 flex items-center justify-between bg-parchment/40 shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gold/15 text-gold flex items-center justify-center shadow-2xs">
-              {isEdit ? <Pencil className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+        <div className="px-6 py-4 border-b border-border-base flex items-center justify-between bg-bg-alt/50 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-md bg-accent/10 text-accent flex items-center justify-center border border-accent/20">
+              {isEdit ? <Pencil className="w-4.5 h-4.5" /> : <Sparkles className="w-4.5 h-4.5" />}
             </div>
             <div>
-              <h3 className="font-bold text-ink-900 text-lg">
+              <h3 className="font-serif font-bold text-ink-primary text-base sm:text-lg">
                 {isEdit ? 'تعديل المنشور' : 'نشر خبر أو مقال جديد'}
               </h3>
-              <p className="text-xs text-ink-500 font-medium">
+              <p className="text-xs text-ink-muted font-normal">
                 {isEdit
                   ? 'قم بتحديث تفاصيل المنشور أو استبدال المرفقات'
                   : 'شارك الطلاب والمعلمين آخر الأخبار والمقالات والإعلانات التربوية'}
@@ -274,27 +274,27 @@ export function ArticleDialog({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 text-ink-400 hover:text-ink-700 hover:bg-ink-100 rounded-xl transition-colors cursor-pointer"
+            className="p-1.5 text-ink-muted hover:text-ink-primary hover:bg-bg-alt rounded-md transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4.5 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4 overflow-y-auto flex-1">
           {/* Category selection */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               نوع المنشور <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {CATEGORIES.map((cat) => (
                 <label
                   key={cat}
-                  className={`flex items-center justify-center p-2.5 rounded-xl border text-xs font-bold cursor-pointer transition-all ${
+                  className={`flex items-center justify-center p-2 rounded-md border text-xs font-medium cursor-pointer transition-colors ${
                     watchedCategory === cat
-                      ? 'border-gold bg-gold/10 text-gold shadow-2xs'
-                      : 'border-ink-200 bg-white text-ink-700 hover:border-ink-300'
+                      ? 'border-accent bg-accent/10 text-accent shadow-2xs font-semibold'
+                      : 'border-border-base bg-bg-surface text-ink-primary hover:border-accent/40'
                   }`}
                 >
                   <input
@@ -308,57 +308,57 @@ export function ArticleDialog({
               ))}
             </div>
             {errors.category && (
-              <p className="text-xs text-red-500 mt-1 font-medium">{errors.category.message}</p>
+              <p className="text-xs text-red-500 mt-1 font-normal">{errors.category.message}</p>
             )}
           </div>
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               عنوان المنشور <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               placeholder="مثال: موعد انطلاق الاختبارات الشهرية وتوجيهات الاستعداد"
               {...register('title')}
-              className={`w-full px-4 py-2.5 rounded-xl border text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-gold/30 transition-all ${
-                errors.title ? 'border-red-400 bg-red-50/20' : 'border-ink-200 focus:border-gold'
+              className={`w-full px-3 py-2 rounded-md border text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors ${
+                errors.title ? 'border-red-400 bg-red-50/20' : 'border-border-base bg-bg-surface'
               }`}
             />
             {errors.title && (
-              <p className="text-xs text-red-500 mt-1 font-medium">{errors.title.message}</p>
+              <p className="text-xs text-red-500 mt-1 font-normal">{errors.title.message}</p>
             )}
           </div>
 
           {/* Content */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               نص وتفاصيل المنشور <span className="text-red-500">*</span>
             </label>
             <textarea
-              rows={5}
+              rows={4}
               placeholder="اكتب نص الخبر أو المقال بالتفصيل لجميع منسوبي المنصة..."
               {...register('content')}
-              className={`w-full px-4 py-3 rounded-xl border text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-gold/30 resize-none transition-all ${
-                errors.content ? 'border-red-400 bg-red-50/20' : 'border-ink-200 focus:border-gold'
+              className={`w-full px-3 py-2 rounded-md border text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-none transition-colors leading-relaxed ${
+                errors.content ? 'border-red-400 bg-red-50/20' : 'border-border-base bg-bg-surface'
               }`}
             />
             {errors.content && (
-              <p className="text-xs text-red-500 mt-1 font-medium">{errors.content.message}</p>
+              <p className="text-xs text-red-500 mt-1 font-normal">{errors.content.message}</p>
             )}
           </div>
 
           {/* Media Attachments */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               إرفاق وسائط أو مستند (اختياري)
             </label>
 
             {previewImage || previewVideo || pdfFileName || videoFileName || watchedImagePath || watchedPdfPath || watchedVideoPath ? (
-              <div className="p-3.5 rounded-xl border border-gold/30 bg-gold/5 flex items-center justify-between gap-3">
+              <div className="p-3 rounded-md border border-border-base bg-bg-alt/70 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 truncate">
                   {previewImage || watchedImagePath ? (
-                    <div className="w-10 h-10 rounded-lg bg-gold/15 flex items-center justify-center shrink-0 overflow-hidden">
+                    <div className="w-9 h-9 rounded-md bg-accent/15 flex items-center justify-center shrink-0 overflow-hidden border border-accent/20">
                       {previewImage ? (
                         <img
                           src={previewImage}
@@ -366,27 +366,27 @@ export function ArticleDialog({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <ImageIcon className="w-5 h-5 text-gold" />
+                        <ImageIcon className="w-4 h-4 text-accent" />
                       )}
                     </div>
                   ) : previewVideo || watchedVideoPath ? (
-                    <div className="w-10 h-10 rounded-lg bg-amber-500/15 text-amber-600 flex items-center justify-center shrink-0 overflow-hidden">
+                    <div className="w-9 h-9 rounded-md bg-accent-bg text-accent flex items-center justify-center shrink-0 overflow-hidden border border-accent/20">
                       {previewVideo ? (
                         <video
                           src={previewVideo}
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <Video className="w-5 h-5" />
+                        <Video className="w-4 h-4" />
                       )}
                     </div>
                   ) : (
-                    <div className="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                      <FileText className="w-5 h-5" />
+                    <div className="w-9 h-9 rounded-md bg-red-100 text-red-600 flex items-center justify-center shrink-0 border border-red-200">
+                      <FileText className="w-4 h-4" />
                     </div>
                   )}
                   <div className="truncate">
-                    <p className="text-xs font-bold text-ink-900 truncate">
+                    <p className="text-xs font-semibold text-ink-primary truncate">
                       {videoFileName
                         ? videoFileName
                         : pdfFileName
@@ -395,14 +395,14 @@ export function ArticleDialog({
                         ? 'مقطع فيديو مرفق'
                         : 'تم إرفاق صورة للمنشور'}
                     </p>
-                    <p className="text-[11px] text-emerald-600 font-medium">جاهز للنشر</p>
+                    <p className="text-[11px] text-emerald-700 font-medium">جاهز للنشر</p>
                   </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={removeMedia}
-                  className="p-1.5 text-ink-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0 cursor-pointer"
+                  className="p-1.5 text-ink-muted hover:text-red-700 hover:bg-red-50 rounded-md transition-colors shrink-0 cursor-pointer"
                   title="إزالة المرفق"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -411,7 +411,7 @@ export function ArticleDialog({
             ) : (
               <div className="grid grid-cols-3 gap-2">
                 {/* Upload Image Option */}
-                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+                <label className="flex flex-col items-center justify-center p-3 rounded-md border border-dashed border-border-base hover:border-accent bg-bg-alt/30 hover:bg-accent/5 cursor-pointer transition-colors text-center group">
                   <input
                     type="file"
                     accept="image/*"
@@ -419,17 +419,17 @@ export function ArticleDialog({
                     disabled={uploadingMedia}
                     className="sr-only"
                   />
-                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                  <div className="w-7 h-7 rounded-md bg-bg-surface group-hover:bg-accent/15 text-ink-secondary group-hover:text-accent flex items-center justify-center mb-1 border border-border-subtle transition-colors">
                     <ImageIcon className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                  <span className="text-xs font-medium text-ink-primary group-hover:text-accent truncate w-full">
                     صورة
                   </span>
-                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 5MB</span>
+                  <span className="text-[9px] text-ink-muted truncate w-full">حتى 5MB</span>
                 </label>
 
                 {/* Upload PDF Option */}
-                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+                <label className="flex flex-col items-center justify-center p-3 rounded-md border border-dashed border-border-base hover:border-accent bg-bg-alt/30 hover:bg-accent/5 cursor-pointer transition-colors text-center group">
                   <input
                     type="file"
                     accept="application/pdf"
@@ -437,17 +437,17 @@ export function ArticleDialog({
                     disabled={uploadingMedia}
                     className="sr-only"
                   />
-                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                  <div className="w-7 h-7 rounded-md bg-bg-surface group-hover:bg-accent/15 text-ink-secondary group-hover:text-accent flex items-center justify-center mb-1 border border-border-subtle transition-colors">
                     <FileText className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                  <span className="text-xs font-medium text-ink-primary group-hover:text-accent truncate w-full">
                     مستند PDF
                   </span>
-                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 10MB</span>
+                  <span className="text-[9px] text-ink-muted truncate w-full">حتى 10MB</span>
                 </label>
 
                 {/* Upload Video Option */}
-                <label className="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-dashed border-ink-200 hover:border-gold bg-parchment/30 hover:bg-gold/5 cursor-pointer transition-all text-center group">
+                <label className="flex flex-col items-center justify-center p-3 rounded-md border border-dashed border-border-base hover:border-accent bg-bg-alt/30 hover:bg-accent/5 cursor-pointer transition-colors text-center group">
                   <input
                     type="file"
                     accept="video/mp4,video/webm,video/ogg,video/quicktime"
@@ -455,19 +455,19 @@ export function ArticleDialog({
                     disabled={uploadingMedia}
                     className="sr-only"
                   />
-                  <div className="w-7 h-7 rounded-lg bg-white group-hover:bg-gold/15 text-ink-500 group-hover:text-gold flex items-center justify-center mb-1 shadow-2xs transition-colors">
+                  <div className="w-7 h-7 rounded-md bg-bg-surface group-hover:bg-accent/15 text-ink-secondary group-hover:text-accent flex items-center justify-center mb-1 border border-border-subtle transition-colors">
                     <Video className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-ink-700 group-hover:text-gold truncate w-full">
+                  <span className="text-xs font-medium text-ink-primary group-hover:text-accent truncate w-full">
                     مقطع فيديو
                   </span>
-                  <span className="text-[9px] text-ink-400 truncate w-full">حتى 20MB</span>
+                  <span className="text-[9px] text-ink-muted truncate w-full">حتى 20MB</span>
                 </label>
               </div>
             )}
 
             {uploadingMedia && (
-              <div className="flex items-center gap-2 mt-2 text-xs text-gold font-bold">
+              <div className="flex items-center gap-2 mt-2 text-xs text-accent font-medium">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>جارٍ رفع المرفق إلى السحابة...</span>
               </div>
@@ -475,28 +475,28 @@ export function ArticleDialog({
           </div>
 
           {/* Actions */}
-          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-ink-100">
+          <div className="pt-2 flex items-center justify-end gap-2.5 border-t border-border-subtle">
             <button
               type="button"
               onClick={onClose}
               disabled={submitting || uploadingMedia}
-              className="px-4 py-2.5 rounded-xl text-sm font-semibold text-ink-600 hover:bg-ink-100 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-medium text-ink-secondary hover:bg-bg-alt border border-border-base transition-colors cursor-pointer"
             >
               إلغاء
             </button>
             <button
               type="submit"
               disabled={submitting || uploadingMedia}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-gold hover:bg-gold-600 text-white shadow-soft transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 rounded-md text-xs sm:text-sm font-medium bg-accent hover:bg-accent-hover text-white shadow-xs transition-colors flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
             >
               {submitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   <span>جارٍ الحفظ...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-4 h-4" />
+                  <Upload className="w-3.5 h-3.5" />
                   <span>{isEdit ? 'تحديث المنشور' : 'نشر الآن'}</span>
                 </>
               )}

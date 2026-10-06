@@ -26,11 +26,11 @@ export function getTeacherColumns(): ColumnDef<UserItem>[] {
         const u = row.original
         return (
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gold/15 text-gold-dark font-bold text-xs flex items-center justify-center shrink-0 border border-gold/30">
+            <div className="w-8 h-8 rounded-full bg-accent-bg text-accent font-semibold text-xs flex items-center justify-center shrink-0 border border-accent/20">
               {(u.full_name || u.email).charAt(0).toUpperCase()}
             </div>
-            <div className="font-semibold text-ink-900 text-sm">
-              {u.full_name || <span className="text-ink-400 italic">بدون اسم</span>}
+            <div className="font-semibold text-ink-primary text-sm">
+              {u.full_name || <span className="text-ink-muted italic">بدون اسم</span>}
             </div>
           </div>
         )

@@ -7,13 +7,13 @@ type LogoProps = {
 };
 
 export default function Logo({ variant = 'full', className = '', showTagline = false }: LogoProps) {
-  const textColor = variant === 'white' ? 'text-white' : 'text-ink-900';
-  const subColor = variant === 'white' ? 'text-white/70' : 'text-ink-500';
+  const textColor = variant === 'white' ? 'text-white' : 'text-ink-primary';
+  const subColor = variant === 'white' ? 'text-white/70' : 'text-ink-muted';
 
   return (
     <Link
       href="/"
-      className={`flex items-center gap-2 sm:gap-2.5 group shrink-0 select-none ${className}`}
+      className={`flex items-center gap-2.5 group shrink-0 select-none ${className}`}
       aria-label="مِداد - الصفحة الرئيسية"
     >
       <span className="shrink-0 flex items-center justify-center">
@@ -21,13 +21,13 @@ export default function Logo({ variant = 'full', className = '', showTagline = f
       </span>
       <span className="flex flex-col leading-none shrink-0">
         <span
-          className={`font-heading font-extrabold text-lg sm:text-xl tracking-tight ${textColor}`}
+          className={`font-serif font-bold text-lg sm:text-xl tracking-tight ${textColor}`}
         >
           مِداد
         </span>
         {variant !== 'compact' && (
           <span
-            className={`text-[10px] sm:text-[11px] font-medium ${subColor} mt-0.5 whitespace-nowrap`}
+            className={`text-[11px] font-medium ${subColor} mt-0.5 whitespace-nowrap`}
           >
             {showTagline ? 'المعرفة تُكتب وتُشارك' : 'MIDAD'}
           </span>
@@ -38,11 +38,11 @@ export default function Logo({ variant = 'full', className = '', showTagline = f
 }
 
 export function LogoMark({ variant = 'full', className = '' }: { variant?: string; className?: string }) {
-  const bookColor = variant === 'white' ? '#F7F2EA' : '#A98262';
-  const bookPageColor = variant === 'white' ? '#6B4F3A' : '#F7F2EA';
-  const nibColor = variant === 'white' ? '#F7F2EA' : '#6B4F3A';
-  const nibShade = variant === 'white' ? '#A98262' : '#352A24';
-  const goldAccent = '#C69C5D';
+  const bookColor = variant === 'white' ? '#FAF8F4' : '#D4CFC4';
+  const bookPageColor = variant === 'white' ? '#2D5F5D' : '#FAF8F4';
+  const nibColor = variant === 'white' ? '#FAF8F4' : '#2D5F5D';
+  const nibShade = variant === 'white' ? '#4A8580' : '#1C1B19';
+  const goldAccent = '#B8732E';
 
   return (
     <svg

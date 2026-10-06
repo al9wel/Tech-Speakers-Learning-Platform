@@ -62,24 +62,24 @@ export function ArticleCard({
     switch (category) {
       case 'خبر':
         return {
-          pill: 'bg-black/40 text-sky-200 border-white/15 backdrop-blur-xs',
-          dot: 'bg-sky-400',
+          pill: 'bg-accent-bg text-accent border-accent/20',
+          dot: 'bg-accent',
         }
       case 'مقال':
         return {
-          pill: 'bg-black/40 text-emerald-200 border-white/15 backdrop-blur-xs',
-          dot: 'bg-emerald-400',
+          pill: 'bg-paper-terracotta/10 text-paper-terracotta border-paper-terracotta/20',
+          dot: 'bg-paper-terracotta',
         }
       case 'إعلان':
         return {
-          pill: 'bg-black/40 text-amber-200 border-white/15 backdrop-blur-xs',
-          dot: 'bg-amber-400',
+          pill: 'bg-bg-alt text-ink-primary border-border-base',
+          dot: 'bg-ink-secondary',
         }
       case 'توجيه تربوي':
       default:
         return {
-          pill: 'bg-black/40 text-purple-200 border-white/15 backdrop-blur-xs',
-          dot: 'bg-purple-400',
+          pill: 'bg-accent-bg text-accent border-accent/20',
+          dot: 'bg-accent',
         }
     }
   }
@@ -97,92 +97,116 @@ export function ArticleCard({
     }
   }
 
-  // Dynamic height based on card variant
-  const getMinHeightClass = () => {
-    switch (variant) {
-      case 'hero':
-        return 'min-h-[460px] sm:min-h-[500px]'
-      case 'wide':
-        return 'min-h-[400px] sm:min-h-[440px]'
-      case 'compact':
-        return 'min-h-[400px] sm:min-h-[440px]'
-      case 'standard':
-      default:
-        return 'min-h-[380px] sm:min-h-[400px]'
-    }
-  }
+  const isLead = isFeatured || variant === 'hero'
 
   return (
     <>
-      {/* Editorial News Card */}
+      {/* ========================================================
+         COMPACT HORIZONTAL EDITORIAL ROW (مثل فهرس الدروس)
+         Full width, compact height, clear highlight under text
+         ======================================================== */}
       <article
         onClick={() => setShowReaderModal(true)}
-        className={`group relative rounded-3xl overflow-hidden border border-white/15 shadow-soft hover:shadow-2xl transition-all duration-300 flex flex-col justify-between cursor-pointer select-none p-4 sm:p-6 ${getMinHeightClass()}`}
+        className={`p-3.5 sm:p-4.5 transition-colors group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-5 cursor-pointer select-none ${
+          isLead
+            ? 'bg-accent/6 hover:bg-accent/10 border-r-3 border-accent'
+            : 'hover:bg-bg-alt/60'
+        }`}
       >
-        {/* Background Layers */}
-        {article.imageUrl ? (
-          <>
-            <img
-              src={article.imageUrl}
-              alt={article.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              loading="lazy"
-            />
-            {/* Subtle Natural Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none transition-opacity duration-300" />
-          </>
-        ) : (
-          <>
-            {/* Rich Editorial Ambient Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#241a14] via-[#35261d] to-[#18110d]" />
-            <div className="absolute top-0 right-0 w-80 h-80 bg-gold/15 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-sage/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />
-          </>
-        )}
-
-        {/* Top Header Row (Badges & Management Actions) */}
-        <div className="relative z-10 flex items-start justify-between gap-2.5">
-          <div className="flex flex-wrap items-center gap-2">
-            {(isFeatured || variant === 'hero') && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-gold to-gold-600 text-white shadow-md backdrop-blur-xs border border-gold-300/40 animate-pulse">
-                <Sparkles className="w-3.5 h-3.5 text-white" />
-                <span>الخبر الأبرز</span>
-              </span>
-            )}
-
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold backdrop-blur-xs border shadow-sm ${categoryStyle.pill}`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${categoryStyle.dot}`} />
-              <span>{article.category || 'خبر'}</span>
-            </span>
-
-            {article.videoUrl && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-xs bg-black/40 text-amber-200 border border-white/15 shadow-sm">
-                <Video className="w-3 h-3 text-amber-300" />
-                <span>مقطع فيديو</span>
-              </span>
-            )}
-
-            {article.pdfUrl && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold backdrop-blur-xs bg-black/40 text-red-200 border border-white/15 shadow-sm">
-                <FileText className="w-3 h-3 text-red-300" />
-                <span>مرفق مستند</span>
-              </span>
-            )}
-          </div>
-
-          {/* Quick Management Buttons */}
-          {canManage && (
+        {/* Right side / Main content (RTL) */}
+        <div className="flex items-start gap-3.5 flex-1 min-w-0">
+          {/* Unboxed Compact Thumbnail (if present) */}
+          {article.imageUrl && (
             <div
-              className="flex items-center gap-1 backdrop-blur-xs bg-black/40 rounded-2xl p-1 border border-white/15 shadow-sm"
-              onClick={(e) => e.stopPropagation()}
+              className="w-20 h-16 sm:w-24 sm:h-18 rounded-md overflow-hidden bg-bg-alt border border-border-subtle shrink-0 self-center order-last sm:order-first group-hover:opacity-95 transition-opacity"
             >
+              <img
+                src={article.imageUrl}
+                alt={article.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
+              />
+            </div>
+          )}
+
+          {/* Text & Metadata */}
+          <div className="min-w-0 flex-1 space-y-1">
+            {/* Top Tag Row */}
+            <div className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+              {isLead && (
+                <span className="chip bg-paper-terracotta/10 text-paper-terracotta border-paper-terracotta/20 text-[10px] font-semibold">
+                  <Sparkles className="w-2.5 h-2.5" />
+                  <span>الخبر الأبرز</span>
+                </span>
+              )}
+
+              <span className={`chip text-[10px] font-semibold ${categoryStyle.pill}`}>
+                {article.category || 'خبر'}
+              </span>
+
+              <span className="text-[11px] font-medium text-ink-secondary">
+                أ. {authorName}
+              </span>
+
+              <span>·</span>
+
+              <span className="text-[11px] text-ink-muted">
+                {formatDate(article.created_at)}
+              </span>
+
+              {article.videoUrl && (
+                <span className="chip text-[10px] text-ink-secondary">
+                  <Video className="w-3 h-3 text-accent" />
+                  <span>فيديو</span>
+                </span>
+              )}
+
+              {article.pdfUrl && (
+                <span className="chip text-[10px] text-ink-secondary">
+                  <FileText className="w-3 h-3 text-red-600" />
+                  <span>PDF</span>
+                </span>
+              )}
+            </div>
+
+            {/* Headline with High-Visibility Under-Highlight Marker */}
+            <h3 className="font-serif font-bold text-base sm:text-[17px] text-ink-primary group-hover:text-accent transition-colors leading-snug">
+              <span className="inline bg-accent/12 text-ink-primary px-1.5 py-0.5 rounded-xs border-b-2 border-accent/40 group-hover:bg-accent/20 group-hover:border-accent transition-colors">
+                {article.title}
+              </span>
+            </h3>
+
+            {/* Compact 1-line Excerpt */}
+            <p className="text-xs text-ink-secondary line-clamp-1 leading-relaxed font-normal">
+              {article.content}
+            </p>
+          </div>
+        </div>
+
+        {/* Left side: Action Links & Management (RTL) */}
+        <div
+          className="flex items-center gap-2 shrink-0 self-end sm:self-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {article.pdfUrl && (
+            <a
+              href={article.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-outline text-[11px] py-1 px-2.5 flex items-center gap-1"
+              title="معاينة المستند المرفق"
+            >
+              <FileText className="w-3 h-3 text-red-600" />
+              <span>PDF</span>
+            </a>
+          )}
+
+          {canManage && (
+            <div className="flex items-center gap-0.5">
               <button
                 type="button"
                 onClick={() => onEdit?.(article)}
-                className="p-1.5 text-white/80 hover:text-gold-300 hover:bg-white/10 rounded-xl transition-all cursor-pointer"
+                className="p-1 text-ink-muted hover:text-ink-primary hover:bg-bg-alt rounded transition-colors cursor-pointer"
                 title="تعديل المنشور"
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -190,104 +214,22 @@ export function ArticleCard({
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-1.5 text-white/80 hover:text-red-300 hover:bg-red-500/20 rounded-xl transition-all cursor-pointer"
+                className="p-1 text-ink-muted hover:text-error hover:bg-error-bg rounded transition-colors cursor-pointer"
                 title="حذف المنشور"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
-        </div>
 
-        {/* Bottom Content Area: Subtle Frosted Glass Veil */}
-        <div className="relative z-10 p-4 sm:p-5 rounded-2xl bg-black/25 backdrop-blur-xs border border-white/10 shadow-sm space-y-3 mt-auto transition-colors duration-300 group-hover:bg-black/35">
-          {/* Metadata Row: Author & Date */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-ink-200">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-gold/25 border border-gold/40 text-gold-200 flex items-center justify-center font-bold text-[11px] shrink-0 shadow-2xs">
-                <User className="w-3 h-3" />
-              </div>
-              <span className="font-bold text-white text-xs truncate max-w-[120px] sm:max-w-[160px]">
-                {authorName}
-              </span>
-              <span className="px-1.5 py-0.5 rounded-md bg-white/10 text-gold-200 text-[10px] font-bold">
-                مشرف
-              </span>
-            </div>
-
-            <span className="text-white/30 hidden sm:inline">•</span>
-
-            <div className="flex items-center gap-1 text-[11px] text-ink-300 font-medium">
-              <Calendar className="w-3 h-3 text-gold-300" />
-              <span>{formatDate(article.created_at)}</span>
-            </div>
-          </div>
-
-          {/* Headline */}
-          <h2
-            className={`font-black text-white leading-tight drop-shadow-sm group-hover:text-gold-200 transition-colors ${
-              variant === 'hero'
-                ? 'text-xl sm:text-2xl md:text-3xl line-clamp-2 sm:line-clamp-3'
-                : variant === 'wide'
-                ? 'text-lg sm:text-xl md:text-2xl line-clamp-2'
-                : variant === 'compact'
-                ? 'text-base sm:text-lg line-clamp-2'
-                : 'text-lg sm:text-xl line-clamp-2'
-            }`}
+          <button
+            type="button"
+            onClick={() => setShowReaderModal(true)}
+            className="text-xs font-semibold text-ink-muted group-hover:text-accent flex items-center gap-1 transition-colors cursor-pointer"
           >
-            {article.title}
-          </h2>
-
-          {/* Excerpt */}
-          <p
-            className={`text-ink-100/90 leading-relaxed font-normal ${
-              variant === 'hero'
-                ? 'text-xs sm:text-sm md:text-base line-clamp-3'
-                : variant === 'compact'
-                ? 'text-xs text-ink-100/80 line-clamp-2'
-                : 'text-xs sm:text-sm line-clamp-2'
-            }`}
-          >
-            {article.content}
-          </p>
-
-          {/* Bottom Action Footer */}
-          <div className="pt-2 flex items-center justify-between border-t border-white/10 text-xs">
-            <span className="inline-flex items-center gap-1.5 text-gold-300 group-hover:text-gold-200 font-bold transition-all">
-              <span>قراءة التفاصيل</span>
-              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
-            </span>
-
-            {/* Direct Media Links */}
-            <div
-              className="flex items-center gap-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {article.imageUrl && (
-                <button
-                  type="button"
-                  onClick={() => setShowImageModal(true)}
-                  className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white/90 transition-colors cursor-pointer"
-                  title="تكبير الصورة"
-                >
-                  <ZoomIn className="w-3.5 h-3.5" />
-                </button>
-              )}
-
-              {article.pdfUrl && (
-                <a
-                  href={article.pdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-red-600/90 hover:bg-red-600 text-white font-bold text-[11px] shadow-2xs transition-colors cursor-pointer"
-                  title="معاينة الملف المرفق"
-                >
-                  <FileText className="w-3 h-3" />
-                  <span>PDF</span>
-                </a>
-              )}
-            </div>
-          </div>
+            <span>قراءة</span>
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          </button>
         </div>
       </article>
 
@@ -298,12 +240,12 @@ export function ArticleCard({
           onClick={() => setShowReaderModal(false)}
         >
           <div
-            className="relative w-full max-w-3xl max-h-[92vh] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col cursor-default border border-ink-100"
+            className="relative w-full max-w-3xl max-h-[92vh] bg-bg-surface rounded-lg overflow-hidden shadow-xl flex flex-col cursor-default border border-border-base"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header Media (if image exists) */}
             {article.imageUrl && (
-              <div className="relative h-56 sm:h-72 w-full shrink-0 overflow-hidden bg-ink-900 group/zoom">
+              <div className="relative h-56 sm:h-72 w-full shrink-0 overflow-hidden bg-ink-primary group/zoom">
                 <img
                   src={article.imageUrl}
                   alt={article.title}
@@ -313,7 +255,7 @@ export function ArticleCard({
                 <button
                   type="button"
                   onClick={() => setShowImageModal(true)}
-                  className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black/80 text-white text-xs font-bold backdrop-blur-xs transition-colors cursor-pointer"
+                  className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-black/60 hover:bg-black/80 text-white text-xs font-medium backdrop-blur-xs transition-colors cursor-pointer"
                 >
                   <ZoomIn className="w-3.5 h-3.5" />
                   <span>عرض الصورة الأصلية</span>
@@ -325,70 +267,70 @@ export function ArticleCard({
             <button
               type="button"
               onClick={() => setShowReaderModal(false)}
-              className="absolute top-4 left-4 z-20 p-2.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-colors cursor-pointer shadow-md"
+              className="absolute top-3 left-3 z-20 p-2 rounded-md bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-colors cursor-pointer shadow-md"
               title="إغلاق"
             >
               <X className="w-4 h-4" />
             </button>
 
             {/* Modal Body */}
-            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 flex-1">
+            <div className="p-5 sm:p-7 overflow-y-auto space-y-5 flex-1">
               {/* Category & Date Info */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-ink-100">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border-subtle">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${categoryStyle.pill}`}
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium border ${categoryStyle.pill}`}
                   >
                     <Tag className="w-3 h-3" />
                     <span>{article.category || 'خبر'}</span>
                   </span>
                   {(isFeatured || variant === 'hero') && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gold text-white">
-                      <Sparkles className="w-3 h-3" />
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-paper-terracotta/10 text-paper-terracotta border border-paper-terracotta/20">
+                      <Sparkles className="w-3 h-3 text-paper-terracotta" />
                       <span>الخبر الأبرز</span>
                     </span>
                   )}
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs text-ink-500 font-medium">
-                  <Calendar className="w-3.5 h-3.5 text-ink-400" />
+                <div className="flex items-center gap-1.5 text-xs text-ink-muted font-normal">
+                  <Calendar className="w-3 h-3 text-ink-muted/70" />
                   <span>{formatDate(article.created_at)}</span>
                 </div>
               </div>
 
               {/* Title */}
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-ink-900 leading-tight">
+              <h1 className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-ink-primary leading-tight">
                 {article.title}
               </h1>
 
               {/* Author Card */}
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-parchment/60 border border-ink-100">
-                <div className="w-10 h-10 rounded-full bg-gold/20 text-gold flex items-center justify-center font-bold text-sm shrink-0">
-                  <User className="w-5 h-5" />
+              <div className="flex items-center gap-3 p-3 rounded-md bg-bg-alt/70 border border-border-subtle">
+                <div className="w-9 h-9 rounded-md bg-accent/15 text-accent flex items-center justify-center font-bold text-sm shrink-0 border border-accent/20">
+                  <User className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-ink-900">
+                    <span className="font-serif font-bold text-sm text-ink-primary">
                       {authorName}
                     </span>
-                    <span className="px-2 py-0.5 rounded-md bg-gold/15 text-gold text-[10px] font-bold">
+                    <span className="px-1.5 py-0.2 rounded bg-accent/10 text-accent text-[10px] font-medium">
                       مشرف تربوي
                     </span>
                   </div>
-                  <span className="text-[11px] text-ink-400">
+                  <span className="text-[11px] text-ink-muted">
                     المركز الإعلامي والإشراف الأكاديمي
                   </span>
                 </div>
               </div>
 
               {/* Full Content */}
-              <div className="prose prose-sm max-w-none text-ink-800 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
+              <div className="prose prose-sm max-w-none text-ink-primary text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
                 {article.content}
               </div>
 
               {/* Video Player (if available) */}
               {article.videoUrl && (
-                <div className="rounded-2xl overflow-hidden border border-ink-200/80 bg-ink-950 shadow-inner">
+                <div className="rounded-md overflow-hidden border border-border-base bg-black shadow-inner">
                   <video
                     src={article.videoUrl}
                     controls
@@ -401,16 +343,16 @@ export function ArticleCard({
 
               {/* PDF Attachment (if available) */}
               {article.pdfUrl && (
-                <div className="p-4 rounded-2xl bg-red-50/70 border border-red-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="p-3.5 rounded-md bg-bg-alt/80 border border-border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                      <FileText className="w-5 h-5" />
+                    <div className="w-9 h-9 rounded-md bg-red-100 text-red-700 flex items-center justify-center shrink-0 border border-red-200">
+                      <FileText className="w-4 h-4" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-red-950">
+                      <h4 className="font-serif text-sm font-bold text-ink-primary">
                         مستند توضيحي مرفق (PDF)
                       </h4>
-                      <p className="text-xs text-red-700">
+                      <p className="text-xs text-ink-muted">
                         يمكنك الاطلاع على التعميم أو النشرة كاملة أو تحميلها
                       </p>
                     </div>
@@ -421,7 +363,7 @@ export function ArticleCard({
                       href={article.pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-xl bg-white border border-red-200 text-red-700 hover:bg-red-100 font-bold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-md bg-bg-surface border border-border-base text-ink-primary hover:bg-bg-alt font-medium text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                       <span>معاينة</span>
@@ -429,7 +371,7 @@ export function ArticleCard({
                     <a
                       href={article.pdfUrl}
                       download
-                      className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white font-medium text-xs inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                     >
                       <FileDown className="w-3.5 h-3.5" />
                       <span>تحميل</span>
@@ -440,14 +382,14 @@ export function ArticleCard({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 sm:p-5 bg-ink-50/50 border-t border-ink-100 flex items-center justify-between">
-              <span className="text-xs text-ink-400">
-                منصة المتحدثون التقنيون التعليمية
+            <div className="p-3.5 sm:p-4 bg-bg-alt/40 border-t border-border-base flex items-center justify-between">
+              <span className="text-xs text-ink-muted">
+                {formatDate(article.created_at)}
               </span>
               <button
                 type="button"
                 onClick={() => setShowReaderModal(false)}
-                className="px-5 py-2 rounded-xl bg-ink-900 hover:bg-ink-800 text-white text-xs font-bold transition-colors cursor-pointer"
+                className="px-4 py-1.5 rounded-md bg-bg-surface hover:bg-bg-alt text-ink-secondary border border-border-base text-xs font-medium transition-colors cursor-pointer"
               >
                 إغلاق النافذة
               </button>
@@ -459,23 +401,23 @@ export function ArticleCard({
       {/* Full Image Modal Lightbox */}
       {showImageModal && article.imageUrl && (
         <div
-          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200 cursor-pointer"
+          className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-150 cursor-pointer"
           onClick={() => setShowImageModal(false)}
         >
           <div
-            className="relative max-w-5xl w-full max-h-[92vh] bg-transparent rounded-3xl overflow-hidden p-2 cursor-default flex items-center justify-center"
+            className="relative max-w-5xl w-full max-h-[92vh] bg-transparent rounded-lg overflow-hidden p-2 cursor-default flex items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setShowImageModal(false)}
-              className="absolute top-4 left-4 z-10 p-2.5 rounded-full bg-black/70 text-white hover:bg-black transition-colors cursor-pointer shadow-lg"
+              className="absolute top-4 left-4 z-10 p-2 rounded-md bg-black/70 text-white hover:bg-black transition-colors cursor-pointer shadow-lg"
             >
               <X className="w-5 h-5" />
             </button>
             <img
               src={article.imageUrl}
               alt={article.title}
-              className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/10"
+              className="max-w-full max-h-[85vh] object-contain rounded-md shadow-2xl border border-white/10"
             />
           </div>
         </div>
@@ -483,14 +425,14 @@ export function ArticleCard({
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 border border-ink-100 shadow-2xl animate-in zoom-in-95">
-            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
-              <AlertCircle className="w-6 h-6" />
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-ink-primary/40 backdrop-blur-xs">
+          <div className="bg-bg-surface rounded-lg max-w-sm w-full p-5 text-center space-y-4 border border-border-base shadow-xl">
+            <div className="w-10 h-10 rounded-md bg-red-50 text-red-600 flex items-center justify-center mx-auto border border-red-200">
+              <AlertCircle className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <h4 className="font-bold text-ink-900">حذف المنشور</h4>
-              <p className="text-xs text-ink-500">
+              <h4 className="font-serif font-bold text-ink-primary text-base">حذف المنشور</h4>
+              <p className="text-xs text-ink-muted">
                 هل أنت متأكد من حذف هذا الخبر/المقال؟ سيتم إزالته وحذف ملفاته المرفقة نهائياً.
               </p>
             </div>
@@ -499,7 +441,7 @@ export function ArticleCard({
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-ink-600 hover:bg-ink-100 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-md text-xs font-medium text-ink-secondary hover:bg-bg-alt border border-border-base transition-colors cursor-pointer"
               >
                 تراجع
               </button>
@@ -507,11 +449,11 @@ export function ArticleCard({
                 type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-md text-xs font-medium bg-red-600 hover:bg-red-700 text-white flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 {isDeleting ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3 h-3 animate-spin" />
                     <span>جارٍ الحذف...</span>
                   </>
                 ) : (

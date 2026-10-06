@@ -3,18 +3,18 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-gold/30",
+  "inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors focus:outline-none focus:ring-1 focus:ring-accent/40 border",
   {
     variants: {
       variant: {
-        default: "bg-ink-100 text-ink-900 border border-ink-200",
-        admin: "bg-ink-800 text-white",
-        teacher: "bg-gold/20 text-gold-dark border border-gold/30",
-        student: "bg-sage-50 text-sage-dark border border-sage-100",
-        supervisor: "bg-blue-50 text-blue-700 border border-blue-200",
-        counselor: "bg-rose-50 text-rose-700 border border-rose-200",
-        destructive: "bg-red-100 text-red-800 border border-red-200",
-        outline: "text-ink-700 border border-ink-200 bg-white",
+        default: "bg-bg-alt text-ink-primary border-border-base",
+        admin: "bg-ink-primary text-white border-transparent",
+        teacher: "bg-amber-bg text-amber border-amber/30",
+        student: "bg-accent-bg text-accent border-accent/30",
+        supervisor: "bg-[#eef3f7] text-[#2c5270] border-[#c8d8e5]",
+        counselor: "bg-[#fbf0ee] text-[#8a3e38] border-[#ebd4d1]",
+        destructive: "bg-error-bg text-error border-error/30",
+        outline: "text-ink-secondary border-border-base bg-bg-surface",
       },
     },
     defaultVariants: {

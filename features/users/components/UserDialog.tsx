@@ -123,16 +123,16 @@ export function UserDialog({ user, trigger }: UserDialogProps) {
         <button
           type="button"
           onClick={handleOpen}
-          className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 hover:bg-gold/10 hover:border-gold"
+          className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 hover:bg-teal/5 hover:border-teal rounded-md"
         >
-          <Pencil className="w-3.5 h-3.5 text-gold-dark" />
+          <Pencil className="w-3.5 h-3.5 text-teal" />
           <span>تعديل</span>
         </button>
       ) : (
         <button
           type="button"
           onClick={handleOpen}
-          className="btn-primary text-sm flex items-center gap-2"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-teal text-white text-xs sm:text-sm font-medium hover:bg-teal-dark transition shadow-xs"
         >
           <UserPlus className="w-4 h-4" />
           <span>إضافة مستخدم جديد</span>
@@ -140,16 +140,16 @@ export function UserDialog({ user, trigger }: UserDialogProps) {
       )}
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink-900/50 backdrop-blur-xs animate-page overflow-y-auto">
-          <div className="card w-full max-w-lg max-h-[92vh] overflow-y-auto p-4 sm:p-6 bg-white shadow-card-hover border-ink-200 animate-scale-in my-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink-950/40 backdrop-blur-xs animate-page overflow-y-auto">
+          <div className="card w-full max-w-lg max-h-[92vh] overflow-y-auto p-5 sm:p-6 bg-paper-light shadow-xl border border-ink-200/80 rounded-lg animate-scale-in my-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-ink-100">
+            <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-ink-200/60">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-ink-100 text-ink-700 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-md bg-teal/10 text-teal flex items-center justify-center">
                   {isEdit ? <Pencil className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
                 </div>
                 <div>
-                  <h3 className="font-heading font-bold text-lg text-ink-900">
+                  <h3 className="font-serif font-bold text-lg text-ink-900">
                     {isEdit ? 'تعديل بيانات المستخدم' : 'إضافة مستخدم جديد'}
                   </h3>
                   <p className="text-xs text-ink-500">
@@ -160,7 +160,7 @@ export function UserDialog({ user, trigger }: UserDialogProps) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-400 hover:text-ink-700 hover:bg-ink-50 transition"
+                className="w-8 h-8 rounded-md flex items-center justify-center text-ink-400 hover:text-ink-700 hover:bg-ink-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -168,15 +168,15 @@ export function UserDialog({ user, trigger }: UserDialogProps) {
 
             {/* Status Messages */}
             {serverError && (
-              <div className="p-3 mb-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
+              <div className="p-3 mb-4 rounded-md bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
                 <span>{serverError}</span>
               </div>
             )}
 
             {serverSuccess && (
-              <div className="p-3 mb-4 rounded-xl bg-sage-50 border border-sage-100 text-sage-dark text-sm flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-sage-dark" />
+              <div className="p-3 mb-4 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
                 <span>{serverSuccess}</span>
               </div>
             )}
@@ -184,14 +184,14 @@ export function UserDialog({ user, trigger }: UserDialogProps) {
             {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-ink-700 mb-1.5">
+                <label className="block text-xs font-semibold text-ink-700 mb-1.5">
                   الاسم الكامل:
                 </label>
                 <input
                   type="text"
                   placeholder="مثال: علي أحمد سالم"
                   {...register('full_name')}
-                  className="input-field text-sm"
+                  className="w-full px-3 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20"
                 />
                 {errors.full_name && (
                   <p className="text-red-600 text-xs mt-1">{errors.full_name.message}</p>
@@ -199,14 +199,14 @@ export function UserDialog({ user, trigger }: UserDialogProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink-700 mb-1.5">
+                <label className="block text-xs font-semibold text-ink-700 mb-1.5">
                   البريد الإلكتروني:
                 </label>
                 <input
                   type="email"
                   placeholder="user@example.com"
                   {...register('email')}
-                  className="input-field text-sm"
+                  className="w-full px-3 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20"
                 />
                 {errors.email && (
                   <p className="text-red-600 text-xs mt-1">{errors.email.message}</p>
@@ -214,12 +214,12 @@ export function UserDialog({ user, trigger }: UserDialogProps) {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-ink-700 mb-1.5">
+                <label className="block text-xs font-semibold text-ink-700 mb-1.5">
                   الدور في المنصة:
                 </label>
                 <select
                   {...register('role')}
-                  className="input-field text-sm bg-white"
+                  className="w-full px-3 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-900 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20"
                 >
                   {ROLES.map((r) => (
                     <option key={r.value} value={r.value}>
@@ -233,19 +233,19 @@ export function UserDialog({ user, trigger }: UserDialogProps) {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-end gap-2.5 pt-4 mt-6 border-t border-ink-100">
+              <div className="flex items-center justify-end gap-2.5 pt-4 mt-6 border-t border-ink-200/60">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   disabled={isSubmitting}
-                  className="btn-outline text-sm"
+                  className="btn-outline text-xs sm:text-sm py-2 px-4 rounded-md"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary text-sm min-w-28 flex items-center justify-center gap-2"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-teal text-white text-xs sm:text-sm font-medium hover:bg-teal-dark transition shadow-xs min-w-28"
                 >
                   {isSubmitting ? (
                     <>

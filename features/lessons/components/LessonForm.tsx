@@ -334,14 +334,14 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
   const isPending = isSubmitting || globalUploading
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 animate-page">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Top Banner and Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-ink-100">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-border-base">
         <div>
-          <h1 className="font-heading font-extrabold text-2xl text-ink-900">
+          <h1 className="font-serif font-bold text-xl sm:text-2xl text-ink-primary">
             {isEdit ? 'تعديل الدرس والأقسام' : 'إنشاء درس تعليمي جديد'}
           </h1>
-          <p className="text-sm text-ink-500">
+          <p className="text-xs sm:text-sm text-ink-muted">
             اختر المادة الدراسية، واكتب الشرح التمهيدي، ثم أضف الأقسام مع الصور أو ملفات PDF
           </p>
         </div>
@@ -349,18 +349,18 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
         <div className="flex items-center gap-2.5 self-end sm:self-center">
           <Link
             href="/teacher/lessons"
-            className="btn-outline text-sm"
+            className="px-3.5 py-1.5 rounded-md border border-border-base bg-bg-surface hover:bg-bg-alt text-xs sm:text-sm font-medium text-ink-secondary transition-colors"
           >
             إلغاء
           </Link>
           <button
             type="submit"
             disabled={isPending}
-            className="btn-primary text-sm min-w-36 flex items-center justify-center gap-2 disabled:opacity-50"
+            className="px-4 py-2 rounded-md bg-accent hover:bg-accent-hover text-white text-xs sm:text-sm font-medium shadow-xs min-w-32 flex items-center justify-center gap-2 disabled:opacity-50 transition-colors cursor-pointer"
           >
             {isPending ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>{globalUploading ? 'جاري رفع الملفات...' : 'جاري الحفظ...'}</span>
               </>
             ) : (
@@ -371,29 +371,29 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
       </div>
 
       {formError && (
-        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+        <div className="p-3.5 rounded-md bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm">
           {formError}
         </div>
       )}
 
       {/* Main Lesson Info Card */}
-      <div className="card p-6 bg-white shadow-card border-ink-100 space-y-5">
-        <h2 className="font-heading font-bold text-lg text-ink-900 flex items-center gap-2 pb-2 border-b border-ink-100">
-          <BookOpen className="w-5 h-5 text-gold-dark" />
+      <div className="bg-bg-surface border border-border-base rounded-lg p-5 sm:p-6 shadow-xs space-y-4">
+        <h2 className="font-serif font-bold text-base text-ink-primary flex items-center gap-2 pb-2 border-b border-border-subtle">
+          <BookOpen className="w-4.5 h-4.5 text-accent" />
           <span>المعلومات الأساسية للدرس</span>
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Subject Selector */}
           <div className="md:col-span-2">
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               المادة الدراسية: <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <select
                 {...register('subject_id')}
                 disabled={isPending}
-                className="input-field text-sm appearance-none bg-cream/30 pr-4 pl-10"
+                className="w-full px-3 py-2 appearance-none rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors pr-3 pl-8"
               >
                 {subjects.map((sub) => (
                   <option key={sub.id} value={sub.id}>
@@ -401,7 +401,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-4 h-4 text-ink-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-ink-muted/70 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
             {errors.subject_id && (
               <p className="text-red-600 text-xs mt-1">{errors.subject_id.message}</p>
@@ -410,7 +410,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
 
           {/* Sort Order */}
           <div>
-            <label className="block text-xs font-bold text-ink-700 mb-1.5">
+            <label className="block text-xs font-semibold text-ink-primary mb-1.5">
               ترتيب الدرس:
             </label>
             <input
@@ -418,7 +418,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
               min="0"
               {...register('sort_order', { valueAsNumber: true })}
               disabled={isPending}
-              className="input-field text-sm bg-cream/30"
+              className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
               placeholder="0"
             />
             {errors.sort_order && (
@@ -429,7 +429,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
 
         {/* Lesson Title */}
         <div>
-          <label className="block text-xs font-bold text-ink-700 mb-1.5">
+          <label className="block text-xs font-semibold text-ink-primary mb-1.5">
             عنوان الدرس: <span className="text-red-500">*</span>
           </label>
           <input
@@ -437,7 +437,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
             placeholder="مثال: خصائص الجمع والضرب في الأعداد الطبيعية"
             {...register('title')}
             disabled={isPending}
-            className="input-field text-sm"
+            className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
           />
           {errors.title && (
             <p className="text-red-600 text-xs mt-1">{errors.title.message}</p>
@@ -446,7 +446,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
 
         {/* Lesson Explanation / Intro */}
         <div>
-          <label className="block text-xs font-bold text-ink-700 mb-1.5">
+          <label className="block text-xs font-semibold text-ink-primary mb-1.5">
             الشرح التمهيدي للدرس: <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -454,7 +454,7 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
             placeholder="اكتب مقدمة شاملة أو تلخيصاً لما سيتعلمه الطالب في هذا الدرس..."
             {...register('explanation')}
             disabled={isPending}
-            className="input-field text-sm resize-y leading-relaxed"
+            className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-y leading-relaxed transition-colors"
           />
           {errors.explanation && (
             <p className="text-red-600 text-xs mt-1">{errors.explanation.message}</p>
@@ -466,8 +466,8 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-gold-dark" />
-            <h2 className="font-heading font-bold text-lg text-ink-900">
+            <Layers className="w-4.5 h-4.5 text-accent" />
+            <h2 className="font-serif font-bold text-base sm:text-lg text-ink-primary">
               أقسام الدرس التفاعلية ({fields.length})
             </h2>
           </div>
@@ -485,42 +485,45 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
               })
             }
             disabled={isPending}
-            className="btn-outline text-xs py-2 px-3 flex items-center gap-1.5 hover:bg-gold/10 hover:border-gold"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border-base bg-bg-surface hover:bg-bg-alt text-xs font-medium text-ink-secondary transition-colors cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-gold-dark" />
+            <Plus className="w-3.5 h-3.5 text-accent" />
             <span>إضافة قسم جديد</span>
           </button>
         </div>
+
         {fields.length === 0 ? (
-          <div className="card p-8 bg-cream/20 border-dashed border-2 border-ink-200/80 text-center rounded-2xl">
-            <div className="w-12 h-12 rounded-2xl bg-ink-100/70 text-ink-500 flex items-center justify-center mx-auto mb-3">
-              <Layers className="w-6 h-6 text-gold-dark" />
+          <div className="border border-dashed border-border-base rounded-lg p-8 sm:p-10 text-center bg-bg-surface space-y-2">
+            <div className="w-10 h-10 rounded-md bg-bg-alt text-ink-muted flex items-center justify-center mx-auto mb-2 border border-border-subtle">
+              <Layers className="w-5 h-5" />
             </div>
-            <h3 className="font-heading font-bold text-sm text-ink-800 mb-1">
+            <h3 className="font-serif font-bold text-sm text-ink-primary">
               لم تتم إضافة أي أقسام فرعية (اختياري)
             </h3>
-            <p className="text-xs text-ink-500 max-w-md mx-auto mb-4 leading-relaxed">
+            <p className="text-xs text-ink-muted max-w-md mx-auto leading-relaxed">
               يمكنك الاكتفاء بعنوان الدرس وشرحه التمهيدي فقط، أو الضغط أدناه لإضافة أقسام فرعية تفاعلية تضم شروحات إضافية وصور وملفات PDF.
             </p>
-            <button
-              type="button"
-              onClick={() =>
-                append({
-                  id: crypto.randomUUID(),
-                  title: '',
-                  content: '',
-                  image_path: null,
-                  pdf_path: null,
-                  video_path: null,
-                  sort_order: 1,
-                })
-              }
-              disabled={isPending}
-              className="btn-outline text-xs py-2 px-4 inline-flex items-center gap-2 hover:bg-gold/10 hover:border-gold cursor-pointer"
-            >
-              <Plus className="w-4 h-4 text-gold-dark" />
-              <span>إضافة قسم فرعي للدرس</span>
-            </button>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() =>
+                  append({
+                    id: crypto.randomUUID(),
+                    title: '',
+                    content: '',
+                    image_path: null,
+                    pdf_path: null,
+                    video_path: null,
+                    sort_order: 1,
+                  })
+                }
+                disabled={isPending}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white text-xs font-medium shadow-xs transition-colors cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>إضافة قسم فرعي للدرس</span>
+              </button>
+            </div>
           </div>
         ) : (
           fields.map((field, index) => {
@@ -533,258 +536,259 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
             const hasVideo = Boolean(currentVideoPath || sectionState.previewVideoUrl)
 
             return (
-            <div
-              key={field.id}
-              className="card p-6 bg-white shadow-card border-ink-100/90 relative space-y-4"
-            >
-              {/* Section Header Bar */}
-              <div className="flex items-center justify-between pb-3 border-b border-ink-100">
-                <div className="flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-lg bg-ink-100 text-ink-800 text-xs font-heading font-bold flex items-center justify-center">
-                    {index + 1}
-                  </span>
-                  <span className="font-heading font-bold text-sm text-ink-800">
-                    القسم رقم {index + 1}
-                  </span>
+              <div
+                key={field.id}
+                className="bg-bg-surface border border-border-base rounded-lg p-5 sm:p-6 shadow-xs relative space-y-4"
+              >
+                {/* Section Header Bar */}
+                <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-md bg-bg-alt text-ink-secondary text-xs font-bold flex items-center justify-center border border-border-subtle">
+                      {index + 1}
+                    </span>
+                    <span className="font-serif font-bold text-sm text-ink-primary">
+                      القسم رقم {index + 1}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    disabled={isPending}
+                    className="p-1 rounded-md text-red-600 hover:bg-red-50 transition-colors text-xs flex items-center gap-1 cursor-pointer"
+                    title="حذف هذا القسم"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>حذف القسم</span>
+                  </button>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  disabled={isPending}
-                  className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition text-xs flex items-center gap-1 cursor-pointer"
-                  title="حذف هذا القسم"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span>حذف القسم</span>
-                </button>
-              </div>
+                {/* Section Title & Sort Order */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5">
+                  <div className="md:col-span-3">
+                    <label className="block text-xs font-semibold text-ink-primary mb-1">
+                      عنوان القسم: <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="مثال: التعريف والخصائص الرياضية"
+                      {...register(`sections.${index}.title`)}
+                      disabled={isPending}
+                      className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                    />
+                    {errors.sections?.[index]?.title && (
+                      <p className="text-red-600 text-xs mt-1">
+                        {errors.sections[index]?.title?.message}
+                      </p>
+                    )}
+                  </div>
 
-              {/* Section Title & Sort Order */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="md:col-span-3">
-                  <label className="block text-xs font-bold text-ink-700 mb-1">
-                    عنوان القسم: <span className="text-red-500">*</span>
+                  <div>
+                    <label className="block text-xs font-semibold text-ink-primary mb-1">
+                      ترتيب القسم:
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      {...register(`sections.${index}.sort_order`, { valueAsNumber: true })}
+                      disabled={isPending}
+                      className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {/* Section Content Textarea */}
+                <div>
+                  <label className="block text-xs font-semibold text-ink-primary mb-1">
+                    محتوى القسم: <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder="مثال: التعريف والخصائص الرياضية"
-                    {...register(`sections.${index}.title`)}
+                  <textarea
+                    rows={4}
+                    placeholder="اكتب المحتوى والشرح التفصيلي لهذا القسم..."
+                    {...register(`sections.${index}.content`)}
                     disabled={isPending}
-                    className="input-field text-sm"
+                    className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-y leading-relaxed transition-colors"
                   />
-                  {errors.sections?.[index]?.title && (
+                  {errors.sections?.[index]?.content && (
                     <p className="text-red-600 text-xs mt-1">
-                      {errors.sections[index]?.title?.message}
+                      {errors.sections[index]?.content?.message}
                     </p>
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-ink-700 mb-1">
-                    ترتيب القسم:
+                {/* Section Media (Image, PDF, Video, or None) */}
+                <div className="pt-1">
+                  <label className="block text-xs font-semibold text-ink-primary mb-2">
+                    الملف المرفق بالقسم (صورة، مستند PDF، أو فيديو):
                   </label>
-                  <input
-                    type="number"
-                    min="0"
-                    {...register(`sections.${index}.sort_order`, { valueAsNumber: true })}
-                    disabled={isPending}
-                    className="input-field text-sm bg-cream/30"
-                  />
+
+                  {sectionState.isUploading ? (
+                    <div className="p-3 rounded-md bg-accent/10 border border-accent/20 flex items-center justify-center gap-2 text-accent text-xs font-medium">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>جاري رفع الملف إلى التخزين السحابي...</span>
+                    </div>
+                  ) : hasVideo ? (
+                    /* Video Attached Preview */
+                    <div className="p-3 rounded-md bg-bg-alt/70 border border-border-subtle flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-md overflow-hidden bg-black shrink-0 border border-border-base flex items-center justify-center">
+                          {sectionState.previewVideoUrl ? (
+                            <video
+                              src={sectionState.previewVideoUrl}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <Video className="w-5 h-5 text-amber" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-ink-primary">
+                            {sectionState.fileName || 'مقطع فيديو مرفق'}
+                          </p>
+                          <p className="text-[11px] text-ink-muted">
+                            {sectionState.fileSize || 'مخزن في السحابة'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleClearMedia(index)}
+                        disabled={isPending}
+                        className="p-1 rounded-md text-ink-muted hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                        title="إزالة الفيديو"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : hasImage ? (
+                    /* Image Attached Preview */
+                    <div className="p-3 rounded-md bg-bg-alt/70 border border-border-subtle flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-md overflow-hidden bg-bg-surface shrink-0 border border-border-base flex items-center justify-center">
+                          {sectionState.previewUrl ? (
+                            <img
+                              src={sectionState.previewUrl}
+                              alt="معاينة"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <ImageIcon className="w-5 h-5 text-accent" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-ink-primary">
+                            {sectionState.fileName || 'صورة توضيحية مرفقة'}
+                          </p>
+                          <p className="text-[11px] text-ink-muted">
+                            {sectionState.fileSize || 'مخزنة في السحابة'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleClearMedia(index)}
+                        disabled={isPending}
+                        className="p-1 rounded-md text-ink-muted hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                        title="إزالة الصورة"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : hasPdf ? (
+                    /* PDF Attached Preview */
+                    <div className="p-3 rounded-md bg-bg-alt/70 border border-border-subtle flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-md bg-red-100 text-red-700 shrink-0 flex items-center justify-center border border-red-200">
+                          <FileText className="w-4.5 h-4.5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-ink-primary">
+                            {sectionState.fileName || 'ملف PDF المرفق'}
+                          </p>
+                          <p className="text-[11px] text-ink-muted">
+                            {sectionState.fileSize || 'مستند متاح للطلاب'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleClearMedia(index)}
+                        disabled={isPending}
+                        className="p-1 rounded-md text-ink-muted hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                        title="إزالة ملف PDF"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    /* Upload Picker (Image, PDF, or Video) */
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      {/* Upload Image Option */}
+                      <label className="border border-dashed border-border-base hover:border-accent rounded-md p-2.5 text-center cursor-pointer transition-colors bg-bg-alt/30 hover:bg-accent/5 flex items-center justify-center gap-2">
+                        <ImageIcon className="w-4 h-4 text-accent shrink-0" />
+                        <div className="text-right truncate">
+                          <p className="text-xs font-medium text-ink-primary truncate">صورة توضيحية</p>
+                          <p className="text-[10px] text-ink-muted">PNG, JPG (5MB)</p>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          disabled={isPending}
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0]
+                            if (f) handleFileUpload(index, f, 'image')
+                          }}
+                        />
+                      </label>
+
+                      {/* Upload PDF Option */}
+                      <label className="border border-dashed border-border-base hover:border-red-400 rounded-md p-2.5 text-center cursor-pointer transition-colors bg-bg-alt/30 hover:bg-red-50/40 flex items-center justify-center gap-2">
+                        <FileText className="w-4 h-4 text-red-600 shrink-0" />
+                        <div className="text-right truncate">
+                          <p className="text-xs font-medium text-ink-primary truncate">مستند PDF</p>
+                          <p className="text-[10px] text-ink-muted">PDF فقط (10MB)</p>
+                        </div>
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          disabled={isPending}
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0]
+                            if (f) handleFileUpload(index, f, 'pdf')
+                          }}
+                        />
+                      </label>
+
+                      {/* Upload Video Option */}
+                      <label className="border border-dashed border-border-base hover:border-accent rounded-md p-2.5 text-center cursor-pointer transition-colors bg-bg-alt/30 hover:bg-accent/5 flex items-center justify-center gap-2">
+                        <Video className="w-4 h-4 text-accent shrink-0" />
+                        <div className="text-right truncate">
+                          <p className="text-xs font-medium text-ink-primary truncate">مقطع فيديو</p>
+                          <p className="text-[10px] text-ink-muted">MP4, WebM (20MB)</p>
+                        </div>
+                        <input
+                          type="file"
+                          accept="video/mp4,video/webm,video/ogg,video/quicktime"
+                          disabled={isPending}
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0]
+                            if (f) handleFileUpload(index, f, 'video')
+                          }}
+                        />
+                      </label>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* Section Content Textarea */}
-              <div>
-                <label className="block text-xs font-bold text-ink-700 mb-1">
-                  محتوى القسم: <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="اكتب المحتوى والشرح التفصيلي لهذا القسم..."
-                  {...register(`sections.${index}.content`)}
-                  disabled={isPending}
-                  className="input-field text-sm resize-y leading-relaxed"
-                />
-                {errors.sections?.[index]?.content && (
-                  <p className="text-red-600 text-xs mt-1">
-                    {errors.sections[index]?.content?.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Section Media (Image, PDF, Video, or None) */}
-              <div className="pt-2">
-                <label className="block text-xs font-bold text-ink-700 mb-2">
-                  الملف المرفق بالقسم (صورة، مستند PDF، أو فيديو):
-                </label>
-
-                {sectionState.isUploading ? (
-                  <div className="p-4 rounded-xl bg-gold/10 border border-gold/30 flex items-center justify-center gap-2 text-gold-dark text-xs font-bold">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>جاري رفع الملف إلى التخزين السحابي...</span>
-                  </div>
-                ) : hasVideo ? (
-                  /* Video Attached Preview */
-                  <div className="p-3 rounded-2xl bg-cream/30 border border-ink-100 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-ink-950 shrink-0 border border-ink-100 flex items-center justify-center">
-                        {sectionState.previewVideoUrl ? (
-                          <video
-                            src={sectionState.previewVideoUrl}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <Video className="w-6 h-6 text-gold" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-ink-900">
-                          {sectionState.fileName || 'مقطع فيديو مرفق'}
-                        </p>
-                        <p className="text-[11px] text-ink-500">
-                          {sectionState.fileSize || 'مخزن في السحابة'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleClearMedia(index)}
-                      disabled={isPending}
-                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition cursor-pointer"
-                      title="إزالة الفيديو"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : hasImage ? (
-                  /* Image Attached Preview */
-                  <div className="p-3 rounded-2xl bg-cream/30 border border-ink-100 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-ink-100 shrink-0 border border-ink-100 flex items-center justify-center">
-                        {sectionState.previewUrl ? (
-                          <img
-                            src={sectionState.previewUrl}
-                            alt="معاينة"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <ImageIcon className="w-6 h-6 text-gold-dark" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-ink-900">
-                          {sectionState.fileName || 'صورة توضيحية مرفقة'}
-                        </p>
-                        <p className="text-[11px] text-ink-500">
-                          {sectionState.fileSize || 'مخزنة في السحابة'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleClearMedia(index)}
-                      disabled={isPending}
-                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition cursor-pointer"
-                      title="إزالة الصورة"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : hasPdf ? (
-                  /* PDF Attached Preview */
-                  <div className="p-3 rounded-2xl bg-cream/30 border border-ink-100 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-red-50 text-red-600 shrink-0 flex items-center justify-center border border-red-100">
-                        <FileText className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-ink-900">
-                          {sectionState.fileName || 'ملف PDF المرفق'}
-                        </p>
-                        <p className="text-[11px] text-ink-500">
-                          {sectionState.fileSize || 'مستند متاح للطلاب'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleClearMedia(index)}
-                      disabled={isPending}
-                      className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition cursor-pointer"
-                      title="إزالة ملف PDF"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  /* Upload Picker (Image, PDF, or Video) */
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {/* Upload Image Option */}
-                    <label className="border border-dashed border-ink-200 hover:border-gold rounded-xl p-3 text-center cursor-pointer transition-colors bg-cream/15 hover:bg-cream/35 flex items-center justify-center gap-2">
-                      <ImageIcon className="w-4 h-4 text-gold-dark shrink-0" />
-                      <div className="text-right truncate">
-                        <p className="text-xs font-bold text-ink-800 truncate">صورة توضيحية</p>
-                        <p className="text-[10px] text-ink-400">PNG, JPG (5MB)</p>
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp,image/gif"
-                        disabled={isPending}
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0]
-                          if (f) handleFileUpload(index, f, 'image')
-                        }}
-                      />
-                    </label>
-
-                    {/* Upload PDF Option */}
-                    <label className="border border-dashed border-ink-200 hover:border-red-300 rounded-xl p-3 text-center cursor-pointer transition-colors bg-cream/15 hover:bg-red-50/30 flex items-center justify-center gap-2">
-                      <FileText className="w-4 h-4 text-red-600 shrink-0" />
-                      <div className="text-right truncate">
-                        <p className="text-xs font-bold text-ink-800 truncate">مستند PDF</p>
-                        <p className="text-[10px] text-ink-400">PDF فقط (10MB)</p>
-                      </div>
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        disabled={isPending}
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0]
-                          if (f) handleFileUpload(index, f, 'pdf')
-                        }}
-                      />
-                    </label>
-
-                    {/* Upload Video Option */}
-                    <label className="border border-dashed border-ink-200 hover:border-gold rounded-xl p-3 text-center cursor-pointer transition-colors bg-cream/15 hover:bg-gold/10 flex items-center justify-center gap-2">
-                      <Video className="w-4 h-4 text-gold-dark shrink-0" />
-                      <div className="text-right truncate">
-                        <p className="text-xs font-bold text-ink-800 truncate">مقطع فيديو</p>
-                        <p className="text-[10px] text-ink-400">MP4, WebM (20MB)</p>
-                      </div>
-                      <input
-                        type="file"
-                        accept="video/mp4,video/webm,video/ogg,video/quicktime"
-                        disabled={isPending}
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0]
-                          if (f) handleFileUpload(index, f, 'video')
-                        }}
-                      />
-                    </label>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        }))}
+            )
+          })
+        )}
 
         {/* Add Another Section Button */}
         {fields.length > 0 && (
@@ -802,27 +806,30 @@ export function LessonForm({ subjects, initialLesson, currentUserId }: LessonFor
               })
             }
             disabled={isPending}
-            className="w-full py-3.5 border-2 border-dashed border-ink-200 hover:border-gold rounded-2xl flex items-center justify-center gap-2 text-sm font-bold text-ink-700 hover:text-gold-dark hover:bg-gold/5 transition cursor-pointer"
+            className="w-full py-2.5 border border-dashed border-border-base hover:border-accent rounded-md flex items-center justify-center gap-2 text-xs sm:text-sm font-medium text-ink-secondary hover:text-accent hover:bg-accent/5 transition-colors cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5" />
             <span>إضافة قسم جديد لهذا الدرس</span>
           </button>
         )}
       </div>
 
       {/* Bottom Actions */}
-      <div className="flex items-center justify-end gap-3 pt-6 border-t border-ink-100">
-        <Link href="/teacher/lessons" className="btn-outline text-sm">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border-base">
+        <Link
+          href="/teacher/lessons"
+          className="px-3.5 py-1.5 rounded-md border border-border-base bg-bg-surface hover:bg-bg-alt text-xs sm:text-sm font-medium text-ink-secondary transition-colors"
+        >
           إلغاء
         </Link>
         <button
           type="submit"
           disabled={isPending}
-          className="btn-primary text-sm min-w-40 flex items-center justify-center gap-2 disabled:opacity-50"
+          className="px-4 py-2 rounded-md bg-accent hover:bg-accent-hover text-white text-xs sm:text-sm font-medium shadow-xs min-w-36 flex items-center justify-center gap-2 disabled:opacity-50 transition-colors cursor-pointer"
         >
           {isPending ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
               <span>جاري الحفظ...</span>
             </>
           ) : (

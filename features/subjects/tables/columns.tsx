@@ -26,7 +26,7 @@ export function getSubjectColumns(currentUserId?: string, canManage: boolean = t
         const s = row.original
         return (
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl overflow-hidden bg-cream/80 border border-ink-100 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-lg overflow-hidden bg-bg-alt border border-border-subtle flex items-center justify-center shrink-0">
               {s.imageUrl ? (
                 <img
                   src={s.imageUrl}
@@ -34,14 +34,14 @@ export function getSubjectColumns(currentUserId?: string, canManage: boolean = t
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-gold/15 text-gold-dark flex items-center justify-center">
+                <div className="w-full h-full bg-accent/10 text-accent flex items-center justify-center">
                   <BookOpen className="w-5 h-5" />
                 </div>
               )}
             </div>
             <div>
-              <p className="font-heading font-bold text-sm text-ink-900">{s.name}</p>
-              <p className="text-xs text-ink-400">مادة تعليمية معتمدة</p>
+              <p className="font-serif font-bold text-sm text-ink-primary">{s.name}</p>
+              <p className="text-xs text-ink-muted">مادة تعليمية معتمدة</p>
             </div>
           </div>
         )

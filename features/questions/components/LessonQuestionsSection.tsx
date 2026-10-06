@@ -29,21 +29,21 @@ export function LessonQuestionsSection({
   }, [initialQuestions])
 
   return (
-    <section className="mt-12 rounded-2xl border border-ink-100 bg-white p-6 sm:p-8 shadow-sm">
+    <section className="mt-8 rounded-lg border border-border-base bg-bg-surface p-5 sm:p-7">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-ink-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border-subtle">
         <div className="flex items-start sm:items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gold/15 text-gold-dark flex items-center justify-center shrink-0">
-            <HelpCircle className="w-5 h-5" />
+          <div className="w-8 h-8 rounded-md bg-accent-bg text-accent border border-accent/20 flex items-center justify-center shrink-0">
+            <HelpCircle className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-ink-900">الأسئلة والنقاشات التفاعلية</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gold/15 text-gold-dark border border-gold/30">
+              <h2 className="font-serif text-lg font-bold text-ink-primary">الأسئلة والنقاشات التفاعلية</h2>
+              <span className="chip text-[11px] font-semibold text-accent border-accent/20 bg-accent-bg">
                 {questions.length} {questions.length === 1 ? 'سؤال' : 'أسئلة'}
               </span>
             </div>
-            <p className="text-sm text-ink-500 mt-0.5">
+            <p className="text-xs text-ink-secondary mt-0.5">
               أسئلة المعلم الموجهة للدرس ومشاركات وإجابات الطلاب
             </p>
           </div>
@@ -62,9 +62,9 @@ export function LessonQuestionsSection({
             trigger={
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gold text-white font-medium hover:bg-gold-dark transition shadow-sm text-sm shrink-0"
+                className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5 shrink-0"
               >
-                <MessageSquarePlus className="w-4 h-4" />
+                <MessageSquarePlus className="w-3.5 h-3.5" />
                 <span>إضافة سؤال للدرس</span>
               </button>
             }
@@ -73,20 +73,20 @@ export function LessonQuestionsSection({
       </div>
 
       {/* Questions List */}
-      <div className="mt-6 space-y-4">
+      <div className="mt-5 space-y-3.5">
         {questions.length === 0 ? (
-          <div className="text-center py-12 px-4 rounded-xl border border-dashed border-ink-200 bg-parchment/40">
-            <div className="w-12 h-12 rounded-full bg-parchment flex items-center justify-center mx-auto text-ink-400 mb-3">
-              <MessageCircleQuestion className="w-6 h-6" />
+          <div className="text-center py-10 px-4 rounded-md border border-dashed border-border-base bg-bg-alt/30">
+            <div className="w-9 h-9 rounded-md bg-bg-alt border border-border-subtle flex items-center justify-center mx-auto text-ink-muted mb-2.5">
+              <MessageCircleQuestion className="w-5 h-5 stroke-[1.6]" />
             </div>
-            <h3 className="text-base font-semibold text-ink-800 mb-1">لا توجد أسئلة لهذا الدرس حتى الآن</h3>
-            <p className="text-sm text-ink-500 max-w-md mx-auto">
+            <h3 className="font-serif font-bold text-sm sm:text-base text-ink-primary mb-1">لا توجد أسئلة لهذا الدرس حتى الآن</h3>
+            <p className="text-xs text-ink-secondary max-w-md mx-auto">
               {isTeacherOrAdmin
                 ? 'يمكنك كمعلم طرح أسئلة استيعابية أو اختبارات قصيرة هنا لتحفيز الطلاب على الإجابة والتفاعل.'
                 : 'لم يقم المعلم بنشر أي أسئلة لهذا الدرس بعد. ترقب الأسئلة التفاعلية قريباً!'}
             </p>
             {isTeacherOrAdmin && (
-              <div className="mt-4">
+              <div className="mt-3.5">
                 <QuestionDialog
                   preselectedLessonId={lessonId}
                   lessons={[{ id: lessonId, title: lessonTitle, subject_id: '' }]}
@@ -98,9 +98,8 @@ export function LessonQuestionsSection({
                   trigger={
                     <button
                       type="button"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gold/10 text-gold-dark font-medium hover:bg-gold/20 transition text-sm"
+                      className="btn-outline text-xs py-1.5 px-3 mx-auto"
                     >
-                      <Sparkles className="w-4 h-4" />
                       <span>طرح أول سؤال الآن</span>
                     </button>
                   }

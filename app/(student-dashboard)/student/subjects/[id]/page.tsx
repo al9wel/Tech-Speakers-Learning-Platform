@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/require-role'
 import { createClient } from '@/lib/supabase/server'
 import { SubjectLessonsExplorer, type SubjectLessonItem } from '@/features/subjects/components/SubjectLessonsExplorer'
-import { BookOpen, ArrowRight, ChevronRight } from 'lucide-react'
+import { BookOpen, ArrowRight, ChevronLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
@@ -78,49 +78,54 @@ export default async function StudentSubjectLessonsPage({ params }: PageProps) {
   }
 
   return (
-    <div className="container-page py-8 animate-page">
+    <div className="container-page py-6 sm:py-8 animate-fade-in">
       {/* Breadcrumb Navigation */}
-      <nav className="flex items-center gap-2 text-xs text-ink-500 mb-6">
-        <Link href="/student" className="hover:text-ink-900 transition">
+      <nav className="flex items-center gap-1.5 text-xs text-ink-muted mb-4 flex-wrap">
+        <Link href="/student" className="text-ink-secondary hover:text-accent transition-colors font-medium">
           لوحة الطالب
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 rotate-180 text-ink-300" />
-        <Link href="/student/subjects" className="hover:text-ink-900 transition">
+        <ChevronLeft className="w-3.5 h-3.5 text-ink-muted" />
+        <Link href="/student/subjects" className="text-ink-secondary hover:text-accent transition-colors font-medium">
           المواد الدراسية
         </Link>
-        <ChevronRight className="w-3.5 h-3.5 rotate-180 text-ink-300" />
-        <span className="text-ink-900 font-bold">{subject.name}</span>
+        <ChevronLeft className="w-3.5 h-3.5 text-ink-muted" />
+        <span className="text-ink-primary font-medium">{subject.name}</span>
       </nav>
 
       {/* Subject Header Banner */}
-      <div className="card p-6 sm:p-8 bg-white border-ink-100/80 mb-8 flex flex-col md:flex-row items-center gap-6">
-        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-cream/60 border border-ink-100 flex items-center justify-center shrink-0 shadow-soft">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={subject.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <BookOpen className="w-12 h-12 text-gold-dark" />
-          )}
-        </div>
-
-        <div className="flex-1 text-center md:text-right">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-xs font-bold mb-2">
-            <span>مقرر دراسي</span>
+      <div className="border border-border-base rounded-lg bg-bg-surface p-5 sm:p-6 mb-6 flex flex-col md:flex-row items-start sm:items-center justify-between gap-5">
+        <div className="flex items-start gap-4">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-md overflow-hidden bg-bg-alt border border-border-subtle flex items-center justify-center shrink-0">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={subject.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <BookOpen className="w-8 h-8 text-accent stroke-[1.5]" />
+            )}
           </div>
-          <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-ink-900 mb-2">
-            {subject.name}
-          </h1>
-          <p className="text-sm text-ink-600 max-w-2xl leading-relaxed">
-            قائمة الدروس والمحتوى التعليمي المنشور لهذه المادة. يمكنك الضغط على أي درس لبدء القراءة والاطلاع على الأقسام والملفات المرفقة.
-          </p>
+
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="chip text-[11px] font-semibold text-accent border-accent/20 bg-accent-bg">
+                مقرر دراسي
+              </span>
+              <span className="text-xs text-ink-muted">· {lessons.length} دروس</span>
+            </div>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-ink-primary mb-1">
+              {subject.name}
+            </h1>
+            <p className="text-xs sm:text-sm text-ink-secondary max-w-2xl leading-relaxed">
+              فهرس الدروس والمحتوى التعليمي المنشور لهذه المادة. اضغط على أي درس لبدء القراءة ومطالعة الأقسام والشروحات.
+            </p>
+          </div>
         </div>
 
         <Link
           href="/student/subjects"
-          className="btn-outline text-xs flex items-center gap-1.5 shrink-0 self-center md:self-start hover:bg-ink-50"
+          className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 shrink-0 self-end sm:self-center"
         >
           <ArrowRight className="w-3.5 h-3.5" />
           <span>كل المواد</span>

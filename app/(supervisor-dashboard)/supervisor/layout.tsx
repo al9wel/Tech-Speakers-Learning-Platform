@@ -6,9 +6,9 @@ export default function SupervisorLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
       <SupervisorSubNav />
-      <div className="flex-1">{children}</div>
+      <main className="flex-1 min-w-0 pb-20 lg:pb-8">{children}</main>
     </div>
   )
 }

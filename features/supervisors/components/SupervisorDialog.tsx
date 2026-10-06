@@ -102,9 +102,9 @@ export function SupervisorDialog({ supervisor, trigger }: SupervisorDialogProps)
         <button
           type="button"
           onClick={handleOpen}
-          className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 hover:bg-gold/10 hover:border-gold"
+          className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 hover:bg-accent-bg hover:border-accent/40"
         >
-          <Pencil className="w-3.5 h-3.5 text-gold-dark" />
+          <Pencil className="w-3.5 h-3.5 text-accent" />
           <span>تعديل</span>
         </button>
       ) : (
@@ -119,16 +119,16 @@ export function SupervisorDialog({ supervisor, trigger }: SupervisorDialogProps)
       )}
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink-900/50 backdrop-blur-xs animate-page overflow-y-auto">
-          <div className="card w-full max-w-lg max-h-[92vh] overflow-y-auto p-4 sm:p-6 bg-white shadow-card-hover border-ink-200 animate-scale-in my-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink-primary/40 backdrop-blur-xs animate-fade-in overflow-y-auto">
+          <div className="border border-border-base rounded-lg w-full max-w-lg max-h-[92vh] overflow-y-auto p-5 sm:p-6 bg-bg-surface shadow-xl my-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-ink-100">
+            <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-border-subtle">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-md bg-accent/10 text-accent flex items-center justify-center">
                   {isEdit ? <Pencil className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
                 </div>
                 <div>
-                  <h3 className="font-heading font-bold text-lg text-ink-900">
+                  <h3 className="font-serif font-bold text-lg text-ink-primary">
                     {isEdit ? 'تعديل بيانات المشرف' : 'إضافة مشرف جديد'}
                   </h3>
                   <p className="text-xs text-ink-500">

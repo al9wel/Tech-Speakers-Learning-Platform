@@ -96,24 +96,24 @@ export function NewConsultationModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-primary/40 backdrop-blur-xs animate-in fade-in duration-150"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl p-6 sm:p-7 shadow-2xl border border-ink-100 space-y-5 animate-in zoom-in-95 cursor-default"
+        className="relative w-full max-w-lg bg-bg-surface rounded-lg p-5 sm:p-6 shadow-xl border border-border-base space-y-4 animate-in zoom-in-95 duration-150 cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-ink-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-gold/15 text-gold flex items-center justify-center shadow-2xs">
-              <HeartHandshake className="w-5 h-5" />
+        <div className="flex items-center justify-between pb-3 border-b border-border-base">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-md bg-accent/10 text-accent flex items-center justify-center border border-accent/20">
+              <HeartHandshake className="w-4.5 h-4.5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-ink-900">
+              <h3 className="font-serif text-base sm:text-lg font-bold text-ink-primary">
                 {mode === 'student' ? 'طلب استشارة نفسية جديدة' : 'إرسال رسالة توجيهية لطالب'}
               </h3>
-              <p className="text-xs text-ink-400">
+              <p className="text-xs text-ink-muted">
                 {mode === 'student'
                   ? 'محادثة خاصة وسرية مع المستشار التربوي والنفسي'
                   : 'تواصل مباشر مع الطالب لمتابعته وتقديم النصح'}
@@ -124,22 +124,22 @@ export function NewConsultationModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-ink-400 hover:text-ink-700 hover:bg-ink-50 transition-colors cursor-pointer"
+            className="p-1.5 rounded-md text-ink-muted hover:text-ink-primary hover:bg-bg-alt transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           {/* Target Selector */}
           {mode === 'student' ? (
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-ink-700">المستشار النفسي المطلوب:</label>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-ink-primary">المستشار النفسي المطلوب:</label>
               <select
                 value={selectedCounselorId}
                 onChange={(e) => setSelectedCounselorId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-ink-200 bg-ink-50/40 text-sm text-ink-900 focus:outline-none focus:border-gold focus:bg-white transition-all cursor-pointer"
+                className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary focus:outline-none focus:border-accent transition-colors cursor-pointer"
                 disabled={isPending}
               >
                 {counselors.map((c) => (
@@ -150,8 +150,8 @@ export function NewConsultationModal({
               </select>
             </div>
           ) : (
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-ink-700">اختيار الطالب المستهدف:</label>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-ink-primary">اختيار الطالب المستهدف:</label>
               {allStudents.length > 5 && (
                 <div className="relative mb-2">
                   <input
@@ -159,15 +159,15 @@ export function NewConsultationModal({
                     value={studentSearch}
                     onChange={(e) => setStudentSearch(e.target.value)}
                     placeholder="ابحث باسم الطالب..."
-                    className="w-full pl-3 pr-8 py-2 rounded-xl border border-ink-200 bg-white text-xs text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-gold"
+                    className="w-full pl-3 pr-8 py-1.5 rounded-md border border-border-base bg-bg-surface text-xs text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent"
                   />
-                  <Search className="w-3.5 h-3.5 text-ink-400 absolute right-2.5 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-ink-muted/70 absolute right-2.5 top-1/2 -translate-y-1/2" />
                 </div>
               )}
               <select
                 value={selectedStudentId}
                 onChange={(e) => setSelectedStudentId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-ink-200 bg-ink-50/40 text-sm text-ink-900 focus:outline-none focus:border-gold focus:bg-white transition-all cursor-pointer"
+                className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary focus:outline-none focus:border-accent transition-colors cursor-pointer"
                 disabled={isPending}
               >
                 {filteredStudents.map((s) => (
@@ -180,27 +180,27 @@ export function NewConsultationModal({
           )}
 
           {/* Title */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-ink-700">موضوع أو عنوان الاستشارة:</label>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-ink-primary">موضوع أو عنوان الاستشارة:</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="مثال: قلق الامتحانات، تنظيم الوقت، استفسار خاص..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-ink-200 bg-ink-50/40 text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-gold focus:bg-white transition-all"
+              className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent transition-colors"
               disabled={isPending}
             />
           </div>
 
           {/* Content */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-ink-700">نص الرسالة أو الاستشارة بالتفصيل:</label>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-ink-primary">نص الرسالة أو الاستشارة بالتفصيل:</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              rows={5}
+              rows={4}
               placeholder="اكتب رسالتك أو استفسارك هنا بكل حرية، الرسالة سرية تماماً ولن يراها إلا المستشار..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-ink-200 bg-ink-50/40 text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-gold focus:bg-white transition-all resize-none leading-relaxed"
+              className="w-full px-3 py-2 rounded-md border border-border-base bg-bg-surface text-sm text-ink-primary placeholder:text-ink-muted/50 focus:outline-none focus:border-accent transition-colors resize-none leading-relaxed"
               disabled={isPending}
             />
           </div>
@@ -211,23 +211,23 @@ export function NewConsultationModal({
               type="button"
               onClick={onClose}
               disabled={isPending}
-              className="px-4 py-2.5 rounded-xl text-xs font-bold text-ink-600 hover:bg-ink-100 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-md text-xs font-medium text-ink-secondary hover:bg-bg-alt border border-border-base transition-colors cursor-pointer"
             >
               إلغاء
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-ink-900 hover:bg-ink-800 text-white font-bold text-xs shadow-soft transition-all cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-md bg-accent hover:bg-accent-hover text-white font-medium text-xs sm:text-sm shadow-xs transition-colors cursor-pointer disabled:opacity-50"
             >
               {isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-gold" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
                   <span>جارٍ الإرسال...</span>
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4 text-gold" />
+                  <Send className="w-3.5 h-3.5 text-white" />
                   <span>إرسال الاستشارة</span>
                 </>
               )}

@@ -47,7 +47,7 @@ export function UsersTable({ data, currentAdminId }: UsersTableProps) {
   })
 
   return (
-    <div className="card p-4 sm:p-6 bg-white shadow-card border-ink-100/80">
+    <div className="rounded-lg border border-ink-200/80 bg-paper-light p-4 sm:p-6 shadow-xs">
       {/* Top Bar: Search & Add Button */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
         <div className="relative w-full sm:w-80">
@@ -57,29 +57,29 @@ export function UsersTable({ data, currentAdminId }: UsersTableProps) {
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder="ابحث بالاسم أو البريد..."
-            className="input-field text-sm pr-10 bg-cream/30"
+            className="w-full pr-10 pl-4 py-2 rounded-md border border-ink-200 bg-white text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/20"
           />
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
           <div className="text-xs text-ink-500 font-medium hidden sm:block">
-            إجمالي المستخدمين: <span className="font-bold text-ink-900">{data.length}</span>
+            إجمالي المستخدمين: <span className="font-serif font-bold text-ink-900">{data.length}</span>
           </div>
           <UserDialog />
         </div>
       </div>
 
       {/* Table Container */}
-      <div className="overflow-x-auto rounded-xl border border-ink-100">
+      <div className="overflow-x-auto rounded-md border border-ink-200 bg-white">
         <table className="w-full text-right border-collapse">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr
                 key={headerGroup.id}
-                className="bg-cream/60 border-b border-ink-100 text-xs font-bold text-ink-700"
+                className="bg-paper-mid border-b border-ink-200 text-xs font-semibold text-ink-700"
               >
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="p-3.5 font-bold">
+                  <th key={header.id} className="p-3.5 font-semibold">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -88,12 +88,12 @@ export function UsersTable({ data, currentAdminId }: UsersTableProps) {
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-ink-100/60 text-sm">
+          <tbody className="divide-y divide-ink-200/60 text-sm">
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="hover:bg-cream/20 transition-colors"
+                  className="hover:bg-paper-light transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="p-3.5 text-ink-900">
@@ -107,7 +107,7 @@ export function UsersTable({ data, currentAdminId }: UsersTableProps) {
                 <td colSpan={columns.length} className="p-12 text-center text-ink-400">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <Inbox className="w-10 h-10 text-ink-300 stroke-1" />
-                    <p className="font-bold text-ink-700">لا توجد بيانات مطابقة</p>
+                    <p className="font-serif font-bold text-ink-800">لا توجد بيانات مطابقة</p>
                     <p className="text-xs text-ink-500">
                       {globalFilter
                         ? 'لم يتم العثور على أي مستخدم يطابق كلمة البحث.'
@@ -123,17 +123,17 @@ export function UsersTable({ data, currentAdminId }: UsersTableProps) {
 
       {/* Pagination Controls */}
       {table.getPageCount() > 1 && (
-        <div className="flex items-center justify-between pt-4 mt-4 border-t border-ink-100/60 text-xs text-ink-600">
+        <div className="flex items-center justify-between pt-4 mt-4 border-t border-ink-200/60 text-xs text-ink-600">
           <div>
-            صفحة <span className="font-bold text-ink-900">{table.getState().pagination.pageIndex + 1}</span> من{' '}
-            <span className="font-bold text-ink-900">{table.getPageCount()}</span>
+            صفحة <span className="font-serif font-bold text-ink-900">{table.getState().pagination.pageIndex + 1}</span> من{' '}
+            <span className="font-serif font-bold text-ink-900">{table.getPageCount()}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="btn-outline py-1 px-2.5 text-xs flex items-center gap-1 disabled:opacity-40"
+              className="btn-outline py-1 px-2.5 text-xs rounded-md flex items-center gap-1 disabled:opacity-40"
             >
               <ChevronRight className="w-3.5 h-3.5" />
               <span>السابق</span>
@@ -142,7 +142,7 @@ export function UsersTable({ data, currentAdminId }: UsersTableProps) {
               type="button"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="btn-outline py-1 px-2.5 text-xs flex items-center gap-1 disabled:opacity-40"
+              className="btn-outline py-1 px-2.5 text-xs rounded-md flex items-center gap-1 disabled:opacity-40"
             >
               <span>التالي</span>
               <ChevronLeft className="w-3.5 h-3.5" />

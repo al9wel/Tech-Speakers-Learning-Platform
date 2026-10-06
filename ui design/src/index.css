@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme {
+  --font-sans: 'Tajawal', system-ui, sans-serif;
+  --font-serif: 'Amiri', Georgia, serif;
+}
+
+:root {
+  --bg-base: #faf8f4;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #f3efe8;
+  --text-primary: #1c1b19;
+  --text-secondary: #6b6863;
+  --text-muted: #9a958e;
+  --border-base: #e2ddd3;
+  --border-subtle: #ece8df;
+  --accent: #2d5f5d;
+  --accent-light: #4a8580;
+  --accent-bg: #e8f0ee;
+  --accent-bg-hover: #dceae7;
+  --amber: #b8732e;
+  --success: #5a7c4f;
+  --warning: #c4943b;
+  --error: #a04040;
+  --locked: #c8c4bc;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Tajawal', system-ui, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  letter-spacing: 0;
+}
+
+.font-serif {
+  font-family: 'Amiri', Georgia, serif;
+  letter-spacing: 0;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4cfc4;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b3a8;
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth transitions for interactive elements */
+.transition-base {
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fade-in animation for page transitions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #ece8df 25%, #f3efe8 50%, #ece8df 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Lesson content typography */
+.prose-lesson {
+  line-height: 1.9;
+}
+.prose-lesson p {
+  margin-bottom: 1.25rem;
+  color: #2a2925;
+}
+.prose-lesson h2 {
+  font-family: 'Amiri', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.875rem;
+  color: #1c1b19;
+}
+.prose-lesson h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.625rem;
+  color: #1c1b19;
+}
+.prose-lesson ul {
+  list-style: none;
+  padding-right: 0;
+  margin-bottom: 1.25rem;
+}
+.prose-lesson ul li {
+  position: relative;
+  padding-right: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #2a2925;
+}
+.prose-lesson ul li::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0.7rem;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+}
+.prose-lesson blockquote {
+  border-right: 2px solid var(--accent);
+  padding-right: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+.prose-lesson strong {
+  font-weight: 700;
+  color: #1c1b19;
+}
+.prose-lesson code {
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 0.85em;
+  background: var(--bg-surface-alt);
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  color: var(--accent);
+}
