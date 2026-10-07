@@ -3,18 +3,21 @@ import { requireRole } from '@/lib/auth/require-role'
 import { createClient } from '@/lib/supabase/server'
 import { LessonForm } from '@/features/lessons/components/LessonForm'
 import type { LessonItem, LessonSectionItem } from '@/features/lessons/types'
+import { cache } from 'react'
 import type { Metadata } from 'next'
-
-export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
+const getLesson = cache(async (id: string) => {
+  const supabase = await createClient()
+  return await supabase.from('lessons').select('*').eq('id', id).single()
+})
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: lesson } = await supabase.from('lessons').select('title').eq('id', id).single()
+  const { data: lesson } = await getLesson(id)
   return {
     title: lesson?.title ? `تعديل: ${lesson.title}` : 'تعديل الدرس',
   }
@@ -22,72 +25,54 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EditLessonPage({ params }: PageProps) {
   const { id: lessonId } = await params
-  const { user, supabase } = await requireRole('teacher')
+  const [{ user, supabase }, { data: lesson, error: lessonError }] = await Promise.all([
+    requireRole('teacher'),
+    getLesson(lessonId),
+  ])
 
-  // 1. Fetch lesson and verify teacher ownership
-  const { data: lesson, error: lessonError } = await supabase
-    .from('lessons')
-    .select('*')
-    .eq('id', lessonId)
-    .single()
-
-  if (lessonError || !lesson) {
+  if (lessonError || !lesson || lesson.created_by !== user.id) {
     notFound()
   }
 
-  if (lesson.created_by !== user.id) {
-    notFound()
-  }
+  // 2. Fetch sections and subjects in parallel
+  const [
+    { data: rawSections },
+    { data: subjects },
+  ] = await Promise.all([
+    supabase
+      .from('lesson_sections')
+      .select('*')
+      .eq('lesson_id', lessonId)
+      .order('sort_order', { ascending: true }),
+    supabase
+      .from('subjects')
+      .select('id, name')
+      .order('name', { ascending: true }),
+  ])
 
-  // 2. Fetch sections
-  const { data: rawSections } = await supabase
-    .from('lesson_sections')
-    .select('*')
-    .eq('lesson_id', lessonId)
-    .order('sort_order', { ascending: true })
-
-  // 3. Generate signed URLs for preview
+  // 3. Generate signed URLs in parallel for preview
   const sections: LessonSectionItem[] = await Promise.all(
     (rawSections ?? []).map(async (sec) => {
-      let imageUrl: string | null = null
-      let pdfUrl: string | null = null
-      let videoUrl: string | null = null
-
-      if (sec.image_path) {
-        const { data: signedImg } = await supabase.storage
-          .from('lesson-media')
-          .createSignedUrl(sec.image_path, 3600 * 24)
-        imageUrl = signedImg?.signedUrl ?? null
-      }
-
-      if (sec.pdf_path) {
-        const { data: signedPdf } = await supabase.storage
-          .from('lesson-media')
-          .createSignedUrl(sec.pdf_path, 3600 * 24)
-        pdfUrl = signedPdf?.signedUrl ?? null
-      }
-
-      if (sec.video_path) {
-        const { data: signedVideo } = await supabase.storage
-          .from('lesson-media')
-          .createSignedUrl(sec.video_path, 3600 * 24)
-        videoUrl = signedVideo?.signedUrl ?? null
-      }
+      const [signedImg, signedPdf, signedVideo] = await Promise.all([
+        sec.image_path
+          ? supabase.storage.from('lesson-media').createSignedUrl(sec.image_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+        sec.pdf_path
+          ? supabase.storage.from('lesson-media').createSignedUrl(sec.pdf_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+        sec.video_path
+          ? supabase.storage.from('lesson-media').createSignedUrl(sec.video_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+      ])
 
       return {
         ...sec,
-        imageUrl,
-        pdfUrl,
-        videoUrl,
+        imageUrl: signedImg.data?.signedUrl ?? null,
+        pdfUrl: signedPdf.data?.signedUrl ?? null,
+        videoUrl: signedVideo.data?.signedUrl ?? null,
       }
     })
   )
-
-  // 4. Fetch ALL subjects
-  const { data: subjects } = await supabase
-    .from('subjects')
-    .select('id, name')
-    .order('name', { ascending: true })
 
   const initialLesson: LessonItem & { sections: LessonSectionItem[] } = {
     ...lesson,

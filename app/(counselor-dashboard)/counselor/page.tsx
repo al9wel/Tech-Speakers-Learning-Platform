@@ -12,8 +12,6 @@ import {
 } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'لوحة تحكم المستشار التربوي',
   description: 'متابعة طلبات الإرشاد واستشارات الطلاب النفسية والتربوية والرد عليها',
@@ -22,28 +20,32 @@ export const metadata: Metadata = {
 export default async function CounselorPage() {
   const { user, supabase } = await requireRole('counselor')
 
-  // Real stats
-  const { count: totalConsultations } = await supabase
-    .from('counseling_messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('counselor_id', user.id)
-
-  const { count: pendingConsultations } = await supabase
-    .from('counseling_messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('counselor_id', user.id)
-    .eq('status', 'pending')
-
-  const { count: answeredConsultations } = await supabase
-    .from('counseling_messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('counselor_id', user.id)
-    .eq('status', 'answered')
-
-  const { count: totalStudents } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-    .eq('role', 'student')
+  // Parallel stats queries
+  const [
+    { count: totalConsultations },
+    { count: pendingConsultations },
+    { count: answeredConsultations },
+    { count: totalStudents },
+  ] = await Promise.all([
+    supabase
+      .from('counseling_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('counselor_id', user.id),
+    supabase
+      .from('counseling_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('counselor_id', user.id)
+      .eq('status', 'pending'),
+    supabase
+      .from('counseling_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('counselor_id', user.id)
+      .eq('status', 'answered'),
+    supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('role', 'student'),
+  ])
 
   const statCards = [
     {

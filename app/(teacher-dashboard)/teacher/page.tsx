@@ -11,8 +11,6 @@ import {
 } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'لوحة تحكم المعلم',
   description: 'إدارة الدروس التعليمية والمحتوى الدراسي ومتابعة استفسارات الطلاب',

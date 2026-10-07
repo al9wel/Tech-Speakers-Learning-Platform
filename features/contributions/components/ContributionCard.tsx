@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import {
   User,
   Calendar,
@@ -140,11 +141,13 @@ export function ContributionCard({
                 onClick={() => setShowImageModal(true)}
                 className="relative rounded-2xl overflow-hidden border border-ink-100 bg-ink-50/50 group/img max-h-56 cursor-pointer"
               >
-                <img
+                <Image
                   src={contribution.imageUrl}
                   alt={contribution.title}
-                  className="w-full h-48 sm:h-52 object-cover transition-transform duration-300 group-hover/img:scale-105 cursor-pointer"
+                  width={600}
+                  height={300}
                   loading="lazy"
+                  className="w-full h-48 sm:h-52 object-cover transition-transform duration-300 group-hover/img:scale-105 cursor-pointer"
                 />
                 <button
                   type="button"
@@ -203,9 +206,12 @@ export function ContributionCard({
             >
               <X className="w-5 h-5" />
             </button>
-            <img
+            <Image
               src={contribution.imageUrl}
               alt={contribution.title}
+              width={1200}
+              height={800}
+              loading="lazy"
               className="w-full h-auto max-h-[85vh] object-contain rounded-2xl"
             />
           </div>

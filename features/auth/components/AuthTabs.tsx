@@ -46,7 +46,6 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
         window.dispatchEvent(new Event('auth-changed'))
       }
       router.push(res.redirectTo || '/')
-      router.refresh()
     }
   }
 
@@ -71,7 +70,6 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
       // تم تعليق التحقق من البريد مؤقتاً
       // router.push(res.redirectTo || '/verify-email')
       router.push(res.redirectTo || '/student')
-      router.refresh()
     }
   }
 

@@ -5,8 +5,6 @@ import type { LessonItem } from '@/features/lessons/types'
 import { BookOpen, ArrowRight, AlertTriangle } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'إدارة الدروس التعليمية',
   description: 'إدارة وتعديل ونشر الدروس التعليمية وأقسامها',

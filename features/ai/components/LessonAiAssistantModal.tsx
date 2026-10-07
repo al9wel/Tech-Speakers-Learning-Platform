@@ -117,24 +117,42 @@ export function LessonAiAssistantModal({
         }),
       })
 
-      const data: AiAssistantResponse = await response.json()
-
-      if (data.success && data.reply) {
-        const assistantMessage: AiChatMessage = {
-          id: `asst_${Date.now()}`,
-          role: 'assistant',
-          content: data.reply,
-          createdAt: Date.now(),
-        }
-        setMessages((prev) => [...prev, assistantMessage])
-      } else {
+      if (!response.ok || response.headers.get('content-type')?.includes('application/json')) {
+        const data = await response.json().catch(() => null)
         const errorMessage: AiChatMessage = {
           id: `err_${Date.now()}`,
           role: 'assistant',
-          content: data.error || 'عذراً، حدث خطأ أثناء معالجة السؤال. يرجى المحاولة مرة أخرى.',
+          content: data?.error || 'عذراً، حدث خطأ أثناء معالجة السؤال. يرجى المحاولة مرة أخرى.',
           createdAt: Date.now(),
         }
         setMessages((prev) => [...prev, errorMessage])
+        return
+      }
+
+      const assistantId = `asst_${Date.now()}`
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: assistantId,
+          role: 'assistant',
+          content: '',
+          createdAt: Date.now(),
+        },
+      ])
+
+      const reader = response.body?.getReader()
+      if (!reader) return
+      const decoder = new TextDecoder()
+      let accumulated = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        accumulated += chunk
+        setMessages((prev) =>
+          prev.map((msg) => (msg.id === assistantId ? { ...msg, content: accumulated } : msg))
+        )
       }
     } catch {
       const errorMessage: AiChatMessage = {
@@ -162,11 +180,24 @@ export function LessonAiAssistantModal({
         }),
       })
 
-      const data: AiAssistantResponse = await response.json()
-      if (data.success && data.summary) {
-        setSummary(data.summary)
-      } else {
-        setSummary('تعذر توليد الملخص حالياً: ' + (data.error || 'خطأ غير متوقع'))
+      if (!response.ok || response.headers.get('content-type')?.includes('application/json')) {
+        const data = await response.json().catch(() => null)
+        setSummary('تعذر توليد الملخص حالياً: ' + (data?.error || 'خطأ غير متوقع'))
+        return
+      }
+
+      const reader = response.body?.getReader()
+      if (!reader) return
+      const decoder = new TextDecoder()
+      let accumulated = ''
+      setSummary('')
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        accumulated += chunk
+        setSummary(accumulated)
       }
     } catch {
       setSummary('تعذر الاتصال بالخادم أثناء طلب التلخيص.')

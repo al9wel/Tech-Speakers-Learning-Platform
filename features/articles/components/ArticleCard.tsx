@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import {
   User,
   Calendar,
@@ -128,11 +129,13 @@ export function ArticleCard({
         {/* Background Layers */}
         {hasImage ? (
           <>
-            <img
+            <Image
               src={article.imageUrl || ''}
               alt={article.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              fill
               loading="lazy"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
             {/* Subtle Natural Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none transition-opacity duration-300" />
@@ -385,10 +388,13 @@ export function ArticleCard({
             {/* Modal Header Media (if image exists) */}
             {article.imageUrl && (
               <div className="relative h-56 sm:h-72 w-full shrink-0 overflow-hidden bg-ink-900 group/zoom">
-                <img
+                <Image
                   src={article.imageUrl}
                   alt={article.title}
-                  className="w-full h-full object-cover"
+                  fill
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
                 <button
@@ -553,9 +559,12 @@ export function ArticleCard({
             >
               <X className="w-5 h-5" />
             </button>
-            <img
+            <Image
               src={article.imageUrl}
               alt={article.title}
+              width={1200}
+              height={800}
+              loading="lazy"
               className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/10"
             />
           </div>

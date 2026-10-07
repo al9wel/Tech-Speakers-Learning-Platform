@@ -1,6 +1,7 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
+import Image from 'next/image'
 import type { SubjectItem } from '../types'
 import { SubjectDialog } from '../components/SubjectDialog'
 import { DeleteSubjectDialog } from '../components/DeleteSubjectDialog'
@@ -26,12 +27,15 @@ export function getSubjectColumns(currentUserId?: string, canManage: boolean = t
         const s = row.original
         return (
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl overflow-hidden bg-cream/80 border border-ink-100 flex items-center justify-center shrink-0">
+            <div className="w-11 h-11 relative rounded-xl overflow-hidden bg-cream/80 border border-ink-100 flex items-center justify-center shrink-0">
               {s.imageUrl ? (
-                <img
+                <Image
                   src={s.imageUrl}
                   alt={s.name}
-                  className="w-full h-full object-cover"
+                  fill
+                  loading="lazy"
+                  sizes="44px"
+                  className="object-cover"
                 />
               ) : (
                 <div className="w-full h-full bg-gold/15 text-gold-dark flex items-center justify-center">

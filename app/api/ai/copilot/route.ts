@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { generatePlatformCopilotAnswer } from '@/lib/ai/gemini'
-import type { CopilotRequest, CopilotResponse } from '@/features/ai/types'
+import { streamPlatformCopilotAnswer } from '@/lib/ai/gemini'
+import type { CopilotRequest } from '@/features/ai/types'
 
 export async function POST(req: Request) {
   try {
@@ -37,20 +37,20 @@ export async function POST(req: Request) {
       )
     }
 
-    // 4. Generate Copilot Guidance Response
-    const reply = await generatePlatformCopilotAnswer({
+    // 4. Stream Copilot Guidance Response
+    const stream = await streamPlatformCopilotAnswer({
       userRole: profile?.role || 'student',
       userName: profile?.full_name || null,
       currentPath: currentPath || '/',
       messages,
     })
 
-    const responseData: CopilotResponse = {
-      success: true,
-      reply,
-    }
-
-    return NextResponse.json(responseData)
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache, no-transform',
+      },
+    })
   } catch (err: any) {
     console.error('AI Copilot Error:', err)
     return NextResponse.json(

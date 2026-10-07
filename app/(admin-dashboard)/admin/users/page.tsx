@@ -7,8 +7,6 @@ import type { UserItem } from '@/features/users/components/UserDialog'
 import { Users, ArrowRight } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'إدارة المستخدمين',
   description: 'إدارة وتعديل حسابات جميع مستخدمي المنصة وتعيين الصلاحيات',

@@ -2,8 +2,6 @@ import { requireRole } from '@/lib/auth/require-role'
 import { SupervisorSuggestionsManager } from '@/features/suggestions/components/SupervisorSuggestionsManager'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'صندوق مقترحات الطلاب',
   description: 'استعراض ومتابعة مقترحات الطلاب الواردة للإدارة',

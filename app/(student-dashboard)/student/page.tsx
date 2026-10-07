@@ -12,9 +12,6 @@ import {
 import type { Metadata } from 'next'
 import { StudentAiInsightsCard } from '@/features/ai/components/StudentAiInsightsCard'
 
-
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'لوحة تحكم الطالب',
   description: 'الوصول السريع لمحتواك التعليمي وتصفح الدروس والمناهج',

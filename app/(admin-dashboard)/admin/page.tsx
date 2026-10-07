@@ -13,8 +13,6 @@ import {
 } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'لوحة تحكم الإدارة',
   description: 'إحصائيات وإدارة مستخدمي المنصة والصلاحيات',
@@ -24,17 +22,29 @@ export default async function AdminPage() {
   await requireRole('admin')
 
   const admin = createAdminClient()
-  const { data: profiles } = await admin
-    .from('profiles')
-    .select('role')
+  const [
+    { count: totalCount },
+    { count: studentCount },
+    { count: teacherCount },
+    { count: adminCount },
+    { count: supervisorCount },
+    { count: counselorCount },
+  ] = await Promise.all([
+    admin.from('profiles').select('*', { count: 'exact', head: true }),
+    admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+    admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'teacher'),
+    admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'admin'),
+    admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'supervisor'),
+    admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'counselor'),
+  ])
 
   const counts = {
-    total: profiles?.length ?? 0,
-    student: profiles?.filter((p) => p.role === 'student').length ?? 0,
-    teacher: profiles?.filter((p) => p.role === 'teacher').length ?? 0,
-    admin: profiles?.filter((p) => p.role === 'admin').length ?? 0,
-    supervisor: profiles?.filter((p) => p.role === 'supervisor').length ?? 0,
-    counselor: profiles?.filter((p) => p.role === 'counselor').length ?? 0,
+    total: totalCount ?? 0,
+    student: studentCount ?? 0,
+    teacher: teacherCount ?? 0,
+    admin: adminCount ?? 0,
+    supervisor: supervisorCount ?? 0,
+    counselor: counselorCount ?? 0,
   }
 
   const statCards = [

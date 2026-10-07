@@ -2,8 +2,6 @@ import { requireRole } from '@/lib/auth/require-role'
 import { ArticlesFeed } from '@/features/articles/components/ArticlesFeed'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'إدارة الأخبار والمقالات',
   description: 'نشر وإدارة وتعديل الأخبار والمقالات والتوجيهات التربوية في المنصة',
@@ -25,39 +23,27 @@ export default async function SupervisorArticlesPage() {
       )
     `)
     .order('created_at', { ascending: false })
+    .limit(50)
 
   const articles = await Promise.all(
     (rawArticles ?? []).map(async (art) => {
-      let imageUrl: string | null = null
-      let pdfUrl: string | null = null
-      let videoUrl: string | null = null
-
-      if (art.image_path) {
-        const { data: signedImg } = await supabase.storage
-          .from(BUCKET_NAME)
-          .createSignedUrl(art.image_path, 3600 * 24)
-        imageUrl = signedImg?.signedUrl ?? null
-      }
-
-      if (art.pdf_path) {
-        const { data: signedPdf } = await supabase.storage
-          .from(BUCKET_NAME)
-          .createSignedUrl(art.pdf_path, 3600 * 24)
-        pdfUrl = signedPdf?.signedUrl ?? null
-      }
-
-      if (art.video_path) {
-        const { data: signedVideo } = await supabase.storage
-          .from(BUCKET_NAME)
-          .createSignedUrl(art.video_path, 3600 * 24)
-        videoUrl = signedVideo?.signedUrl ?? null
-      }
+      const [signedImg, signedPdf, signedVideo] = await Promise.all([
+        art.image_path
+          ? supabase.storage.from(BUCKET_NAME).createSignedUrl(art.image_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+        art.pdf_path
+          ? supabase.storage.from(BUCKET_NAME).createSignedUrl(art.pdf_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+        art.video_path
+          ? supabase.storage.from(BUCKET_NAME).createSignedUrl(art.video_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+      ])
 
       return {
         ...art,
-        imageUrl,
-        pdfUrl,
-        videoUrl,
+        imageUrl: signedImg.data?.signedUrl ?? null,
+        pdfUrl: signedPdf.data?.signedUrl ?? null,
+        videoUrl: signedVideo.data?.signedUrl ?? null,
       }
     })
   )

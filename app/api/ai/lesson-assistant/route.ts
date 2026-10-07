@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import {
-  generateLessonChatAnswer,
-  generateLessonSummary,
+  streamLessonChatAnswer,
+  streamLessonSummary,
   generateLessonQuiz,
   type PdfAttachment,
 } from '@/lib/ai/gemini'
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
         )
       }
 
-      const reply = await generateLessonChatAnswer({
+      const stream = await streamLessonChatAnswer({
         lessonTitle,
         subjectName,
         lessonIntro,
@@ -86,16 +86,16 @@ export async function POST(req: Request) {
         messages,
       })
 
-      const resData: AiAssistantResponse = {
-        success: true,
-        mode: 'chat',
-        reply,
-      }
-      return NextResponse.json(resData)
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+        },
+      })
     }
 
     if (mode === 'summary') {
-      const summary = await generateLessonSummary({
+      const stream = await streamLessonSummary({
         lessonTitle,
         subjectName,
         lessonIntro,
@@ -103,12 +103,12 @@ export async function POST(req: Request) {
         pdfAttachments,
       })
 
-      const resData: AiAssistantResponse = {
-        success: true,
-        mode: 'summary',
-        summary,
-      }
-      return NextResponse.json(resData)
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+        },
+      })
     }
 
     if (mode === 'quiz') {

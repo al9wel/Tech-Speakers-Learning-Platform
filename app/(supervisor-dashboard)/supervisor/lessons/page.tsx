@@ -2,8 +2,6 @@ import { requireRole } from '@/lib/auth/require-role'
 import { SupervisorLessonsManager } from '@/features/lessons/components/SupervisorLessonsManager'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'إدارة ومراجعة الدروس',
   description: 'استعراض ومتابعة وحذف الدروس المنشورة في المنصة',
@@ -12,28 +10,31 @@ export const metadata: Metadata = {
 export default async function SupervisorLessonsPage() {
   const { supabase } = await requireRole('supervisor')
 
-  // Fetch all subjects for filter
-  const { data: subjects } = await supabase
-    .from('subjects')
-    .select('id, name')
-    .order('name', { ascending: true })
-
-  // Fetch all lessons with subject, creator profile, and section count
-  const { data: rawLessons, error } = await supabase
-    .from('lessons')
-    .select(`
-      *,
-      subject:subjects (
-        id,
-        name
-      ),
-      teacher:profiles!lessons_created_by_fkey (
-        id,
-        full_name
-      ),
-      lesson_sections (count)
-    `)
-    .order('created_at', { ascending: false })
+  // Fetch subjects and lessons in parallel
+  const [
+    { data: subjects },
+    { data: rawLessons, error },
+  ] = await Promise.all([
+    supabase
+      .from('subjects')
+      .select('id, name')
+      .order('name', { ascending: true }),
+    supabase
+      .from('lessons')
+      .select(`
+        *,
+        subject:subjects (
+          id,
+          name
+        ),
+        teacher:profiles!lessons_created_by_fkey (
+          id,
+          full_name
+        ),
+        lesson_sections (count)
+      `)
+      .order('created_at', { ascending: false }),
+  ])
 
   if (error) {
     console.error('Error fetching lessons for supervisor:', error)

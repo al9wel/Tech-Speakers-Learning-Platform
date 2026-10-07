@@ -5,8 +5,6 @@ import type { SubjectItem } from '@/features/subjects/types'
 import { BookOpen, ArrowRight, AlertTriangle } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'إدارة المواد الدراسية',
   description: 'إضافة وتعديل وحذف المواد والمناهج الدراسية في المنصة',

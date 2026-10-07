@@ -5,8 +5,6 @@ import type { QuestionItem } from '@/features/questions/types'
 import { HelpCircle, ArrowRight, AlertTriangle } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'استفسارات وأسئلة الدروس',
   description: 'إدارة وتوجيه أسئلة ونقاشات الطلاب حول الدروس',
@@ -15,61 +13,64 @@ export const metadata: Metadata = {
 export default async function TeacherQuestionsPage() {
   const { user, supabase } = await requireRole('teacher')
 
-  // 1. Fetch lessons owned by this teacher (for question creation & filtering)
-  const { data: rawLessons, error: lessonsError } = await supabase
-    .from('lessons')
-    .select(`
-      id,
-      title,
-      subject_id,
-      subject:subjects (
-        id,
-        name
-      )
-    `)
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false })
-
-  // 2. Fetch questions created by this teacher, including answers and student profiles
-  const { data: rawQuestions, error: questionsError } = await supabase
-    .from('questions')
-    .select(`
-      id,
-      lesson_id,
-      created_by,
-      title,
-      content,
-      created_at,
-      updated_at,
-      lesson:lessons (
+  // Fetch lessons and questions created by this teacher in parallel
+  const [
+    { data: rawLessons, error: lessonsError },
+    { data: rawQuestions, error: questionsError },
+  ] = await Promise.all([
+    supabase
+      .from('lessons')
+      .select(`
         id,
         title,
+        subject_id,
         subject:subjects (
           id,
           name
         )
-      ),
-      author:profiles!questions_created_by_fkey (
+      `)
+      .eq('created_by', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('questions')
+      .select(`
         id,
-        full_name,
-        role
-      ),
-      question_answers (
-        id,
-        question_id,
-        user_id,
+        lesson_id,
+        created_by,
+        title,
         content,
         created_at,
         updated_at,
-        author:profiles!question_answers_user_id_fkey (
+        lesson:lessons (
+          id,
+          title,
+          subject:subjects (
+            id,
+            name
+          )
+        ),
+        author:profiles!questions_created_by_fkey (
           id,
           full_name,
           role
+        ),
+        question_answers (
+          id,
+          question_id,
+          user_id,
+          content,
+          created_at,
+          updated_at,
+          author:profiles!question_answers_user_id_fkey (
+            id,
+            full_name,
+            role
+          )
         )
-      )
-    `)
-    .eq('created_by', user.id)
-    .order('created_at', { ascending: false })
+      `)
+      .eq('created_by', user.id)
+      .order('created_at', { ascending: false }),
+  ])
 
   if (lessonsError || questionsError) {
     const errorMsg = lessonsError?.message || questionsError?.message || 'تعذر تحميل بيانات بنك الأسئلة'

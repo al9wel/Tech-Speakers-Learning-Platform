@@ -1,8 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { rolePaths, isAppRole } from '@/lib/auth/roles'
+import { createSessionToken } from '@/lib/auth/session-token'
 
 export async function updateSession(request: NextRequest) {
+    // Strip incoming header to prevent spoofing from external clients
+    request.headers.delete('x-auth-session')
+
     let supabaseResponse = NextResponse.next({
         request,
     })
@@ -45,7 +49,6 @@ export async function updateSession(request: NextRequest) {
         pathname.startsWith('/verify-email') ||
         pathname.startsWith('/error')
 
-
     if (!user) {
         if (!isPublicRoute) {
             const url = request.nextUrl.clone()
@@ -59,7 +62,7 @@ export async function updateSession(request: NextRequest) {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, full_name')
         .eq('id', user.id)
         .single()
 
@@ -104,5 +107,27 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    return supabaseResponse
+    // Attach signed session token to request headers so Server Components (requireRole) can reuse auth result
+    const sessionToken = await createSessionToken({
+        userId: user.id,
+        email: user.email || '',
+        role,
+        fullName: profile.full_name || '',
+    })
+
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-auth-session', sessionToken)
+
+    const finalResponse = NextResponse.next({
+        request: {
+            headers: requestHeaders,
+        },
+    })
+
+    // Forward any cookies updated during Supabase session refresh
+    supabaseResponse.cookies.getAll().forEach((c) => {
+        finalResponse.cookies.set(c)
+    })
+
+    return finalResponse
 }
