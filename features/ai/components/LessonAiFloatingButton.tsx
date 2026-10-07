@@ -37,12 +37,9 @@ export function LessonAiFloatingButton({ lessonData }: LessonAiWrapperProps) {
       <div className="fixed bottom-6 left-6 z-40 group">
         <button
           onClick={() => openWithMode('chat')}
-          className="relative flex items-center gap-3 p-2 pr-4 pl-2 rounded-full bg-white/95 backdrop-blur-md text-ink-900 shadow-xl hover:shadow-2xl border border-gold/40 hover:border-gold hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+          className="relative flex items-center gap-3 p-2 pr-4 pl-2 rounded-full bg-white text-ink-900 shadow-xl hover:shadow-2xl border-2 border-[#DFC496] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
           aria-label="المعلم الذكي للدرس"
         >
-          {/* Subtle glowing ambient pulse */}
-          <span className="absolute -inset-1 rounded-full bg-linear-to-r from-gold/30 to-gold-light/40 blur-xs opacity-60 group-hover:opacity-100 transition animate-pulse pointer-events-none" />
-
           {/* Text Labels */}
           <div className="relative flex flex-col text-right leading-tight select-none">
             <div className="flex items-center gap-1.5">
@@ -51,13 +48,13 @@ export function LessonAiFloatingButton({ lessonData }: LessonAiWrapperProps) {
               </span>
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 shadow-xs" />
             </div>
-            <span className="text-[10px] text-gold-dark font-medium">
+            <span className="text-[10px] text-gold-dark font-bold">
               اسأل عن محتوى الدرس
             </span>
           </div>
 
           {/* Glowing Icon Avatar */}
-          <div className="relative w-9 h-9 rounded-full bg-linear-to-tr from-gold to-gold-dark flex items-center justify-center text-white shrink-0 shadow-md shadow-gold/25 group-hover:rotate-6 transition-transform">
+          <div className="relative w-9 h-9 rounded-full bg-[#C69C5D] text-white flex items-center justify-center shrink-0 shadow-md group-hover:rotate-6 transition-transform">
             <Sparkles className="w-4 h-4" />
           </div>
         </button>
@@ -76,7 +73,7 @@ export function LessonAiFloatingButton({ lessonData }: LessonAiWrapperProps) {
 
 /**
  * In-Page AI Lesson Hero Card
- * Elegant, light-themed premium card seamlessly integrated into the lesson page.
+ * Elegant, solid-themed premium card seamlessly integrated into the lesson page.
  */
 export function LessonAiBanner({ lessonData }: LessonAiWrapperProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -89,14 +86,11 @@ export function LessonAiBanner({ lessonData }: LessonAiWrapperProps) {
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-white via-cream/50 to-gold/10 p-6 sm:p-7 shadow-card border border-gold/30 hover:border-gold/50 transition-all duration-300 mb-8">
-        {/* Soft background ambient blurs */}
-        <div className="absolute -top-16 -left-16 w-44 h-44 bg-gold/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-16 -right-16 w-44 h-44 bg-sage/15 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+      <div className="rounded-3xl bg-white p-6 sm:p-7 shadow-sm border-2 border-[#E5DAC6] mb-8">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           {/* Main Info */}
           <div className="flex items-start gap-4">
+
             <div className="relative w-13 h-13 rounded-2xl bg-linear-to-tr from-gold via-gold-dark to-gold text-white flex items-center justify-center shadow-lg shadow-gold/25 shrink-0 mt-0.5">
               <Bot className="w-7 h-7" />
               <span className="absolute -top-1 -right-1 flex h-3 w-3">

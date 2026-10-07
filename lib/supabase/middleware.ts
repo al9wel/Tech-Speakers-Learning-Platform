@@ -40,9 +40,11 @@ export async function updateSession(request: NextRequest) {
 
     const isPublicRoute =
         pathname === '/' ||
+        pathname.startsWith('/api') ||
         pathname.startsWith('/auth') ||
         pathname.startsWith('/verify-email') ||
         pathname.startsWith('/error')
+
 
     if (!user) {
         if (!isPublicRoute) {

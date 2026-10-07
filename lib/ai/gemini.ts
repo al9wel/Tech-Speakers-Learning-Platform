@@ -371,3 +371,183 @@ export async function generateLessonQuiz(params: LessonContextParams): Promise<Q
     },
   ]
 }
+
+/**
+ * Universal Platform AI Copilot
+ * Guides all user roles across the platform with direct action links.
+ */
+export async function generatePlatformCopilotAnswer({
+  userRole,
+  userName,
+  currentPath,
+  messages,
+}: {
+  userRole?: string | null
+  userName?: string | null
+  currentPath?: string
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>
+}): Promise<string> {
+  const roleNameMap: Record<string, string> = {
+    student: 'طالب',
+    teacher: 'معلم',
+    admin: 'مدير النظام (مشرف عام)',
+    supervisor: 'مشرف تربوي',
+    counselor: 'مستشار نفسي وتربوي',
+  }
+
+  const roleTitle = roleNameMap[userRole || ''] || 'مستخدم'
+
+  const systemInstruction = `أنت "الموجّه الذكي العام (AI Copilot)" لمنصة "Tech Speakers" التعليمية.
+أنت تخاطب الآن: ${userName ? `${userName}` : 'أحد منسوبي المنصة'}، بصفته: "${roleTitle}".
+الصفحة الحالية التي يتواجد فيها: ${currentPath || 'المنصة'}.
+
+مهمتك:
+مساعدة وتوجيه المستخدم خطوة بخطوة لكيفية استخدام أي شاشة أو ميزة في المنصة وفق دوره وصلاحياته، والإجابة عن أي استفسار حول كيفية إنجاز المهام.
+
+--- دليل وخريطة أقسام المنصة وفق الصلاحيات والأدوار ---
+1. حساب الطالب (student):
+- لوحة تحكم الطالب (/student): الاطلاع على إحصائيات المواد وخطة المذاكرة الذكية.
+- المواد والدروس (/student/subjects): تصفح المناهج، قراءة شروحات الدروس، المعلم الذكي، التلخيص الآلي، الكويزات التفاعلية، ومعاينة مرفقات الـ PDF.
+- المستشار النفسي والتربوي (/student/counseling): إرسال استشارات خاصة ومغلقة بسرية تامة وتلقي توجيهات الدعم النفسي والتربوي.
+- مساهمات الطلاب (/student/contributions): مشاركة ونشر إبداعات وملخصات ومشاريع الطالب مع زملائه والتفاعل معها.
+- الأخبار والمقالات (/student/articles): متابعة القرارات الرسمية والمقالات الإثرائية والتوجيهات.
+- صندوق المقترحات (/student/suggestions): إرسال مقترحات لتطوير المنصة والمتابعة حتى تنفيذها.
+- الملف الشخصي (/student/profile): تحديث البيانات وتغيير كلمة المرور.
+
+2. حساب المعلم (teacher):
+- لوحة تحكم المعلم (/teacher): استعراض إحصائيات الدروس المنشورة وروابط الوصول السريع.
+- قائمة دروسي (/teacher/lessons): استعراض وإدارة كافة الدروس التي أنشأها المعلم.
+- إنشاء درس جديد (/teacher/lessons/new): صياغة العنوان، التمهيد، إضافة أقسام وشروحات، إرفاق مقاطع فيديو أو ملفات ملخصات PDF.
+- استفسارات الطلاب (/teacher/questions): الإجابة عن أسئلة ومناقشات الطلاب المرتبطة بدروس المعلم.
+- المقالات والأخبار (/teacher/articles): كتابة ونشر مقالات ومذكرات إثرائية.
+- الملف الشخصي (/teacher/profile).
+
+3. حساب المشرف التربوي (supervisor):
+- لوحة تحكم المشرف (/supervisor): متابعة المناهج والتدقيق الأكاديمي.
+- إدارة وتدقيق الدروس (/supervisor/lessons): استعراض كافة دروس المنصة والبحث فيها ومراجعة محتواها مع إمكانية التعديل والحذف.
+- صندوق مقترحات الطلاب (/supervisor/suggestions): استعراض أفكار ومقترحات الطلاب وتحديث حالات معالجتها.
+- مساهمات الطلاب (/supervisor/contributions): متابعة إبداعات ومشاريع الطلاب.
+- المركز الإعلامي والمقالات (/supervisor/articles): نشر وتعديل الأخبار الرسمية والتوجيهات المعتمدة.
+- الملف الشخصي (/supervisor/profile).
+
+4. حساب المستشار النفسي والتربوي (counselor):
+- مركز الاستشارات (/counselor): استقبال رسائل واستشارات الطلاب، الرد التوجيهي والنفسي بسرية تامة، ومراسلة أي طالب بالبحث عن اسمه.
+- قائمة الطلاب (/counselor/students): استعراض ومتابعة الطلاب.
+- المقالات التوجيهية (/counselor/articles): نشر مقالات إرشادية حول الصحة النفسية وتنظيم الوقت.
+- الملف الشخصي (/counselor/profile).
+
+5. حساب مدير النظام / الأدمن (admin):
+- لوحة تحكم الإدارة (/admin): إحصائيات شاملة لكافة مستخدمي المنصة ومؤشرات النشاط.
+- إدارة المستخدمين (/admin/users): استعراض كافة الحسابات وتعديل أدوارهم وصلاحياتهم.
+- إدارة الطلاب (/admin/students): إضافة وتعديل وحذف حسابات الطلاب.
+- إدارة المعلمين (/admin/teachers): إدارة حسابات المعلمين وتعيينهم.
+- إدارة المشرفين (/admin/supervisors): إدارة المشرفين التربويين.
+- إدارة المستشارين (/admin/counselors): إدارة المستشارين النفسيين.
+- الملف الشخصي (/admin/profile).
+
+قواعد الإجابة:
+1. كن ودوداً ومشجعاً وواضحاً جداً واستخدم نقاطاً مرتبة باللغة العربية الفصحى.
+2. وجه المستخدم بدقة للخطوات المطلوبة بما يتوافق مع دوره الحالي (${roleTitle}).
+3. إذا تضمنت إجابتك إرشاداً لصفحة معينة، أضف رابط توجيه سريع في نهاية الرد بهذا الشكل الصريح:
+[LINK: عنوان الزر | /المسار]
+مثال: [LINK: الانتقال لإضافة درس جديد | /teacher/lessons/new]
+أو: [LINK: فتح صندوق المقترحات | /student/suggestions]
+(الواجهة ستحول هذا التنسيق تلقائياً إلى زر أنيق قابل للنقر).`
+
+  const contents = messages.map((m) => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }],
+  }))
+
+  return await callGemini(contents, systemInstruction)
+}
+
+export interface StudentLearningInsightsData {
+  focusRecommendation: {
+    subject: string
+    reason: string
+  }
+  studyStrategy: string
+  dailyChallenge: string
+}
+
+/**
+ * AI Student Learning Advisor & Study Insights
+ */
+export async function generateStudentLearningInsights({
+  studentName,
+  subjects,
+  lessonsCount,
+}: {
+  studentName?: string | null
+  subjects: Array<{ name: string; lessonsCount?: number }>
+  lessonsCount?: number
+}): Promise<StudentLearningInsightsData> {
+  const subjectsListText =
+    subjects.length > 0
+      ? subjects.map((s) => `- مادة "${s.name}" (تحتوي على ${s.lessonsCount ?? 1} درس)`).join('\n')
+      : 'مواد دراسية عامة'
+
+  const systemInstruction = `أنت "المستشار الأكاديمي الذكي (AI Study Advisor)" في منصة "Tech Speakers".
+مهمتك: تحليل المقررات المتاحة للطالب ${studentName ? `"${studentName}"` : 'المثابر'}، وتقديم خطة مراجعة وتوصيات ذكية ومحفزة.
+
+المقررات المتاحة في المنصة:
+${subjectsListText}
+إجمالي الدروس المتاحة: ${lessonsCount ?? 4} درس.
+
+المطلوب: توليد تحليل تعليمي مخصص بتنسيق JSON حصرياً يحتوي على:
+1. focusRecommendation: كائن يحتوي على:
+   - subject: اسم إحدى المواد المتاحة الموصى بالتركيز عليها اليوم/هذا الأسبوع.
+   - reason: جملتان تشرحان بأسلوب تربوي مشوق سبب أهمية البدء بهذه المادة.
+2. studyStrategy: فقرة من 2-3 جمل تتضمن نصيحة دراسية فعالة ومبتكرة لاستغلال أدوات المنصة الذكية (مثل: سؤال المعلم الذكي داخل الدرس، استخدام التلخيص الفوري، وحل الكويز التفاعلي).
+3. dailyChallenge: تحدي يومي محفز ومحدد ينجزه الطالب اليوم (مثال: إتقان درس محدد وحل كويز تفاعلي بنتيجة كاملة).
+
+أخرج JSON فقط بالتنسيق التالي:
+{
+  "focusRecommendation": {
+    "subject": "اسم المادة",
+    "reason": "سبب التوصية..."
+  },
+  "studyStrategy": "استراتيجية المذاكرة...",
+  "dailyChallenge": "نص التحدي اليومي..."
+}`
+
+  const contents = [
+    {
+      parts: [
+        {
+          text: 'حلل المواد وقدم التوصيات والخطة الدراسية الذكية للطالب.',
+        },
+      ],
+    },
+  ]
+
+  const rawJson = await callGemini(contents, systemInstruction, true)
+
+  try {
+    const cleaned = rawJson
+      .replace(/```json/gi, '')
+      .replace(/```/g, '')
+      .trim()
+
+    const parsed = JSON.parse(cleaned)
+    if (parsed.focusRecommendation && parsed.studyStrategy && parsed.dailyChallenge) {
+      return parsed
+    }
+  } catch (e) {
+    console.error('Failed to parse Student Insights JSON:', e, rawJson)
+  }
+
+  // Fallback insights
+  const primarySubject = subjects[0]?.name || 'علوم الحاسوب والذكاء الاصطناعي'
+  return {
+    focusRecommendation: {
+      subject: primarySubject,
+      reason: `تعتبر مادة "${primarySubject}" ركيزة أساسية في المنهج، والبدء بفهم مفاهيمها التأسيسية يمنحك انطلاقة قوية واستيعاباً أفضل لكافة الدروس اللاحقة.`,
+    },
+    studyStrategy:
+      'اقرأ مقدمة الدرس بتمعن، ثم استخدم ميزة "المعلم الذكي" لطرح أي سؤال غامض، واختتم مذاكرتك بالضغط على "كويز تفاعلي" لترسيخ المعلومات فورياً في ذاكرتك.',
+    dailyChallenge:
+      `إنهاء أحد موضوعات مادة "${primarySubject}" واختبار فهمك عبر كويز المعلم الذكي والحصول على علامة كاملة!`,
+  }
+}

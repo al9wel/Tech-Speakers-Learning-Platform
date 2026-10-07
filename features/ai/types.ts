@@ -45,3 +45,40 @@ export interface AiAssistantResponse {
   quiz?: QuizQuestion[]
   error?: string
 }
+
+export interface CopilotMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  createdAt: number
+}
+
+export interface CopilotRequest {
+  messages: Array<{
+    role: 'user' | 'assistant'
+    content: string
+  }>
+  currentPath?: string
+}
+
+export interface CopilotResponse {
+  success: boolean
+  reply?: string
+  error?: string
+}
+
+export interface StudentLearningInsightsData {
+  focusRecommendation: {
+    subject: string
+    reason: string
+  }
+  studyStrategy: string
+  dailyChallenge: string
+}
+
+export interface StudentInsightsResponse {
+  success: boolean
+  insights?: StudentLearningInsightsData
+  error?: string
+}
+
