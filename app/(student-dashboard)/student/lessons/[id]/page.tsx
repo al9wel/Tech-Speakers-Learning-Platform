@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/require-role'
 import { createClient } from '@/lib/supabase/server'
@@ -14,40 +15,17 @@ import {
   Layers,
   GraduationCap,
 } from 'lucide-react'
+import { cache } from 'react'
 import type { Metadata } from 'next'
 import { LessonAiFloatingButton, LessonAiBanner } from '@/features/ai/components/LessonAiFloatingButton'
-
-export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params
+const getLesson = cache(async (lessonId: string) => {
   const supabase = await createClient()
-  const { data: lesson } = await supabase
-    .from('lessons')
-    .select('title, subject:subjects(name)')
-    .eq('id', id)
-    .single()
-  const subjectName = (lesson?.subject as any)?.name
-  const title = lesson?.title
-    ? subjectName
-      ? `${lesson.title} - ${subjectName}`
-      : lesson.title
-    : 'درس تعليمي'
-  return {
-    title,
-  }
-}
-
-export default async function StudentLessonViewPage({ params }: PageProps) {
-  const { id: lessonId } = await params
-  const { user, profile, supabase } = await requireRole('student')
-
-  // Fetch lesson with subject and creator
-  const { data: lesson, error: lessonError } = await supabase
+  return await supabase
     .from('lessons')
     .select(`
       *,
@@ -63,87 +41,99 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
     `)
     .eq('id', lessonId)
     .single()
+})
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params
+  const { data: lesson } = await getLesson(id)
+  const subjectName = (lesson?.subject as any)?.name
+  const title = lesson?.title
+    ? subjectName
+      ? `${lesson.title} - ${subjectName}`
+      : lesson.title
+    : 'درس تعليمي'
+  return {
+    title,
+  }
+}
+
+export default async function StudentLessonViewPage({ params }: PageProps) {
+  const { id: lessonId } = await params
+  const [{ user, profile, supabase }, { data: lesson, error: lessonError }] = await Promise.all([
+    requireRole('student'),
+    getLesson(lessonId),
+  ])
 
   if (lessonError || !lesson) {
     notFound()
   }
 
-  // Fetch sections of this lesson ordered by sort_order
-  const { data: rawSections, error: sectionsError } = await supabase
-    .from('lesson_sections')
-    .select('*')
-    .eq('lesson_id', lessonId)
-    .order('sort_order', { ascending: true })
-
-  // Generate signed URLs in parallel for section images, PDFs, and videos
-  const sections = await Promise.all(
-    (rawSections ?? []).map(async (sec) => {
-      let imageUrl: string | null = null
-      let pdfUrl: string | null = null
-      let videoUrl: string | null = null
-
-      if (sec.image_path) {
-        const { data: signedImg } = await supabase.storage
-          .from('lesson-media')
-          .createSignedUrl(sec.image_path, 3600 * 24)
-        imageUrl = signedImg?.signedUrl ?? null
-      }
-
-      if (sec.pdf_path) {
-        const { data: signedPdf } = await supabase.storage
-          .from('lesson-media')
-          .createSignedUrl(sec.pdf_path, 3600 * 24)
-        pdfUrl = signedPdf?.signedUrl ?? null
-      }
-
-      if (sec.video_path) {
-        const { data: signedVideo } = await supabase.storage
-          .from('lesson-media')
-          .createSignedUrl(sec.video_path, 3600 * 24)
-        videoUrl = signedVideo?.signedUrl ?? null
-      }
-
-      return {
-        ...sec,
-        imageUrl,
-        pdfUrl,
-        videoUrl,
-      }
-    })
-  )
-
-  // Fetch questions for this lesson along with answers and authors
-  const { data: rawQuestions } = await supabase
-    .from('questions')
-    .select(`
-      id,
-      lesson_id,
-      created_by,
-      title,
-      content,
-      created_at,
-      updated_at,
-      author:profiles!questions_created_by_fkey (
+  // Fetch sections and questions concurrently in parallel
+  const [
+    { data: rawSections },
+    { data: rawQuestions },
+  ] = await Promise.all([
+    supabase
+      .from('lesson_sections')
+      .select('*')
+      .eq('lesson_id', lessonId)
+      .order('sort_order', { ascending: true }),
+    supabase
+      .from('questions')
+      .select(`
         id,
-        full_name,
-        role
-      ),
-      question_answers (
-        id,
-        question_id,
-        user_id,
+        lesson_id,
+        created_by,
+        title,
         content,
         created_at,
         updated_at,
-        author:profiles!question_answers_user_id_fkey (
+        author:profiles!questions_created_by_fkey (
           id,
           full_name,
           role
+        ),
+        question_answers (
+          id,
+          question_id,
+          user_id,
+          content,
+          created_at,
+          updated_at,
+          author:profiles!question_answers_user_id_fkey (
+            id,
+            full_name,
+            role
+          )
         )
-      )
-    `)
-    .eq('lesson_id', lessonId)
-    .order('created_at', { ascending: false })
+      `)
+      .eq('lesson_id', lessonId)
+      .order('created_at', { ascending: false }),
+  ])
+
+  // Generate signed URLs in parallel for all section media
+  const sections = await Promise.all(
+    (rawSections ?? []).map(async (sec) => {
+      const [signedImg, signedPdf, signedVideo] = await Promise.all([
+        sec.image_path
+          ? supabase.storage.from('lesson-media').createSignedUrl(sec.image_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+        sec.pdf_path
+          ? supabase.storage.from('lesson-media').createSignedUrl(sec.pdf_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+        sec.video_path
+          ? supabase.storage.from('lesson-media').createSignedUrl(sec.video_path, 3600 * 24)
+          : Promise.resolve({ data: null }),
+      ])
+
+      return {
+        ...sec,
+        imageUrl: signedImg.data?.signedUrl ?? null,
+        pdfUrl: signedPdf.data?.signedUrl ?? null,
+        videoUrl: signedVideo.data?.signedUrl ?? null,
+      }
+    })
+  )
 
   const questions: QuestionItem[] = (rawQuestions ?? []).map((q: any) => ({
     id: q.id,
@@ -305,10 +295,13 @@ export default async function StudentLessonViewPage({ params }: PageProps) {
                 )}
 
                 {section.imageUrl && (
-                  <div className="mt-4 rounded-2xl overflow-hidden border border-ink-100 bg-cream/20">
-                    <img
+                  <div className="mt-4 rounded-2xl overflow-hidden border border-ink-100 bg-cream/20 flex justify-center">
+                    <Image
                       src={section.imageUrl}
                       alt={section.title}
+                      width={800}
+                      height={450}
+                      loading="lazy"
                       className="w-full max-h-96 object-contain mx-auto"
                     />
                   </div>

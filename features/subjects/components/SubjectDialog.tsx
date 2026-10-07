@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { subjectFormSchema, type SubjectFormValues } from '../schemas/subject.schema'
@@ -337,9 +338,13 @@ export function SubjectDialog({ subject, trigger, currentUserId }: SubjectDialog
                 {previewUrl ? (
                   <div className="relative rounded-2xl border border-ink-200 p-2.5 bg-cream/30 flex items-center gap-3">
                     <div className="w-16 h-16 rounded-xl overflow-hidden bg-ink-100 shrink-0 border border-ink-100 flex items-center justify-center">
-                      <img
+                      <Image
                         src={previewUrl}
                         alt="معاينة المادة"
+                        width={64}
+                        height={64}
+                        loading="lazy"
+                        unoptimized
                         className="w-full h-full object-cover"
                       />
                     </div>

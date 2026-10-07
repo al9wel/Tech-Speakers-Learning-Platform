@@ -10,8 +10,6 @@ import {
 } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'لوحة تحكم المشرف التربوي',
   description: 'متابعة المناهج والدروس والمساهمات والمقترحات التربوية في المنصة',
@@ -20,13 +18,10 @@ export const metadata: Metadata = {
 export default async function SupervisorPage() {
   const { supabase } = await requireRole('supervisor')
 
-  const { count: subjectsCount } = await supabase
-    .from('subjects')
-    .select('*', { count: 'exact', head: true })
-
-  const { count: lessonsCount } = await supabase
-    .from('lessons')
-    .select('*', { count: 'exact', head: true })
+  const [{ count: subjectsCount }, { count: lessonsCount }] = await Promise.all([
+    supabase.from('subjects').select('*', { count: 'exact', head: true }),
+    supabase.from('lessons').select('*', { count: 'exact', head: true }),
+  ])
 
   const statCards = [
     { icon: BookOpen, label: 'المواد الدراسية', value: String(subjectsCount ?? 0), color: 'text-gold-dark bg-gold/15' },

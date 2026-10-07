@@ -50,7 +50,7 @@ export async function loginAction(data: {
     }
   }
 
-  revalidatePath('/', 'layout')
+  revalidatePath(rolePaths[profile.role])
   return {
     success: true,
     redirectTo: rolePaths[profile.role],
@@ -117,7 +117,7 @@ export async function signupAction(data: {
     })
   }
 
-  revalidatePath('/', 'layout')
+  revalidatePath('/student')
   return {
     success: true,
     // تم تعليق التحقق من البريد مؤقتاً بناءً على طلب المستخدم

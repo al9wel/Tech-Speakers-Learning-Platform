@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { rolePaths, isAppRole } from '@/lib/auth/roles'
+import { verifySessionToken } from '@/lib/auth/session-token'
 import HeroIllustration from '@/components/HeroIllustration'
 import {
   Sparkles,
@@ -12,33 +14,51 @@ import {
 } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'الرئيسية',
   description: 'منصة تعليمية يمنية شاملة للطلاب والمعلمين والمستشارين والمشرفين',
 }
 
 export default async function HomePage() {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+  let user: { id: string; email?: string } | null = null
   let profile: { full_name: string | null; role: string | null } | null = null
   let dashboardPath: string | null = null
 
-  if (user) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('full_name, role')
-      .eq('id', user.id)
-      .single()
+  // 1. Fast-path check from middleware session header
+  try {
+    const headersList = await headers()
+    const sessionToken = headersList.get('x-auth-session')
+    if (sessionToken) {
+      const verified = await verifySessionToken(sessionToken)
+      if (verified && isAppRole(verified.role)) {
+        user = { id: verified.userId, email: verified.email }
+        profile = { full_name: verified.fullName ?? '', role: verified.role }
+        dashboardPath = rolePaths[verified.role]
+      }
+    }
+  } catch {
+    // fallback if headers cannot be read
+  }
 
-    if (data && isAppRole(data.role)) {
-      profile = data
-      dashboardPath = rolePaths[data.role]
+  // 2. Direct Supabase verification fallback if session header not present
+  if (!user) {
+    const supabase = await createClient()
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser()
+
+    if (authUser) {
+      user = authUser
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name, role')
+        .eq('id', authUser.id)
+        .single()
+
+      if (data && isAppRole(data.role)) {
+        profile = data
+        dashboardPath = rolePaths[data.role]
+      }
     }
   }
 

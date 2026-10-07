@@ -4,8 +4,6 @@ import { LessonForm } from '@/features/lessons/components/LessonForm'
 import { ArrowRight, AlertCircle } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'إضافة درس جديد',
   description: 'إنشاء درس تعليمي جديد وإضافة الأقسام والوسائط التوضيحية',

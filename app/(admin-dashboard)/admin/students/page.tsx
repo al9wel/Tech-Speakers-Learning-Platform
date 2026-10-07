@@ -6,8 +6,6 @@ import type { UserItem } from '@/features/users/components/UserDialog'
 import { GraduationCap, ArrowRight } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'إدارة الطلاب',
   description: 'إدارة ومتابعة حسابات الطلاب المسجلين في المنصة',

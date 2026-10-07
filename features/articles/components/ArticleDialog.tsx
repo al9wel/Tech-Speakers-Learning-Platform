@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -360,9 +361,13 @@ export function ArticleDialog({
                   {previewImage || watchedImagePath ? (
                     <div className="w-10 h-10 rounded-lg bg-gold/15 flex items-center justify-center shrink-0 overflow-hidden">
                       {previewImage ? (
-                        <img
+                        <Image
                           src={previewImage}
                           alt="معاينة"
+                          width={40}
+                          height={40}
+                          loading="lazy"
+                          unoptimized
                           className="w-full h-full object-cover"
                         />
                       ) : (

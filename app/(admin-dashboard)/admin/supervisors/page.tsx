@@ -6,8 +6,6 @@ import type { UserItem } from '@/features/users/components/UserDialog'
 import { ShieldCheck, ArrowRight } from 'lucide-react'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
-
 export const metadata: Metadata = {
   title: 'إدارة المشرفين التربويين',
   description: 'إدارة ومتابعة حسابات المشرفين التربويين في المنصة',

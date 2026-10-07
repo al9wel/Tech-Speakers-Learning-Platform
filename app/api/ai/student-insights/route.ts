@@ -19,17 +19,17 @@ export async function GET() {
       )
     }
 
-    // 2. Fetch student profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name, role')
-      .eq('id', user.id)
-      .maybeSingle()
-
-    // 3. Fetch current subjects and lesson counts
-    const { data: rawSubjects } = await supabase
-      .from('subjects')
-      .select('name, lessons(count)')
+    // 2. Fetch student profile and subjects concurrently in parallel
+    const [{ data: profile }, { data: rawSubjects }] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('full_name, role')
+        .eq('id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('subjects')
+        .select('name, lessons(count)'),
+    ])
 
     const subjects = (rawSubjects || []).map((s: any) => ({
       name: s.name as string,

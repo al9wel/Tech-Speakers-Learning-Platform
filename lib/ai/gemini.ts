@@ -173,11 +173,127 @@ async function callGemini(
   throw new Error(`تعذر الحصول على استجابة من الذكاء الاصطناعي: ${lastError || 'الخدمة غير متوفرة حالياً'}`)
 }
 
-/**
- * Smart Lesson Tutor Chat
- * Strictly bounded to the lesson content and any attached PDF summaries.
- */
-export async function generateLessonChatAnswer({
+async function streamGemini(
+  contents: Array<{ role?: string; parts: GeminiContentPart[] }>,
+  systemInstruction?: string
+): Promise<ReadableStream<Uint8Array>> {
+  const keys = getGeminiApiKeys()
+  if (keys.length === 0) {
+    throw new Error('لم يتم العثور على مفتاح GEMINI_API_KEY في ملف .env.local')
+  }
+
+  let lastError: any = null
+  const numKeys = keys.length
+  const startIndex = keyRotationIndex % numKeys
+  keyRotationIndex = (keyRotationIndex + 1) % numKeys
+
+  for (let k = 0; k < numKeys; k++) {
+    const keyIndex = (startIndex + k) % numKeys
+    const apiKey = keys[keyIndex]
+
+    for (const model of GEMINI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`
+
+        const payload: Record<string, any> = {
+          contents,
+          generationConfig: {
+            temperature: 0.4,
+          },
+        }
+
+        if (systemInstruction) {
+          payload.systemInstruction = {
+            parts: [{ text: systemInstruction }],
+          }
+        }
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        })
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => null)
+          lastError = errData?.error?.message || `HTTP ${res.status}`
+          if (res.status === 429 || lastError.includes('quota') || lastError.includes('rate')) {
+            console.warn(`Key #${keyIndex + 1} reached limit, switching to next key...`)
+            break
+          }
+          continue
+        }
+
+        if (!res.body) {
+          continue
+        }
+
+        const textEncoder = new TextEncoder()
+        const textDecoder = new TextDecoder()
+        const reader = res.body.getReader()
+
+        const stream = new ReadableStream<Uint8Array>({
+          async start(controller) {
+            let buffer = ''
+            try {
+              while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+
+                buffer += textDecoder.decode(value, { stream: true })
+                const lines = buffer.split('\n')
+                buffer = lines.pop() || ''
+
+                for (const line of lines) {
+                  const trimmed = line.trim()
+                  if (!trimmed.startsWith('data:')) continue
+                  const jsonStr = trimmed.slice(5).trim()
+                  if (!jsonStr) continue
+                  try {
+                    const parsed = JSON.parse(jsonStr)
+                    const textChunk = parsed?.candidates?.[0]?.content?.parts?.[0]?.text
+                    if (textChunk) {
+                      controller.enqueue(textEncoder.encode(textChunk))
+                    }
+                  } catch {
+                    // Ignore parse error on partial chunks
+                  }
+                }
+              }
+
+              if (buffer.trim().startsWith('data:')) {
+                const jsonStr = buffer.trim().slice(5).trim()
+                if (jsonStr) {
+                  try {
+                    const parsed = JSON.parse(jsonStr)
+                    const textChunk = parsed?.candidates?.[0]?.content?.parts?.[0]?.text
+                    if (textChunk) {
+                      controller.enqueue(textEncoder.encode(textChunk))
+                    }
+                  } catch {}
+                }
+              }
+
+              controller.close()
+            } catch (streamErr) {
+              controller.error(streamErr)
+            }
+          },
+        })
+
+        return stream
+      } catch (err: any) {
+        lastError = err?.message || 'خطأ غير معروف في الاتصال بـ Gemini'
+      }
+    }
+  }
+
+  throw new Error(`تعذر الحصول على استجابة من الذكاء الاصطناعي: ${lastError || 'الخدمة غير متوفرة حالياً'}`)
+}
+
+function buildLessonChatPayload({
   lessonTitle,
   subjectName,
   lessonIntro,
@@ -186,7 +302,7 @@ export async function generateLessonChatAnswer({
   messages,
 }: LessonContextParams & {
   messages: Array<{ role: 'user' | 'assistant'; content: string }>
-}): Promise<string> {
+}) {
   const lessonContext = buildLessonContextText({
     lessonTitle,
     subjectName,
@@ -210,11 +326,9 @@ export async function generateLessonChatAnswer({
 --- مرجع محتوى الدرس المعتمد ---
 ${lessonContext}`
 
-  // Format previous conversation messages
   const contents = messages.map((m, index) => {
     const parts: GeminiContentPart[] = [{ text: m.content }]
 
-    // Attach PDFs to the very first user message to ground the model
     if (index === 0 && m.role === 'user' && hasPdfs) {
       pdfAttachments.forEach((pdf) => {
         parts.unshift({
@@ -232,7 +346,6 @@ ${lessonContext}`
     }
   })
 
-  // If there are PDFs and no previous messages had them
   if (hasPdfs && contents.length > 0 && !contents[0].parts.some((p) => p.inlineData)) {
     pdfAttachments.forEach((pdf) => {
       contents[0].parts.unshift({
@@ -244,14 +357,35 @@ ${lessonContext}`
     })
   }
 
+  return { contents, systemInstruction }
+}
+
+/**
+ * Smart Lesson Tutor Chat
+ * Strictly bounded to the lesson content and any attached PDF summaries.
+ */
+export async function generateLessonChatAnswer(
+  params: LessonContextParams & {
+    messages: Array<{ role: 'user' | 'assistant'; content: string }>
+  }
+): Promise<string> {
+  const { contents, systemInstruction } = buildLessonChatPayload(params)
   return await callGemini(contents, systemInstruction)
 }
 
 /**
- * Smart Lesson Summary
- * Creates a structured revision summary of the lesson and attached PDFs.
+ * Streaming Smart Lesson Tutor Chat
  */
-export async function generateLessonSummary(params: LessonContextParams): Promise<string> {
+export async function streamLessonChatAnswer(
+  params: LessonContextParams & {
+    messages: Array<{ role: 'user' | 'assistant'; content: string }>
+  }
+): Promise<ReadableStream<Uint8Array>> {
+  const { contents, systemInstruction } = buildLessonChatPayload(params)
+  return await streamGemini(contents, systemInstruction)
+}
+
+function buildLessonSummaryPayload(params: LessonContextParams) {
   const lessonContext = buildLessonContextText(params)
   const hasPdfs = params.pdfAttachments && params.pdfAttachments.length > 0
 
@@ -283,8 +417,24 @@ export async function generateLessonSummary(params: LessonContextParams): Promis
   }
 
   const contents = [{ parts }]
+  return { contents, systemInstruction }
+}
 
+/**
+ * Smart Lesson Summary
+ * Creates a structured revision summary of the lesson and attached PDFs.
+ */
+export async function generateLessonSummary(params: LessonContextParams): Promise<string> {
+  const { contents, systemInstruction } = buildLessonSummaryPayload(params)
   return await callGemini(contents, systemInstruction)
+}
+
+/**
+ * Streaming Smart Lesson Summary
+ */
+export async function streamLessonSummary(params: LessonContextParams): Promise<ReadableStream<Uint8Array>> {
+  const { contents, systemInstruction } = buildLessonSummaryPayload(params)
+  return await streamGemini(contents, systemInstruction)
 }
 
 /**
@@ -376,7 +526,7 @@ export async function generateLessonQuiz(params: LessonContextParams): Promise<Q
  * Universal Platform AI Copilot
  * Guides all user roles across the platform with direct action links.
  */
-export async function generatePlatformCopilotAnswer({
+function buildPlatformCopilotPayload({
   userRole,
   userName,
   currentPath,
@@ -386,7 +536,7 @@ export async function generatePlatformCopilotAnswer({
   userName?: string | null
   currentPath?: string
   messages: Array<{ role: 'user' | 'assistant'; content: string }>
-}): Promise<string> {
+}) {
   const roleNameMap: Record<string, string> = {
     student: 'طالب',
     teacher: 'معلم',
@@ -451,15 +601,34 @@ export async function generatePlatformCopilotAnswer({
 3. إذا تضمنت إجابتك إرشاداً لصفحة معينة، أضف رابط توجيه سريع في نهاية الرد بهذا الشكل الصريح:
 [LINK: عنوان الزر | /المسار]
 مثال: [LINK: الانتقال لإضافة درس جديد | /teacher/lessons/new]
-أو: [LINK: فتح صندوق المقترحات | /student/suggestions]
-(الواجهة ستحول هذا التنسيق تلقائياً إلى زر أنيق قابل للنقر).`
+أو: [LINK: فتح صندوق المقترحات | /student/suggestions]`
 
   const contents = messages.map((m) => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.content }],
   }))
 
+  return { contents, systemInstruction }
+}
+
+export async function generatePlatformCopilotAnswer(params: {
+  userRole?: string | null
+  userName?: string | null
+  currentPath?: string
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>
+}): Promise<string> {
+  const { contents, systemInstruction } = buildPlatformCopilotPayload(params)
   return await callGemini(contents, systemInstruction)
+}
+
+export async function streamPlatformCopilotAnswer(params: {
+  userRole?: string | null
+  userName?: string | null
+  currentPath?: string
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>
+}): Promise<ReadableStream<Uint8Array>> {
+  const { contents, systemInstruction } = buildPlatformCopilotPayload(params)
+  return await streamGemini(contents, systemInstruction)
 }
 
 export interface StudentLearningInsightsData {

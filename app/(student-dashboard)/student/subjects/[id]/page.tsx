@@ -1,21 +1,25 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { requireRole } from '@/lib/auth/require-role'
 import { createClient } from '@/lib/supabase/server'
 import { SubjectLessonsExplorer, type SubjectLessonItem } from '@/features/subjects/components/SubjectLessonsExplorer'
 import { BookOpen, ArrowRight, ChevronRight } from 'lucide-react'
+import { cache } from 'react'
 import type { Metadata } from 'next'
-
-export const dynamic = 'force-dynamic'
 
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
+const getSubject = cache(async (id: string) => {
+  const supabase = await createClient()
+  return await supabase.from('subjects').select('*').eq('id', id).single()
+})
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params
-  const supabase = await createClient()
-  const { data: subject } = await supabase.from('subjects').select('name').eq('id', id).single()
+  const { data: subject } = await getSubject(id)
   return {
     title: subject?.name ? `مادة ${subject.name}` : 'تفاصيل المادة الدراسية',
   }
@@ -23,14 +27,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function StudentSubjectLessonsPage({ params }: PageProps) {
   const { id: subjectId } = await params
-  const { supabase } = await requireRole('student')
-
-  // Fetch subject
-  const { data: subject, error: subjectError } = await supabase
-    .from('subjects')
-    .select('*')
-    .eq('id', subjectId)
-    .single()
+  const [{ supabase }, { data: subject, error: subjectError }] = await Promise.all([
+    requireRole('student'),
+    getSubject(subjectId),
+  ])
 
   if (subjectError || !subject) {
     notFound()
@@ -94,12 +94,15 @@ export default async function StudentSubjectLessonsPage({ params }: PageProps) {
 
       {/* Subject Header Banner */}
       <div className="card p-6 sm:p-8 bg-white border-ink-100/80 mb-8 flex flex-col md:flex-row items-center gap-6">
-        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-cream/60 border border-ink-100 flex items-center justify-center shrink-0 shadow-soft">
+        <div className="w-24 h-24 sm:w-28 sm:h-28 relative rounded-2xl overflow-hidden bg-cream/60 border border-ink-100 flex items-center justify-center shrink-0 shadow-soft">
           {imageUrl ? (
-            <img
+            <Image
               src={imageUrl}
               alt={subject.name}
-              className="w-full h-full object-cover"
+              fill
+              loading="lazy"
+              sizes="(max-width: 640px) 96px, 112px"
+              className="object-cover"
             />
           ) : (
             <BookOpen className="w-12 h-12 text-gold-dark" />

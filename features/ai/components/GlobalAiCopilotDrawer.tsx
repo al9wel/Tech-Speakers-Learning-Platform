@@ -151,24 +151,42 @@ export function GlobalAiCopilotDrawer({
         }),
       })
 
-      const data: CopilotResponse = await response.json()
-
-      if (data.success && data.reply) {
-        const assistantMessage: CopilotMessage = {
-          id: `bot_${Date.now()}`,
-          role: 'assistant',
-          content: data.reply,
-          createdAt: Date.now(),
-        }
-        setMessages((prev) => [...prev, assistantMessage])
-      } else {
+      if (!response.ok || response.headers.get('content-type')?.includes('application/json')) {
+        const data = await response.json().catch(() => null)
         const errorMessage: CopilotMessage = {
           id: `err_${Date.now()}`,
           role: 'assistant',
-          content: data.error || 'عذراً، حدث خطأ أثناء إعداد التوجيه. يرجى المحاولة مرة أخرى.',
+          content: data?.error || 'عذراً، حدث خطأ أثناء إعداد التوجيه. يرجى المحاولة مرة أخرى.',
           createdAt: Date.now(),
         }
         setMessages((prev) => [...prev, errorMessage])
+        return
+      }
+
+      const assistantId = `bot_${Date.now()}`
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: assistantId,
+          role: 'assistant',
+          content: '',
+          createdAt: Date.now(),
+        },
+      ])
+
+      const reader = response.body?.getReader()
+      if (!reader) return
+      const decoder = new TextDecoder()
+      let accumulated = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        accumulated += chunk
+        setMessages((prev) =>
+          prev.map((msg) => (msg.id === assistantId ? { ...msg, content: accumulated } : msg))
+        )
       }
     } catch {
       const errorMessage: CopilotMessage = {

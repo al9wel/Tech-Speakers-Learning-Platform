@@ -124,7 +124,7 @@ export function Navbar() {
         window.removeEventListener('auth-changed', handleCustomAuthChange)
       }
     }
-  }, [pathname, loadUser])
+  }, [loadUser])
 
   // Close mobile menu on route change
   useEffect(() => {

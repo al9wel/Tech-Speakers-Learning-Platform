@@ -1,9 +1,8 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { requireRole } from '@/lib/auth/require-role'
 import { BookOpen, ArrowRight, Layers, ArrowLeft } from 'lucide-react'
 import type { Metadata } from 'next'
-
-export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'المواد الدراسية',
@@ -103,10 +102,13 @@ export default async function StudentSubjectsPage() {
               {/* Cover Image */}
               <div className="h-44 w-full bg-cream/60 relative overflow-hidden flex items-center justify-center border-b border-ink-100/60">
                 {subject.imageUrl ? (
-                  <img
+                  <Image
                     src={subject.imageUrl}
                     alt={subject.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    fill
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center text-gold-dark gap-2">
