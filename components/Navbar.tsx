@@ -18,7 +18,11 @@ import {
   LayoutDashboard,
   Menu,
   X,
+  Compass,
 } from 'lucide-react'
+import { GlobalAiCopilotDrawer } from '@/features/ai/components/GlobalAiCopilotDrawer'
+
+
 
 const roleLabels: Record<string, { label: string; icon: any }> = {
   student: { label: 'طالب', icon: GraduationCap },
@@ -50,7 +54,15 @@ export function Navbar() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleOpenCopilot = () => setIsCopilotOpen(true)
+    window.addEventListener('open-global-copilot', handleOpenCopilot)
+    return () => window.removeEventListener('open-global-copilot', handleOpenCopilot)
+  }, [])
+
 
   const loadUser = useCallback(async () => {
     try {
@@ -167,6 +179,20 @@ export function Navbar() {
 
         {/* LEFT SIDE in RTL (End of layout): User controls */}
         <div className="flex items-center gap-2">
+          {/* Platform Guide Button */}
+          <button
+            type="button"
+            onClick={() => setIsCopilotOpen(true)}
+            className="btn-outline text-xs py-1 px-2.5 sm:px-3 bg-white hover:bg-ink-50 flex items-center gap-1.5 shadow-2xs rounded-xl font-bold text-ink-800 transition cursor-pointer shrink-0 whitespace-nowrap"
+            title="دليل المنصة والوصول السريع"
+          >
+            <Compass className="w-3.5 h-3.5 text-gold-dark shrink-0" />
+            <span className="hidden sm:inline">دليل المنصة</span>
+            <span className="sm:hidden">الدليل</span>
+          </button>
+
+
+
           {!isLoaded ? (
             <div className="h-8 w-24 sm:w-32 bg-ink-100/80 rounded-xl animate-pulse" />
           ) : userData ? (
@@ -253,13 +279,26 @@ export function Navbar() {
 
                     {/* Navigation Links */}
                     <div className="space-y-1 text-xs font-bold">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false)
+                          setIsCopilotOpen(true)
+                        }}
+                        className="flex items-center gap-2 w-full px-2.5 py-2.5 rounded-xl text-ink-700 hover:text-ink-900 hover:bg-ink-50 transition cursor-pointer text-right"
+                      >
+                        <Compass className="w-4 h-4 text-gold-dark shrink-0" />
+                        <span>دليل المنصة</span>
+                      </button>
+
+
                       {userData.profilePath && (
                         <Link
                           href={userData.profilePath}
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="flex items-center gap-2 px-2.5 py-2.5 rounded-xl text-ink-700 hover:text-ink-900 hover:bg-ink-50 transition"
                         >
-                          <UserIcon className="w-4 h-4 text-gold-dark" />
+                          <UserIcon className="w-4 h-4 text-gold-dark shrink-0" />
                           <span>الملف الشخصي</span>
                         </Link>
                       )}
@@ -295,6 +334,15 @@ export function Navbar() {
           )}
         </div>
       </nav>
+
+      {/* Global AI Copilot Slide-over Drawer */}
+      <GlobalAiCopilotDrawer
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        userRole={userData?.role}
+        userName={userData?.fullName}
+      />
     </header>
   )
 }
+

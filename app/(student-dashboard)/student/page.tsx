@@ -10,6 +10,8 @@ import {
   UserCheck,
 } from 'lucide-react'
 import type { Metadata } from 'next'
+import { StudentAiInsightsCard } from '@/features/ai/components/StudentAiInsightsCard'
+
 
 export const dynamic = 'force-dynamic'
 
@@ -63,7 +65,11 @@ export default async function StudentPage() {
         })}
       </div>
 
+      {/* AI Learning Advisor & Study Insights */}
+      <StudentAiInsightsCard />
+
       {/* Cards */}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Subjects Card */}
         <div className="card p-6 card-hover flex flex-col justify-between border-gold/30">
