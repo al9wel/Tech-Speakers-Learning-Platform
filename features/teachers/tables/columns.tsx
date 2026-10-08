@@ -4,7 +4,8 @@ import { ColumnDef } from '@tanstack/react-table'
 import type { UserItem } from '@/features/users/components/UserDialog'
 import { TeacherDialog } from '../components/TeacherDialog'
 import { DeleteTeacherDialog } from '../components/DeleteTeacherDialog'
-import { ArrowUpDown } from 'lucide-react'
+import { ApprovalActions } from '@/features/users/components/ApprovalActions'
+import { ArrowUpDown, CheckCircle2, Clock } from 'lucide-react'
 
 export function getTeacherColumns(): ColumnDef<UserItem>[] {
   return [
@@ -14,7 +15,7 @@ export function getTeacherColumns(): ColumnDef<UserItem>[] {
         return (
           <button
             type="button"
-            className="flex items-center gap-1.5 font-bold text-ink-800 hover:text-ink-950 transition"
+            className="flex items-center gap-1.5 font-bold text-ink-800 hover:text-ink-950 transition cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             <span>اسم المعلم</span>
@@ -42,7 +43,7 @@ export function getTeacherColumns(): ColumnDef<UserItem>[] {
         return (
           <button
             type="button"
-            className="flex items-center gap-1.5 font-bold text-ink-800 hover:text-ink-950 transition"
+            className="flex items-center gap-1.5 font-bold text-ink-800 hover:text-ink-950 transition cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             <span>البريد الإلكتروني</span>
@@ -55,6 +56,24 @@ export function getTeacherColumns(): ColumnDef<UserItem>[] {
           {row.original.email}
         </span>
       ),
+    },
+    {
+      accessorKey: 'is_approved',
+      header: 'الحالة',
+      cell: ({ row }) => {
+        const isApproved = row.original.is_approved !== false
+        return isApproved ? (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+            <CheckCircle2 className="w-3 h-3" />
+            <span>معتمد</span>
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 animate-pulse">
+            <Clock className="w-3 h-3 text-amber-600" />
+            <span>بانتظار الموافقة</span>
+          </span>
+        )
+      },
     },
     {
       accessorKey: 'created_at',
@@ -71,6 +90,18 @@ export function getTeacherColumns(): ColumnDef<UserItem>[] {
       header: () => <div className="text-center">العمليات</div>,
       cell: ({ row }) => {
         const u = row.original
+        const isApproved = u.is_approved !== false
+
+        if (!isApproved) {
+          return (
+            <ApprovalActions
+              userId={u.id}
+              userName={u.full_name}
+              roleLabel="المعلم"
+            />
+          )
+        }
+
         return (
           <div className="flex items-center justify-center gap-2">
             <TeacherDialog teacher={u} />

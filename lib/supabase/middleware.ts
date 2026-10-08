@@ -62,7 +62,7 @@ export async function updateSession(request: NextRequest) {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role, full_name')
+        .select('role, full_name, is_approved')
         .eq('id', user.id)
         .single()
 
@@ -71,6 +71,15 @@ export async function updateSession(request: NextRequest) {
         url.pathname = '/error'
 
         return NextResponse.redirect(url)
+    }
+
+    if (profile.is_approved === false) {
+        if (!pathname.startsWith('/auth/pending-approval')) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/auth/pending-approval'
+            return NextResponse.redirect(url)
+        }
+        return supabaseResponse
     }
 
     const role = profile.role

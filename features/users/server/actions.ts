@@ -39,7 +39,7 @@ export async function createUserAction(data: {
       email,
       password: DEFAULT_PASSWORD,
       email_confirm: true,
-      user_metadata: { full_name: full_name || null },
+      user_metadata: { full_name: full_name || null, role },
     })
 
     if (authError || !authData.user) {
@@ -56,6 +56,7 @@ export async function createUserAction(data: {
         id: authData.user.id,
         full_name: full_name || null,
         role,
+        is_approved: true,
       })
 
     if (profileError) {
@@ -195,6 +196,86 @@ export async function deleteUserAction(userId: string): Promise<ActionResult> {
     return {
       success: false,
       message: err?.message || 'حدث خطأ أثناء محاولة حذف المستخدم',
+    }
+  }
+}
+
+export async function approveUserAction(userId: string): Promise<ActionResult> {
+  try {
+    await requireRole('admin')
+
+    if (!userId) {
+      return {
+        success: false,
+        message: 'معرف المستخدم غير محدد',
+      }
+    }
+
+    const admin = createAdminClient()
+    const { error } = await admin
+      .from('profiles')
+      .update({ is_approved: true })
+      .eq('id', userId)
+
+    if (error) {
+      return {
+        success: false,
+        message: error.message || 'تعذر اعتماد وتفعيل الحساب',
+      }
+    }
+
+    revalidatePath('/admin')
+    revalidatePath('/admin/users')
+    revalidatePath('/admin/teachers')
+    revalidatePath('/admin/counselors')
+
+    return {
+      success: true,
+      message: 'تم قبول طلب الانضمام وتفعيل الحساب بنجاح',
+      userId,
+    }
+  } catch (err: unknown) {
+    return {
+      success: false,
+      message: (err as Error)?.message || 'حدث خطأ أثناء اعتماد الحساب',
+    }
+  }
+}
+
+export async function rejectUserAction(userId: string): Promise<ActionResult> {
+  try {
+    await requireRole('admin')
+
+    if (!userId) {
+      return {
+        success: false,
+        message: 'معرف المستخدم غير محدد',
+      }
+    }
+
+    const admin = createAdminClient()
+
+    // Delete user from Auth
+    const { error } = await admin.auth.admin.deleteUser(userId)
+    if (error) {
+      // If auth delete fails or user only has profile, delete profile directly
+      await admin.from('profiles').delete().eq('id', userId)
+    }
+
+    revalidatePath('/admin')
+    revalidatePath('/admin/users')
+    revalidatePath('/admin/teachers')
+    revalidatePath('/admin/counselors')
+
+    return {
+      success: true,
+      message: 'تم رفض طلب الانضمام وحذف الحساب بنجاح',
+      userId,
+    }
+  } catch (err: unknown) {
+    return {
+      success: false,
+      message: (err as Error)?.message || 'حدث خطأ أثناء رفض الطلب',
     }
   }
 }

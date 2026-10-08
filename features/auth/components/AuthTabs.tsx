@@ -4,15 +4,30 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { loginAction, signupAction } from '@/features/auth/server/actions'
 import { LogoMark } from '@/components/Logo'
-import { Mail, Lock, User as UserIcon, Loader2, AlertCircle } from 'lucide-react'
+import {
+  Mail,
+  Lock,
+  User as UserIcon,
+  Loader2,
+  AlertCircle,
+  Clock,
+  GraduationCap,
+  Users,
+  Heart,
+  LogIn,
+} from 'lucide-react'
+
+export type AuthMode = 'login' | 'signup_student' | 'signup_teacher' | 'signup_counselor'
 
 interface AuthTabsProps {
-  initialMode?: 'login' | 'signup'
+  initialMode?: AuthMode | 'signup'
 }
 
 export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
   const router = useRouter()
-  const [mode, setMode] = useState<'login' | 'signup'>(initialMode)
+  const resolvedInitialMode: AuthMode =
+    initialMode === 'signup' ? 'signup_student' : initialMode
+  const [mode, setMode] = useState<AuthMode>(resolvedInitialMode)
 
   // Login form state
   const [loginEmail, setLoginEmail] = useState('')
@@ -54,10 +69,18 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
     setIsSigningUp(true)
     setSignupError(null)
 
+    const targetRole =
+      mode === 'signup_teacher'
+        ? 'teacher'
+        : mode === 'signup_counselor'
+        ? 'counselor'
+        : 'student'
+
     const res = await signupAction({
       full_name: signupFullName,
       email: signupEmail,
       password: signupPassword,
+      role: targetRole,
     })
 
     if (!res.success) {
@@ -67,32 +90,60 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('auth-changed'))
       }
-      // تم تعليق التحقق من البريد مؤقتاً
-      // router.push(res.redirectTo || '/verify-email')
-      router.push(res.redirectTo || '/student')
+      router.push(
+        res.redirectTo ||
+          (targetRole === 'student'
+            ? '/student'
+            : `/auth/pending-approval?role=${targetRole}`)
+      )
     }
   }
 
+  const getHeadingInfo = () => {
+    switch (mode) {
+      case 'login':
+        return {
+          title: 'تسجيل الدخول إلى مِداد',
+          subtitle: 'أهلاً بعودتك، أدخل بياناتك للمتابعة',
+        }
+      case 'signup_student':
+        return {
+          title: 'إنشاء حساب طالب جديد',
+          subtitle: 'انضم إلى منصة مِداد التعليمية وابدأ رحلة تعلمك',
+        }
+      case 'signup_teacher':
+        return {
+          title: 'تسجيل حساب معلم جديد',
+          subtitle: 'قدّم طلب انضمام كمعلم إلى المنصة (يخضع لموافقة الإدارة)',
+        }
+      case 'signup_counselor':
+        return {
+          title: 'تسجيل حساب مستشار جديد',
+          subtitle: 'قدّم طلب انضمام كمستشار نفسي وتربوي (يخضع لموافقة الإدارة)',
+        }
+    }
+  }
+
+  const headingInfo = getHeadingInfo()
+  const isPendingApprovalRole =
+    mode === 'signup_teacher' || mode === 'signup_counselor'
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 animate-page">
-      <div className="w-full max-w-md">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-10 px-4 animate-page">
+      <div className="w-full max-w-lg">
         {/* Logo and Titles */}
         <div className="text-center mb-6">
           <div className="flex justify-center mb-3">
             <LogoMark />
           </div>
           <h1 className="font-heading font-extrabold text-2xl text-ink-900">
-            {mode === 'login' ? 'تسجيل الدخول إلى مِداد' : 'إنشاء حساب طالب جديد'}
+            {headingInfo.title}
           </h1>
-          <p className="text-sm text-ink-500 mt-1">
-            {mode === 'login'
-              ? 'أهلاً بعودتك، أدخل بياناتك للمتابعة'
-              : 'انضم إلى منصة مِداد التعليمية وابدأ رحلة تعلمك'}
-          </p>
+          <p className="text-sm text-ink-500 mt-1">{headingInfo.subtitle}</p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="bg-ink-100/70 p-1 rounded-2xl flex items-center mb-5 border border-ink-200/60">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-ink-100/70 rounded-2xl mb-5 border border-ink-200/60">
           <button
             type="button"
             onClick={() => {
@@ -100,38 +151,75 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
               setLoginError(null)
               setSignupError(null)
             }}
-            className={`flex-1 py-2.5 rounded-xl font-heading font-bold text-sm transition-all duration-200 cursor-pointer ${
+            className={`py-2.5 px-2 rounded-xl font-heading font-bold text-xs transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
               mode === 'login'
                 ? 'bg-white text-ink-900 shadow-sm'
                 : 'text-ink-600 hover:text-ink-900'
             }`}
           >
-            تسجيل الدخول
+            <LogIn className="w-3.5 h-3.5" />
+            <span>تسجيل الدخول</span>
           </button>
+
           <button
             type="button"
             onClick={() => {
-              setMode('signup')
+              setMode('signup_student')
               setLoginError(null)
               setSignupError(null)
             }}
-            className={`flex-1 py-2.5 rounded-xl font-heading font-bold text-sm transition-all duration-200 cursor-pointer ${
-              mode === 'signup'
+            className={`py-2.5 px-2 rounded-xl font-heading font-bold text-xs transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
+              mode === 'signup_student'
                 ? 'bg-white text-ink-900 shadow-sm'
                 : 'text-ink-600 hover:text-ink-900'
             }`}
           >
-            إنشاء حساب طالب
+            <GraduationCap className="w-3.5 h-3.5 text-sage-dark" />
+            <span>حساب طالب</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMode('signup_teacher')
+              setLoginError(null)
+              setSignupError(null)
+            }}
+            className={`py-2.5 px-2 rounded-xl font-heading font-bold text-xs transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
+              mode === 'signup_teacher'
+                ? 'bg-white text-ink-900 shadow-sm'
+                : 'text-ink-600 hover:text-ink-900'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5 text-gold-dark" />
+            <span>حساب معلم</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMode('signup_counselor')
+              setLoginError(null)
+              setSignupError(null)
+            }}
+            className={`py-2.5 px-2 rounded-xl font-heading font-bold text-xs transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer ${
+              mode === 'signup_counselor'
+                ? 'bg-white text-ink-900 shadow-sm'
+                : 'text-ink-600 hover:text-ink-900'
+            }`}
+          >
+            <Heart className="w-3.5 h-3.5 text-rose-600" />
+            <span>حساب مستشار</span>
           </button>
         </div>
 
         {/* Main Card */}
-        <div className="card p-7 bg-white shadow-card border border-ink-100/80">
+        <div className="card p-7 sm:p-8 bg-white shadow-card border border-ink-100/80">
           {mode === 'login' ? (
             /* Login Form */
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               {loginError && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
                   <span>{loginError}</span>
                 </div>
@@ -199,12 +287,22 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
               </div>
             </form>
           ) : (
-            /* Student Sign Up Form */
+            /* Sign Up Form (Student / Teacher / Counselor) */
             <form onSubmit={handleSignupSubmit} className="space-y-4">
               {signupError && (
-                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
                   <span>{signupError}</span>
+                </div>
+              )}
+
+              {/* Notice for Teacher / Counselor pending approval */}
+              {isPendingApprovalRole && (
+                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
+                  <Clock className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
+                  <div className="leading-relaxed">
+                    <strong>تنويه:</strong> بعد إرسال بيانات التسجيل، سيتم وضع الحساب قيد الانتظار لحين مراجعته والموافقة عليه من قبل إدارة المنصة (الأدمن).
+                  </div>
                 </div>
               )}
 
@@ -223,7 +321,13 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                     required
                     value={signupFullName}
                     onChange={(e) => setSignupFullName(e.target.value)}
-                    placeholder="مثال: سالم أحمد علي"
+                    placeholder={
+                      mode === 'signup_teacher'
+                        ? 'مثال: أ/ عبدالله السالم'
+                        : mode === 'signup_counselor'
+                        ? 'مثال: د/ مريم الكعبي'
+                        : 'مثال: سالم أحمد علي'
+                    }
                     className="input-field text-sm !pr-11 pl-4"
                   />
                 </div>
@@ -244,7 +348,7 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                     required
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
-                    placeholder="student@example.com"
+                    placeholder="name@example.com"
                     className="input-field text-sm !pr-11 pl-4"
                     dir="ltr"
                   />
@@ -282,10 +386,16 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
                   {isSigningUp ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>جاري إنشاء الحساب...</span>
+                      <span>جاري إرسال البيانات...</span>
                     </>
                   ) : (
-                    <span>إنشاء حساب طالب</span>
+                    <span>
+                      {mode === 'signup_teacher'
+                        ? 'إرسال طلب تسجيل حساب معلم'
+                        : mode === 'signup_counselor'
+                        ? 'إرسال طلب تسجيل حساب مستشار'
+                        : 'إنشاء حساب طالب'}
+                    </span>
                   )}
                 </button>
               </div>
@@ -295,16 +405,34 @@ export function AuthTabs({ initialMode = 'login' }: AuthTabsProps) {
           {/* Bottom Switch Link */}
           <div className="mt-6 pt-5 border-t border-ink-100/60 text-center text-xs text-ink-500">
             {mode === 'login' ? (
-              <p>
-                ليس لديك حساب بعد؟{' '}
-                <button
-                  type="button"
-                  onClick={() => setMode('signup')}
-                  className="font-bold text-gold-dark hover:underline cursor-pointer"
-                >
-                  إنشاء حساب طالب جديد
-                </button>
-              </p>
+              <div className="space-y-1.5">
+                <p>ليس لديك حساب بعد؟ اختر نوع حسابك للتسجيل:</p>
+                <div className="flex items-center justify-center gap-3 font-bold text-gold-dark">
+                  <button
+                    type="button"
+                    onClick={() => setMode('signup_student')}
+                    className="hover:underline cursor-pointer"
+                  >
+                    حساب طالب
+                  </button>
+                  <span>•</span>
+                  <button
+                    type="button"
+                    onClick={() => setMode('signup_teacher')}
+                    className="hover:underline cursor-pointer"
+                  >
+                    حساب معلم
+                  </button>
+                  <span>•</span>
+                  <button
+                    type="button"
+                    onClick={() => setMode('signup_counselor')}
+                    className="hover:underline cursor-pointer"
+                  >
+                    حساب مستشار
+                  </button>
+                </div>
+              </div>
             ) : (
               <p>
                 لديك حساب بالفعل؟{' '}

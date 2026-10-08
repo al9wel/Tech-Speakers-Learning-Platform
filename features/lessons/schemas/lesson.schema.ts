@@ -25,6 +25,9 @@ export const lessonFormSchema = z.object({
   explanation: z
     .string()
     .min(5, 'الشرح التمهيدي للدرس يجب أن يتكون من 5 أحرف على الأقل'),
+  image_path: z.string().nullable().optional(),
+  pdf_path: z.string().nullable().optional(),
+  video_path: z.string().nullable().optional(),
   sort_order: z
     .number()
     .int('الترتيب يجب أن يكون رقماً صحيحاً')
@@ -39,6 +42,9 @@ export const createLessonActionSchema = z.object({
   subject_id: z.string().uuid('معرف المادة غير صالح'),
   title: z.string().min(2).max(150),
   explanation: z.string().min(5),
+  image_path: z.string().nullable().optional(),
+  pdf_path: z.string().nullable().optional(),
+  video_path: z.string().nullable().optional(),
   sort_order: z.number().int().min(0).default(0),
   sections: z
     .array(
@@ -60,6 +66,9 @@ export const updateLessonActionSchema = z.object({
   subject_id: z.string().uuid('معرف المادة غير صالح'),
   title: z.string().min(2).max(150),
   explanation: z.string().min(5),
+  image_path: z.string().nullable().optional(),
+  pdf_path: z.string().nullable().optional(),
+  video_path: z.string().nullable().optional(),
   sort_order: z.number().int().min(0).default(0),
   sections: z
     .array(

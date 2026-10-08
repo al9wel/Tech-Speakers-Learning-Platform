@@ -16,6 +16,7 @@ import {
   Pencil,
   Sparkles,
   GraduationCap,
+  Presentation,
 } from 'lucide-react'
 import { cache } from 'react'
 import type { Metadata } from 'next'
@@ -117,28 +118,53 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
       .order('created_at', { ascending: false }),
   ])
 
-  // Generate signed URLs in parallel for all section media
-  const sections = await Promise.all(
-    (rawSections ?? []).map(async (sec) => {
-      const [signedImg, signedPdf, signedVideo] = await Promise.all([
-        sec.image_path
-          ? supabase.storage.from('lesson-media').createSignedUrl(sec.image_path, 3600 * 24)
-          : Promise.resolve({ data: null }),
-        sec.pdf_path
-          ? supabase.storage.from('lesson-media').createSignedUrl(sec.pdf_path, 3600 * 24)
-          : Promise.resolve({ data: null }),
-        sec.video_path
-          ? supabase.storage.from('lesson-media').createSignedUrl(sec.video_path, 3600 * 24)
-          : Promise.resolve({ data: null }),
-      ])
+  // Generate signed URLs in parallel for main lesson media and all section media
+  const [
+    [signedLessonImg, signedLessonPdf, signedLessonVideo],
+    sections,
+  ] = await Promise.all([
+    Promise.all([
+      lesson.image_path
+        ? supabase.storage.from('lesson-media').createSignedUrl(lesson.image_path, 3600 * 24)
+        : Promise.resolve({ data: null }),
+      lesson.pdf_path
+        ? supabase.storage.from('lesson-media').createSignedUrl(lesson.pdf_path, 3600 * 24)
+        : Promise.resolve({ data: null }),
+      lesson.video_path
+        ? supabase.storage.from('lesson-media').createSignedUrl(lesson.video_path, 3600 * 24)
+        : Promise.resolve({ data: null }),
+    ]),
+    Promise.all(
+      (rawSections ?? []).map(async (sec) => {
+        const [signedImg, signedPdf, signedVideo] = await Promise.all([
+          sec.image_path
+            ? supabase.storage.from('lesson-media').createSignedUrl(sec.image_path, 3600 * 24)
+            : Promise.resolve({ data: null }),
+          sec.pdf_path
+            ? supabase.storage.from('lesson-media').createSignedUrl(sec.pdf_path, 3600 * 24)
+            : Promise.resolve({ data: null }),
+          sec.video_path
+            ? supabase.storage.from('lesson-media').createSignedUrl(sec.video_path, 3600 * 24)
+            : Promise.resolve({ data: null }),
+        ])
 
-      return {
-        ...sec,
-        imageUrl: signedImg.data?.signedUrl ?? null,
-        pdfUrl: signedPdf.data?.signedUrl ?? null,
-        videoUrl: signedVideo.data?.signedUrl ?? null,
-      }
-    })
+        return {
+          ...sec,
+          imageUrl: signedImg.data?.signedUrl ?? null,
+          pdfUrl: signedPdf.data?.signedUrl ?? null,
+          videoUrl: signedVideo.data?.signedUrl ?? null,
+        }
+      })
+    ),
+  ])
+
+  const lessonImageUrl = signedLessonImg.data?.signedUrl ?? null
+  const lessonPdfUrl = signedLessonPdf.data?.signedUrl ?? null
+  const lessonVideoUrl = signedLessonVideo.data?.signedUrl ?? null
+  const isLessonPpt = Boolean(
+    lesson.pdf_path &&
+      (lesson.pdf_path.toLowerCase().endsWith('.ppt') ||
+        lesson.pdf_path.toLowerCase().endsWith('.pptx'))
   )
 
   const questions: QuestionItem[] = (rawQuestions ?? []).map((q: any) => ({
@@ -253,6 +279,90 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
           <p className="font-bold text-xs text-ink-500 mb-1.5">مقدمة وتمهيد الدرس:</p>
           {lesson.explanation}
         </div>
+
+        {/* Main Lesson Media Attachments */}
+        {(lessonVideoUrl || lessonImageUrl || lessonPdfUrl) && (
+          <div className="mt-5 pt-5 border-t border-ink-100 space-y-4">
+            {lessonVideoUrl && (
+              <div className="rounded-2xl overflow-hidden border border-ink-200/80 bg-ink-950 shadow-inner">
+                <video
+                  src={lessonVideoUrl}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full max-h-[480px] object-contain bg-black mx-auto"
+                />
+              </div>
+            )}
+
+            {lessonImageUrl && (
+              <div className="rounded-2xl overflow-hidden border border-ink-100 bg-cream/20 flex justify-center">
+                <Image
+                  src={lessonImageUrl}
+                  alt={lesson.title}
+                  width={800}
+                  height={450}
+                  loading="lazy"
+                  className="w-full max-h-96 object-contain mx-auto"
+                />
+              </div>
+            )}
+
+            {lessonPdfUrl && (
+              <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                isLessonPpt
+                  ? 'bg-orange-50/50 border-orange-200/80'
+                  : 'bg-cream/30 border-ink-100'
+              }`}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-11 h-11 rounded-xl shrink-0 flex items-center justify-center border shadow-2xs ${
+                    isLessonPpt
+                      ? 'bg-orange-600 text-white border-orange-700'
+                      : 'bg-red-50 text-red-600 border-red-100'
+                  }`}>
+                    {isLessonPpt ? (
+                      <Presentation className="w-5 h-5" />
+                    ) : (
+                      <FileText className="w-5 h-5" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-bold text-xs text-ink-900">
+                      {isLessonPpt ? 'عرض تقديمي مرفق بالدرس (PowerPoint)' : 'ملف تمهيدي مرفق (PDF)'}
+                    </p>
+                    <p className={`text-[11px] ${isLessonPpt ? 'text-orange-700 font-medium' : 'text-ink-500'}`}>
+                      {isLessonPpt
+                        ? 'عرض توضيحي أعدّه المعلم لهذا الدرس، يمكن للطلاب تحميله ومتابعته'
+                        : 'يمكن للطالب قراءة الملف أو تحميله للمراجعة دون اتصال'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 self-end sm:self-center">
+                  {!isLessonPpt && (
+                    <a
+                      href={lessonPdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 bg-white"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>فتح في تبويب</span>
+                    </a>
+                  )}
+                  <a
+                    href={lessonPdfUrl}
+                    download
+                    className={`${isLessonPpt ? 'btn-primary bg-orange-600 hover:bg-orange-700 text-white' : 'btn-primary'} text-xs py-1.5 px-3 flex items-center gap-1.5`}
+                  >
+                    <FileDown className="w-3.5 h-3.5" />
+                    <span>{isLessonPpt ? 'تحميل العرض التقديمي' : 'تحميل الملف'}</span>
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Dynamic Sections Section */}
@@ -324,44 +434,67 @@ export default async function TeacherLessonViewPage({ params }: PageProps) {
                   </div>
                 )}
 
-                {/* Optional Media: PDF */}
-                {section.pdfUrl && (
-                  <div className="mt-4 p-4 rounded-2xl border border-ink-100 bg-cream/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 border border-red-100">
-                        <FileText className="w-5 h-5" />
+                {/* Optional Media: PDF / PowerPoint */}
+                {section.pdfUrl && (() => {
+                  const isSecPpt = Boolean(
+                    section.pdf_path &&
+                      (section.pdf_path.toLowerCase().endsWith('.ppt') ||
+                        section.pdf_path.toLowerCase().endsWith('.pptx'))
+                  )
+                  return (
+                    <div className={`mt-4 p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+                      isSecPpt
+                        ? 'bg-orange-50/50 border-orange-200/80'
+                        : 'bg-cream/30 border-ink-100'
+                    }`}>
+                      <div className="flex items-center gap-3">
+                        <div className={`w-11 h-11 rounded-xl shrink-0 flex items-center justify-center border shadow-2xs ${
+                          isSecPpt
+                            ? 'bg-orange-600 text-white border-orange-700'
+                            : 'bg-red-50 text-red-600 border-red-100'
+                        }`}>
+                          {isSecPpt ? (
+                            <Presentation className="w-5 h-5" />
+                          ) : (
+                            <FileText className="w-5 h-5" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-bold text-xs text-ink-900">
+                            {isSecPpt ? 'عرض تقديمي مرفق بالقسم (PowerPoint)' : 'ملف توضيحي مرفق (PDF)'}
+                          </p>
+                          <p className={`text-[11px] ${isSecPpt ? 'text-orange-700 font-medium' : 'text-ink-500'}`}>
+                            {isSecPpt
+                              ? 'عرض توضيحي مرفق بهذا القسم يمكن للطلاب تحميله ومتابعته'
+                              : 'يمكن للطالب قراءة الملف أو تحميله للمراجعة'}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold text-xs text-ink-900">
-                          ملف توضيحي مرفق (PDF)
-                        </p>
-                        <p className="text-[11px] text-ink-500">
-                          يمكن للطالب قراءة الملف أو تحميله للمراجعة
-                        </p>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-2 self-end sm:self-center">
-                      <a
-                        href={section.pdfUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 bg-white"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span>فتح في تبويب</span>
-                      </a>
-                      <a
-                        href={section.pdfUrl}
-                        download
-                        className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5"
-                      >
-                        <FileDown className="w-3.5 h-3.5" />
-                        <span>تحميل الملف</span>
-                      </a>
+                      <div className="flex items-center gap-2 self-end sm:self-center">
+                        {!isSecPpt && (
+                          <a
+                            href={section.pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-outline text-xs py-1.5 px-3 flex items-center gap-1.5 bg-white"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            <span>فتح في تبويب</span>
+                          </a>
+                        )}
+                        <a
+                          href={section.pdfUrl}
+                          download
+                          className={`${isSecPpt ? 'btn-primary bg-orange-600 hover:bg-orange-700 text-white' : 'btn-primary'} text-xs py-1.5 px-3 flex items-center gap-1.5`}
+                        >
+                          <FileDown className="w-3.5 h-3.5" />
+                          <span>{isSecPpt ? 'تحميل العرض التقديمي' : 'تحميل الملف'}</span>
+                        </a>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )
+                })()}
               </div>
             ))}
           </div>

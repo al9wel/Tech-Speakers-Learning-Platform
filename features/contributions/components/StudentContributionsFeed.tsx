@@ -9,10 +9,14 @@ import {
   Inbox,
   Filter,
   X,
+  Clock,
+  CheckCircle2,
+  User,
+  Globe,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ContributionItem } from '../types'
-import { deleteContributionAction } from '../server/actions'
+import { deleteContributionAction, approveContributionAction } from '../server/actions'
 import { ContributionCard } from './ContributionCard'
 import { CreateContributionDialog } from './CreateContributionDialog'
 
@@ -47,10 +51,48 @@ export function StudentContributionsFeed({
   const [contributions, setContributions] = useState<ContributionItem[]>(initialContributions)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved'>('all')
+  const [viewScope, setViewScope] = useState<'all' | 'mine'>('all')
+  const [myStatusFilter, setMyStatusFilter] = useState<'all' | 'pending' | 'approved'>('all')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  // Platform approved count
+  const approvedPlatformCount = useMemo(
+    () => contributions.filter((c) => c.status === 'approved').length,
+    [contributions]
+  )
+
+  // Supervisor stats
+  const pendingCount = useMemo(
+    () => contributions.filter((c) => c.status === 'pending').length,
+    [contributions]
+  )
+  const approvedCount = useMemo(
+    () => contributions.filter((c) => c.status === 'approved').length,
+    [contributions]
+  )
+
+  // Student's own contributions stats
+  const myContributions = useMemo(
+    () => contributions.filter((c) => c.student_id === currentUserId),
+    [contributions, currentUserId]
+  )
+  const myTotalCount = myContributions.length
+  const myPendingCount = useMemo(
+    () => myContributions.filter((c) => c.status === 'pending').length,
+    [myContributions]
+  )
+  const myApprovedCount = useMemo(
+    () => myContributions.filter((c) => c.status === 'approved').length,
+    [myContributions]
+  )
 
   const handleContributionCreated = (newContribution: ContributionItem) => {
     setContributions((prev) => [newContribution, ...prev])
+    if (!isSupervisorOrAdmin) {
+      setViewScope('mine')
+      setMyStatusFilter('all')
+    }
   }
 
   const handleDeleteContribution = async (id: string) => {
@@ -67,8 +109,42 @@ export function StudentContributionsFeed({
     }
   }
 
+  const handleApproveContribution = async (id: string) => {
+    try {
+      const res = await approveContributionAction(id)
+      if (res.success) {
+        toast.success(res.message || 'تم اعتماد ونشر المساهمة بنجاح!')
+        setContributions((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, status: 'approved' } : c))
+        )
+      } else {
+        toast.error(res.message || 'تعذر اعتماد المساهمة')
+      }
+    } catch {
+      toast.error('حدث خطأ أثناء اعتماد المساهمة')
+    }
+  }
+
   const filteredContributions = useMemo(() => {
     return contributions.filter((item) => {
+      // Filter by scope for student
+      if (!isSupervisorOrAdmin) {
+        if (viewScope === 'mine') {
+          if (item.student_id !== currentUserId) return false
+          if (myStatusFilter === 'pending' && item.status !== 'pending') return false
+          if (myStatusFilter === 'approved' && item.status !== 'approved') return false
+        } else {
+          // In the public platform feed, only show approved contributions
+          if (item.status !== 'approved') return false
+        }
+      }
+
+      // Filter by status if supervisor or admin
+      if (isSupervisorOrAdmin && statusFilter !== 'all') {
+        if (statusFilter === 'pending' && item.status !== 'pending') return false
+        if (statusFilter === 'approved' && item.status !== 'approved') return false
+      }
+
       // Filter by subject
       if (selectedSubjectId !== 'all' && item.subject_id !== selectedSubjectId) {
         return false
@@ -85,7 +161,16 @@ export function StudentContributionsFeed({
 
       return true
     })
-  }, [contributions, selectedSubjectId, searchQuery])
+  }, [
+    contributions,
+    selectedSubjectId,
+    searchQuery,
+    statusFilter,
+    isSupervisorOrAdmin,
+    viewScope,
+    myStatusFilter,
+    currentUserId,
+  ])
 
   return (
     <div className="space-y-6">
@@ -120,8 +205,172 @@ export function StudentContributionsFeed({
         </div>
       </div>
 
+      {/* Main Tabs for Student: [جميع مساهمات المنصة | مساهماتي] */}
+      {!isSupervisorOrAdmin && (
+        <div className="bg-white rounded-2xl border border-ink-100 p-2 sm:p-2.5 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setViewScope('all')
+                setMyStatusFilter('all')
+              }}
+              className={`flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                viewScope === 'all'
+                  ? 'bg-ink-900 text-white shadow-soft'
+                  : 'text-ink-600 hover:text-ink-900 hover:bg-ink-50'
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              <span>جميع مساهمات المنصة</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                  viewScope === 'all' ? 'bg-white/20 text-white' : 'bg-ink-100 text-ink-600'
+                }`}
+              >
+                {approvedPlatformCount}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setViewScope('mine')}
+              className={`flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                viewScope === 'mine'
+                  ? 'bg-gold-dark text-white shadow-soft'
+                  : 'text-ink-600 hover:text-ink-900 hover:bg-gold/10'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              <span>مساهماتي</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                  viewScope === 'mine' ? 'bg-white text-gold-dark' : 'bg-gold/15 text-gold-dark'
+                }`}
+              >
+                {myTotalCount}
+              </span>
+            </button>
+          </div>
+
+          {/* Sub-pills for My Contributions status: [الكل | المعتمدة | قيد المراجعة] */}
+          {viewScope === 'mine' && (
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar p-1 bg-parchment/60 rounded-xl border border-ink-100/60">
+              <button
+                type="button"
+                onClick={() => setMyStatusFilter('all')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  myStatusFilter === 'all'
+                    ? 'bg-ink-900 text-white shadow-2xs'
+                    : 'text-ink-600 hover:text-ink-900'
+                }`}
+              >
+                الكل ({myTotalCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setMyStatusFilter('approved')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                  myStatusFilter === 'approved'
+                    ? 'bg-emerald-600 text-white shadow-2xs'
+                    : 'text-emerald-700 hover:bg-emerald-100/60'
+                }`}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>المعتمدة والمقبولة ({myApprovedCount})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMyStatusFilter('pending')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                  myStatusFilter === 'pending'
+                    ? 'bg-amber-600 text-white shadow-2xs'
+                    : 'text-amber-800 hover:bg-amber-100/60'
+                }`}
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>قيد المراجعة ({myPendingCount})</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Helpful banner for pending contributions in "مساهماتي" */}
+      {!isSupervisorOrAdmin && viewScope === 'mine' && myPendingCount > 0 && (
+        <div className="p-4 rounded-2xl bg-amber-50/90 border border-amber-200/90 flex items-center gap-3.5 text-amber-900 shadow-2xs">
+          <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 border border-amber-300/60">
+            <Clock className="w-4.5 h-4.5 text-amber-600 animate-pulse" />
+          </div>
+          <div className="flex-1 text-xs sm:text-sm">
+            <span className="font-bold block sm:inline">
+              لديك {myPendingCount} {myPendingCount === 1 ? 'مساهمة' : 'مساهمات'} بانتظار اعتماد المشرف التربوي:
+            </span>
+            <span className="text-amber-800/90 sm:mr-1 font-medium block sm:inline mt-0.5 sm:mt-0">
+              تظهر لك هنا بحالة «قيد المراجعة» وتُنشر تلقائياً لجميع زملائك في المنصة فور موافقة المشرف عليها.
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Search and Filters Bar */}
-      <div className="bg-white rounded-2xl border border-ink-100 p-3.5 sm:p-4 shadow-2xs space-y-3">
+      <div className="bg-white rounded-2xl border border-ink-100 p-3.5 sm:p-4 shadow-2xs space-y-3.5">
+
+        {/* Supervisor Status Filter Pills */}
+        {isSupervisorOrAdmin && (
+          <div className="flex items-center gap-2 pb-3 border-b border-ink-100/70 overflow-x-auto no-scrollbar">
+            <span className="text-xs font-bold text-ink-400 pl-1 shrink-0">حالة النشر:</span>
+            <button
+              type="button"
+              onClick={() => setStatusFilter('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
+                statusFilter === 'all'
+                  ? 'bg-ink-900 text-white shadow-2xs'
+                  : 'bg-parchment/60 text-ink-600 hover:bg-ink-100 border border-ink-200/50'
+              }`}
+            >
+              جميع المساهمات ({contributions.length})
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStatusFilter('pending')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                statusFilter === 'pending'
+                  ? 'bg-amber-600 text-white shadow-2xs'
+                  : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5 text-amber-600" />
+              <span>بانتظار موافقة المشرف</span>
+              {pendingCount > 0 && (
+                <span
+                  className={`px-1.5 py-0.2 rounded-full text-[11px] font-black ${
+                    statusFilter === 'pending'
+                      ? 'bg-white text-amber-700'
+                      : 'bg-amber-500 text-white'
+                  }`}
+                >
+                  {pendingCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStatusFilter('approved')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                statusFilter === 'approved'
+                  ? 'bg-emerald-700 text-white shadow-2xs'
+                  : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60'
+              }`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>المعتمدة ({approvedCount})</span>
+            </button>
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
@@ -161,7 +410,7 @@ export function StudentContributionsFeed({
                 : 'bg-parchment/60 text-ink-600 hover:bg-ink-100 border border-ink-200/50'
             }`}
           >
-            جميع المواد ({contributions.length})
+            جميع المواد
           </button>
           {subjects.map((s) => {
             const count = contributions.filter((c) => c.subject_id === s.id).length
@@ -191,13 +440,29 @@ export function StudentContributionsFeed({
           </div>
           <div className="space-y-1 max-w-md mx-auto">
             <h3 className="text-lg font-bold text-ink-900">
-              {searchQuery || selectedSubjectId !== 'all'
-                ? 'لا توجد مساهمات مطابقة للبحث'
+              {viewScope === 'mine'
+                ? myTotalCount === 0
+                  ? 'لم تقم بنشر أي مساهمة بعد'
+                  : myStatusFilter === 'pending'
+                  ? 'لا توجد مساهمات قيد المراجعة حالياً'
+                  : myStatusFilter === 'approved'
+                  ? 'لا توجد مساهمات معتمدة لك حتى الآن'
+                  : 'لا توجد مساهمات مطابقة'
+                : searchQuery || selectedSubjectId !== 'all' || (isSupervisorOrAdmin && statusFilter !== 'all')
+                ? 'لا توجد مساهمات مطابقة للبحث أو التصفية'
                 : 'لا توجد أي مساهمات حتى الآن'}
             </h3>
             <p className="text-xs sm:text-sm text-ink-500 font-medium">
-              {searchQuery || selectedSubjectId !== 'all'
-                ? 'جرب البحث بكلمات أخرى أو اختر مادة دراسية مختلفة.'
+              {viewScope === 'mine'
+                ? myTotalCount === 0
+                  ? 'شارك زملاءك ملخصاً، مشروعاً، أو حلاً متميزاً وسيقوم المشرف بمراجعته واعتماده ليظهر للجميع!'
+                  : myStatusFilter === 'pending'
+                  ? 'رائع! لا توجد لديك أي مساهمات معلقة بانتظار المشرف. جميع مساهماتك معتمدة ومنشورة بنجاح.'
+                  : myStatusFilter === 'approved'
+                  ? 'المساهمات التي تقوم بنشرها تخضع لمراجعة المشرف وستظهر هنا بمجرد الموافقة عليها.'
+                  : 'جرب اختيار خيار تصفية آخر أو اختيار "الكل" لعرض كافة مساهماتك.'
+                : searchQuery || selectedSubjectId !== 'all' || (isSupervisorOrAdmin && statusFilter !== 'all')
+                ? 'جرب تغيير خيارات التصفية أو البحث بكلمات أخرى.'
                 : 'كن أول من يشارك ملخصاً أو حلاً مميزاً مع زملائك الطلاب!'}
             </p>
           </div>
@@ -207,7 +472,7 @@ export function StudentContributionsFeed({
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-ink-900 hover:bg-ink-800 text-white font-bold text-xs shadow-soft transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4 text-gold" />
-              <span>نشر أول مساهمة</span>
+              <span>{viewScope === 'mine' ? 'نشر أول مساهمة لي' : 'نشر أول مساهمة'}</span>
             </button>
           )}
         </div>
@@ -220,6 +485,7 @@ export function StudentContributionsFeed({
               currentUserId={currentUserId}
               isSupervisorOrAdmin={isSupervisorOrAdmin}
               onDelete={handleDeleteContribution}
+              onApprove={handleApproveContribution}
             />
           ))}
         </div>

@@ -13,7 +13,7 @@ import {
 import { getTeacherColumns } from '../tables/columns'
 import type { UserItem } from '@/features/users/components/UserDialog'
 import { TeacherDialog } from './TeacherDialog'
-import { Search, ChevronLeft, ChevronRight, Inbox } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, Inbox, Clock } from 'lucide-react'
 
 interface TeachersTableProps {
   data: UserItem[]
@@ -23,11 +23,31 @@ interface TeachersTableProps {
 export function TeachersTable({ data }: TeachersTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'approved' | 'pending'>('all')
+
+  const pendingCount = useMemo(
+    () => data.filter((u) => u.is_approved === false).length,
+    [data]
+  )
+  const approvedCount = useMemo(
+    () => data.filter((u) => u.is_approved !== false).length,
+    [data]
+  )
+
+  const filteredData = useMemo(() => {
+    if (statusFilter === 'approved') {
+      return data.filter((u) => u.is_approved !== false)
+    }
+    if (statusFilter === 'pending') {
+      return data.filter((u) => u.is_approved === false)
+    }
+    return data
+  }, [data, statusFilter])
 
   const columns = useMemo(() => getTeacherColumns(), [])
 
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     state: {
       sorting,
@@ -48,6 +68,57 @@ export function TeachersTable({ data }: TeachersTableProps) {
 
   return (
     <div className="card p-4 sm:p-6 bg-white shadow-card border-ink-100/80">
+      {/* Status Filter Pills */}
+      <div className="flex items-center gap-2 mb-5 pb-4 border-b border-ink-100/70 overflow-x-auto no-scrollbar">
+        <button
+          type="button"
+          onClick={() => setStatusFilter('all')}
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            statusFilter === 'all'
+              ? 'bg-ink-900 text-white shadow-2xs'
+              : 'bg-ink-100/80 text-ink-600 hover:text-ink-900 hover:bg-ink-200/60'
+          }`}
+        >
+          جميع المعلمين ({data.length})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setStatusFilter('approved')}
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            statusFilter === 'approved'
+              ? 'bg-emerald-700 text-white shadow-2xs'
+              : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200/60'
+          }`}
+        >
+          المعتمدون ({approvedCount})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setStatusFilter('pending')}
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+            statusFilter === 'pending'
+              ? 'bg-amber-600 text-white shadow-2xs'
+              : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200/60'
+          }`}
+        >
+          <Clock className="w-3.5 h-3.5 text-amber-600" />
+          <span>طلبات بانتظار الموافقة</span>
+          {pendingCount > 0 && (
+            <span
+              className={`px-1.5 py-0.2 rounded-full text-[11px] font-black ${
+                statusFilter === 'pending'
+                  ? 'bg-white text-amber-700'
+                  : 'bg-amber-500 text-white'
+              }`}
+            >
+              {pendingCount}
+            </span>
+          )}
+        </button>
+      </div>
+
       {/* Top Bar: Search & Add Button */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
         <div className="relative w-full sm:w-80">
@@ -62,9 +133,6 @@ export function TeachersTable({ data }: TeachersTableProps) {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-          <div className="text-xs text-ink-500 font-medium hidden sm:block">
-            إجمالي المعلمين: <span className="font-bold text-ink-900">{data.length}</span>
-          </div>
           <TeacherDialog />
         </div>
       </div>
@@ -104,14 +172,16 @@ export function TeachersTable({ data }: TeachersTableProps) {
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="p-12 text-center text-ink-400">
+                <td
+                  colSpan={columns.length}
+                  className="p-8 text-center text-ink-400"
+                >
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <Inbox className="w-10 h-10 text-ink-300 stroke-1" />
-                    <p className="font-bold text-ink-700">لا توجد بيانات مطابقة</p>
-                    <p className="text-xs text-ink-500">
-                      {globalFilter
-                        ? 'لم يتم العثور على أي معلم يطابق كلمة البحث.'
-                        : 'لم تتم إضافة أي معلمين حتى الآن.'}
+                    <Inbox className="w-8 h-8 text-ink-300" />
+                    <p className="text-sm font-semibold">
+                      {statusFilter === 'pending'
+                        ? 'لا توجد طلبات انضمام معلقة حالياً'
+                        : 'لا يوجد معلمون متطابقون'}
                     </p>
                   </div>
                 </td>
@@ -122,34 +192,30 @@ export function TeachersTable({ data }: TeachersTableProps) {
       </div>
 
       {/* Pagination Controls */}
-      {table.getPageCount() > 1 && (
-        <div className="flex items-center justify-between pt-4 mt-4 border-t border-ink-100/60 text-xs text-ink-600">
-          <div>
-            صفحة <span className="font-bold text-ink-900">{table.getState().pagination.pageIndex + 1}</span> من{' '}
-            <span className="font-bold text-ink-900">{table.getPageCount()}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              className="btn-outline py-1 px-2.5 text-xs flex items-center gap-1 disabled:opacity-40"
-            >
-              <ChevronRight className="w-3.5 h-3.5" />
-              <span>السابق</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="btn-outline py-1 px-2.5 text-xs flex items-center gap-1 disabled:opacity-40"
-            >
-              <span>التالي</span>
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-          </div>
+      <div className="flex items-center justify-between mt-4 text-xs text-ink-500 font-medium pt-2">
+        <div>
+          صفحة {table.getState().pagination.pageIndex + 1} من{' '}
+          {table.getPageCount() || 1}
         </div>
-      )}
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+            className="p-1.5 rounded-lg border border-ink-200 hover:bg-cream/50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+            className="p-1.5 rounded-lg border border-ink-200 hover:bg-cream/50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

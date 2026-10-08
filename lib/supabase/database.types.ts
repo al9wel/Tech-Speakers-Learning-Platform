@@ -227,30 +227,39 @@ export type Database = {
           created_by: string
           explanation: string
           id: string
+          image_path: string | null
+          pdf_path: string | null
           sort_order: number
           subject_id: string
           title: string
           updated_at: string
+          video_path: string | null
         }
         Insert: {
           created_at?: string
           created_by: string
           explanation: string
           id?: string
+          image_path?: string | null
+          pdf_path?: string | null
           sort_order?: number
           subject_id: string
           title: string
           updated_at?: string
+          video_path?: string | null
         }
         Update: {
           created_at?: string
           created_by?: string
           explanation?: string
           id?: string
+          image_path?: string | null
+          pdf_path?: string | null
           sort_order?: number
           subject_id?: string
           title?: string
           updated_at?: string
+          video_path?: string | null
         }
         Relationships: [
           {
@@ -274,18 +283,21 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_approved: boolean
           role: Database["public"]["Enums"]["app_role"]
         }
         Insert: {
           created_at?: string
           full_name?: string | null
           id: string
+          is_approved?: boolean
           role?: Database["public"]["Enums"]["app_role"]
         }
         Update: {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_approved?: boolean
           role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []

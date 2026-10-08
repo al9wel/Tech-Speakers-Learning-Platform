@@ -19,6 +19,12 @@ export interface LessonItem {
   subject_id: string
   title: string
   explanation: string
+  image_path?: string | null
+  pdf_path?: string | null
+  video_path?: string | null
+  imageUrl?: string | null
+  pdfUrl?: string | null
+  videoUrl?: string | null
   sort_order: number
   created_by: string
   created_at: string
@@ -46,6 +52,9 @@ export interface CreateLessonInput {
   subject_id: string
   title: string
   explanation: string
+  image_path?: string | null
+  pdf_path?: string | null
+  video_path?: string | null
   sort_order: number
   sections: LessonSectionInput[]
 }
@@ -55,6 +64,9 @@ export interface UpdateLessonInput {
   subject_id: string
   title: string
   explanation: string
+  image_path?: string | null
+  pdf_path?: string | null
+  video_path?: string | null
   sort_order: number
   sections: LessonSectionInput[]
 }

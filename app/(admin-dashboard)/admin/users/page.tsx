@@ -19,7 +19,7 @@ export default async function AdminUsersPage() {
   const admin = createAdminClient()
   const [authResult, profilesResult] = await Promise.all([
     admin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
-    admin.from('profiles').select('id, full_name, role, created_at'),
+    admin.from('profiles').select('id, full_name, role, created_at, is_approved').order('created_at', { ascending: false }),
   ])
 
   const authUsersData = authResult.data
@@ -35,6 +35,7 @@ export default async function AdminUsersPage() {
       full_name: p?.full_name ?? '',
       role: (p?.role && isAppRole(p.role) ? p.role : 'student') as AppRole,
       created_at: p?.created_at || u.created_at,
+      is_approved: p?.is_approved !== false,
     }
   })
 
