@@ -50,32 +50,51 @@ export default async function EditLessonPage({ params }: PageProps) {
       .order('name', { ascending: true }),
   ])
 
-  // 3. Generate signed URLs in parallel for preview
-  const sections: LessonSectionItem[] = await Promise.all(
-    (rawSections ?? []).map(async (sec) => {
-      const [signedImg, signedPdf, signedVideo] = await Promise.all([
-        sec.image_path
-          ? supabase.storage.from('lesson-media').createSignedUrl(sec.image_path, 3600 * 24)
-          : Promise.resolve({ data: null }),
-        sec.pdf_path
-          ? supabase.storage.from('lesson-media').createSignedUrl(sec.pdf_path, 3600 * 24)
-          : Promise.resolve({ data: null }),
-        sec.video_path
-          ? supabase.storage.from('lesson-media').createSignedUrl(sec.video_path, 3600 * 24)
-          : Promise.resolve({ data: null }),
-      ])
+  // 3. Generate signed URLs in parallel for lesson media and section media
+  const [
+    [signedLessonImg, signedLessonPdf, signedLessonVideo],
+    sections,
+  ] = await Promise.all([
+    Promise.all([
+      lesson.image_path
+        ? supabase.storage.from('lesson-media').createSignedUrl(lesson.image_path, 3600 * 24)
+        : Promise.resolve({ data: null }),
+      lesson.pdf_path
+        ? supabase.storage.from('lesson-media').createSignedUrl(lesson.pdf_path, 3600 * 24)
+        : Promise.resolve({ data: null }),
+      lesson.video_path
+        ? supabase.storage.from('lesson-media').createSignedUrl(lesson.video_path, 3600 * 24)
+        : Promise.resolve({ data: null }),
+    ]),
+    Promise.all(
+      (rawSections ?? []).map(async (sec) => {
+        const [signedImg, signedPdf, signedVideo] = await Promise.all([
+          sec.image_path
+            ? supabase.storage.from('lesson-media').createSignedUrl(sec.image_path, 3600 * 24)
+            : Promise.resolve({ data: null }),
+          sec.pdf_path
+            ? supabase.storage.from('lesson-media').createSignedUrl(sec.pdf_path, 3600 * 24)
+            : Promise.resolve({ data: null }),
+          sec.video_path
+            ? supabase.storage.from('lesson-media').createSignedUrl(sec.video_path, 3600 * 24)
+            : Promise.resolve({ data: null }),
+        ])
 
-      return {
-        ...sec,
-        imageUrl: signedImg.data?.signedUrl ?? null,
-        pdfUrl: signedPdf.data?.signedUrl ?? null,
-        videoUrl: signedVideo.data?.signedUrl ?? null,
-      }
-    })
-  )
+        return {
+          ...sec,
+          imageUrl: signedImg.data?.signedUrl ?? null,
+          pdfUrl: signedPdf.data?.signedUrl ?? null,
+          videoUrl: signedVideo.data?.signedUrl ?? null,
+        }
+      })
+    ),
+  ])
 
   const initialLesson: LessonItem & { sections: LessonSectionItem[] } = {
     ...lesson,
+    imageUrl: signedLessonImg.data?.signedUrl ?? null,
+    pdfUrl: signedLessonPdf.data?.signedUrl ?? null,
+    videoUrl: signedLessonVideo.data?.signedUrl ?? null,
     sections,
   }
 

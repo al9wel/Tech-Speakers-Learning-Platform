@@ -37,7 +37,17 @@ export async function createLessonAction(input: CreateLessonInput): Promise<Less
       }
     }
 
-    const { id, subject_id, title, explanation, sort_order, sections } = validated.data
+    const {
+      id,
+      subject_id,
+      title,
+      explanation,
+      image_path,
+      pdf_path,
+      video_path,
+      sort_order,
+      sections,
+    } = validated.data
 
     // 1. Insert lesson row with verified server-side created_by
     const { data: lesson, error: lessonError } = await supabase
@@ -47,6 +57,9 @@ export async function createLessonAction(input: CreateLessonInput): Promise<Less
         subject_id,
         title,
         explanation,
+        image_path: image_path || null,
+        pdf_path: pdf_path || null,
+        video_path: video_path || null,
         sort_order,
         created_by: user.id, // Strictly server-assigned
       })
@@ -54,10 +67,13 @@ export async function createLessonAction(input: CreateLessonInput): Promise<Less
       .single()
 
     if (lessonError) {
-      // Cleanup any storage files that were uploaded for sections
-      const filesToClean = sections
-        .flatMap((s) => [s.image_path, s.pdf_path, s.video_path])
-        .filter(Boolean) as string[]
+      // Cleanup any storage files that were uploaded for the lesson and sections
+      const filesToClean = [
+        image_path,
+        pdf_path,
+        video_path,
+        ...sections.flatMap((s) => [s.image_path, s.pdf_path, s.video_path]),
+      ].filter(Boolean) as string[]
       if (filesToClean.length > 0) {
         await supabase.storage.from(BUCKET_NAME).remove(filesToClean)
       }
@@ -90,9 +106,12 @@ export async function createLessonAction(input: CreateLessonInput): Promise<Less
         await supabase.from('lessons').delete().eq('id', lesson.id)
 
         // Cleanup storage files
-        const filesToClean = sections
-          .flatMap((s) => [s.image_path, s.pdf_path, s.video_path])
-          .filter(Boolean) as string[]
+        const filesToClean = [
+          image_path,
+          pdf_path,
+          video_path,
+          ...sections.flatMap((s) => [s.image_path, s.pdf_path, s.video_path]),
+        ].filter(Boolean) as string[]
         if (filesToClean.length > 0) {
           await supabase.storage.from(BUCKET_NAME).remove(filesToClean)
         }
@@ -151,7 +170,17 @@ export async function updateLessonAction(input: UpdateLessonInput): Promise<Less
       }
     }
 
-    const { id, subject_id, title, explanation, sort_order, sections } = validated.data
+    const {
+      id,
+      subject_id,
+      title,
+      explanation,
+      image_path,
+      pdf_path,
+      video_path,
+      sort_order,
+      sections,
+    } = validated.data
 
     // Fetch existing lesson to verify ownership
     const { data: existingLesson, error: fetchError } = await supabase
@@ -168,6 +197,17 @@ export async function updateLessonAction(input: UpdateLessonInput): Promise<Less
       return { success: false, message: 'لا تملك صلاحية تعديل هذا الدرس' }
     }
 
+    // Clean up replaced or removed main lesson media from storage
+    if (existingLesson.image_path && existingLesson.image_path !== image_path) {
+      await supabase.storage.from(BUCKET_NAME).remove([existingLesson.image_path])
+    }
+    if (existingLesson.pdf_path && existingLesson.pdf_path !== pdf_path) {
+      await supabase.storage.from(BUCKET_NAME).remove([existingLesson.pdf_path])
+    }
+    if (existingLesson.video_path && existingLesson.video_path !== video_path) {
+      await supabase.storage.from(BUCKET_NAME).remove([existingLesson.video_path])
+    }
+
     // 1. Update lesson fields
     const { error: updateLessonError } = await supabase
       .from('lessons')
@@ -175,6 +215,9 @@ export async function updateLessonAction(input: UpdateLessonInput): Promise<Less
         subject_id,
         title,
         explanation,
+        image_path: image_path || null,
+        pdf_path: pdf_path || null,
+        video_path: video_path || null,
         sort_order,
         updated_at: new Date().toISOString(),
       })
@@ -290,7 +333,7 @@ export async function deleteLessonAction(lessonId: string): Promise<LessonAction
 
     const { data: existingLesson, error: fetchError } = await supabase
       .from('lessons')
-      .select('id, created_by, subject_id')
+      .select('id, created_by, subject_id, image_path, pdf_path, video_path')
       .eq('id', lessonId)
       .single()
 
@@ -306,15 +349,18 @@ export async function deleteLessonAction(lessonId: string): Promise<LessonAction
       return { success: false, message: 'لا تملك صلاحية حذف هذا الدرس' }
     }
 
-    // 1. Collect all media files from sections
+    // 1. Collect all media files from the lesson itself and its sections
     const { data: sections } = await supabase
       .from('lesson_sections')
       .select('image_path, pdf_path, video_path')
       .eq('lesson_id', lessonId)
 
-    const filesToRemove = (sections ?? [])
-      .flatMap((s) => [s.image_path, s.pdf_path, s.video_path])
-      .filter(Boolean) as string[]
+    const filesToRemove = [
+      existingLesson.image_path,
+      existingLesson.pdf_path,
+      existingLesson.video_path,
+      ...(sections ?? []).flatMap((s) => [s.image_path, s.pdf_path, s.video_path]),
+    ].filter(Boolean) as string[]
 
     // 2. Delete sections and lesson
     await supabase.from('lesson_sections').delete().eq('lesson_id', lessonId)

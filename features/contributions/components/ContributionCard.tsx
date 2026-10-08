@@ -13,6 +13,9 @@ import {
   X,
   AlertCircle,
   Loader2,
+  Clock,
+  CheckCircle2,
+  Check,
 } from 'lucide-react'
 import type { ContributionItem } from '../types'
 
@@ -21,6 +24,7 @@ interface ContributionCardProps {
   currentUserId: string
   isSupervisorOrAdmin: boolean
   onDelete: (id: string) => Promise<void>
+  onApprove?: (id: string) => Promise<void>
 }
 
 export function ContributionCard({
@@ -28,10 +32,12 @@ export function ContributionCard({
   currentUserId,
   isSupervisorOrAdmin,
   onDelete,
+  onApprove,
 }: ContributionCardProps) {
   const [showImageModal, setShowImageModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isApproving, setIsApproving] = useState(false)
 
   const canDelete =
     contribution.student_id === currentUserId || isSupervisorOrAdmin
@@ -61,11 +67,25 @@ export function ContributionCard({
     }
   }
 
+  const handleApprove = async () => {
+    if (!onApprove) return
+    setIsApproving(true)
+    try {
+      await onApprove(contribution.id)
+    } finally {
+      setIsApproving(false)
+    }
+  }
+
+  const isPending = contribution.status === 'pending'
+
   return (
     <>
-      <div className="bg-white rounded-3xl border border-ink-100 p-5 sm:p-6 shadow-2xs hover:shadow-soft transition-all duration-200 flex flex-col justify-between group">
+      <div className={`bg-white rounded-3xl border p-5 sm:p-6 shadow-2xs hover:shadow-soft transition-all duration-200 flex flex-col justify-between group ${
+        isPending ? 'border-amber-200 bg-amber-50/20' : 'border-ink-100'
+      }`}>
         <div>
-          {/* Header: Subject + Author Info + Date */}
+          {/* Header: Subject + Author Info + Date + Status */}
           <div className="flex items-start justify-between gap-3 pb-4 border-b border-ink-100/70">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-gold/15 text-gold flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
@@ -79,6 +99,17 @@ export function ContributionCard({
                   {contribution.student_id === currentUserId && (
                     <span className="px-2 py-0.5 rounded-md bg-gold/15 text-gold text-[10px] font-bold shrink-0">
                       مساهمتك
+                    </span>
+                  )}
+                  {isPending ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-900 text-[11px] font-bold shrink-0 border border-amber-300/80">
+                      <Clock className="w-3 h-3 text-amber-700 animate-pulse" />
+                      <span>قيد المراجعة</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 text-[11px] font-bold shrink-0 border border-emerald-200">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <span>معتمدة ومقبولة</span>
                     </span>
                   )}
                 </div>
@@ -188,6 +219,47 @@ export function ContributionCard({
             )}
           </div>
         )}
+
+        {/* Supervisor Approval Action Bar */}
+        {isSupervisorOrAdmin && isPending && (
+          <div className="mt-5 pt-3.5 border-t border-amber-200/80 bg-amber-50/80 -mx-5 sm:-mx-6 -mb-5 sm:-mb-6 p-4 rounded-b-3xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs text-amber-900 font-bold">
+              <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>مساهمة قيد الانتظار تتطلب اعتماد المشرف</span>
+            </div>
+
+            <div className="flex items-center gap-2 justify-end">
+              <button
+                type="button"
+                disabled={isApproving || isDeleting}
+                onClick={handleApprove}
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-soft transition disabled:opacity-50 cursor-pointer"
+              >
+                {isApproving ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>جارٍ الاعتماد...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    <span>اعتماد ونشر المساهمة</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                disabled={isApproving || isDeleting}
+                onClick={() => setShowDeleteConfirm(true)}
+                className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition disabled:opacity-50 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+                <span>رفض / حذف</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Full Image Modal */}
@@ -236,7 +308,7 @@ export function ContributionCard({
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-ink-600 hover:bg-ink-100"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-ink-600 hover:bg-ink-100 cursor-pointer"
               >
                 تراجع
               </button>
@@ -244,7 +316,7 @@ export function ContributionCard({
                 type="button"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white flex items-center gap-1.5 cursor-pointer"
               >
                 {isDeleting ? (
                   <>

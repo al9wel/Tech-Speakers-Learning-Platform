@@ -43,7 +43,7 @@ export async function createContributionAction(
         image_path: image_path || null,
         pdf_path: pdf_path || null,
         video_path: video_path || null,
-        status: 'approved',
+        status: 'pending',
       })
       .select(`
         *,
@@ -95,7 +95,7 @@ export async function createContributionAction(
 
     return {
       success: true,
-      message: 'تم نشر مساهمتك بنجاح!',
+      message: 'تم إرسال مساهمتك بنجاح! ستظهر للجميع بعد مراجعتها واعتمادها من قبل المشرف.',
       contribution: {
         ...newContribution,
         imageUrl,
@@ -106,6 +106,69 @@ export async function createContributionAction(
   } catch (err) {
     console.error('Unexpected error creating contribution:', err)
     return { success: false, message: 'حدث خطأ غير متوقع. يرجى المحاولة ثانية.' }
+  }
+}
+
+export async function approveContributionAction(
+  id: string
+): Promise<ContributionActionResult> {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, message: 'يرجى تسجيل الدخول أولاً' }
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    const isSupervisorOrAdmin =
+      profile?.role === 'supervisor' || profile?.role === 'admin'
+
+    if (!isSupervisorOrAdmin) {
+      return { success: false, message: 'غير مصرح لك باعتماد هذه المساهمة' }
+    }
+
+    const { data: updated, error } = await supabase
+      .from('student_contributions')
+      .update({ status: 'approved' })
+      .eq('id', id)
+      .select(`
+        *,
+        student:profiles (
+          id,
+          full_name,
+          role
+        ),
+        subject:subjects (
+          id,
+          name
+        )
+      `)
+      .single()
+
+    if (error || !updated) {
+      console.error('Error approving contribution:', error)
+      return { success: false, message: 'تعذر اعتماد المساهمة. يرجى المحاولة ثانية.' }
+    }
+
+    revalidatePath('/student/contributions')
+    revalidatePath('/supervisor/contributions')
+
+    return {
+      success: true,
+      message: 'تم اعتماد ونشر المساهمة بنجاح!',
+      contribution: updated as any,
+    }
+  } catch (err) {
+    console.error('Unexpected error approving contribution:', err)
+    return { success: false, message: 'حدث خطأ غير متوقع أثناء اعتماد المساهمة' }
   }
 }
 

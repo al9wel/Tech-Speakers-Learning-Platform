@@ -38,7 +38,7 @@ export async function loginAction(data: {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, is_approved')
     .eq('id', authData.user.id)
     .single()
 
@@ -47,6 +47,14 @@ export async function loginAction(data: {
     return {
       success: false,
       message: 'لا تتوفر صلاحيات صالحة لهذا الحساب في النظام',
+    }
+  }
+
+  if (profile.is_approved === false) {
+    await supabase.auth.signOut()
+    return {
+      success: false,
+      message: 'حسابك بانتظار موافقة مسؤول النظام (الأدمن). يرجى الانتظار حتى يتم قبول طلبك وتفعيله.',
     }
   }
 
@@ -61,11 +69,14 @@ export async function signupAction(data: {
   full_name: string
   email: string
   password: string
+  role?: 'student' | 'teacher' | 'counselor'
 }): Promise<AuthActionResult> {
   const supabase = await createClient()
   const fullName = data.full_name?.trim() ?? ''
   const email = data.email?.trim() ?? ''
   const password = data.password ?? ''
+  const targetRole = data.role === 'teacher' || data.role === 'counselor' ? data.role : 'student'
+  const isApproved = targetRole === 'student'
 
   if (!fullName) {
     return { success: false, message: 'الاسم الكامل مطلوب' }
@@ -83,6 +94,7 @@ export async function signupAction(data: {
     options: {
       data: {
         full_name: fullName,
+        role: targetRole,
       },
     },
   })
@@ -101,15 +113,26 @@ export async function signupAction(data: {
       const admin = createAdminClient()
       await admin.from('profiles').upsert({
         id: authData.user.id,
-        role: 'student',
+        role: targetRole,
         full_name: fullName,
+        is_approved: isApproved,
       })
     } catch {
       // Fallback silently if admin client fails; trigger handle_new_user handles it
     }
   }
 
-  // If email verification is paused and no session was created by signUp, establish session
+  // If teacher or counselor, they require admin approval, so sign out and redirect to pending screen
+  if (!isApproved) {
+    await supabase.auth.signOut()
+    return {
+      success: true,
+      redirectTo: `/auth/pending-approval?role=${targetRole}`,
+      message: 'تم إرسال طلب التسجيل بنجاح! يرجى انتظار موافقة الإدارة.',
+    }
+  }
+
+  // If email verification is paused and no session was created by signUp, establish session for student
   if (!authData.session) {
     await supabase.auth.signInWithPassword({
       email,
@@ -120,8 +143,6 @@ export async function signupAction(data: {
   revalidatePath('/student')
   return {
     success: true,
-    // تم تعليق التحقق من البريد مؤقتاً بناءً على طلب المستخدم
-    // redirectTo: '/verify-email',
     redirectTo: '/student',
   }
 }

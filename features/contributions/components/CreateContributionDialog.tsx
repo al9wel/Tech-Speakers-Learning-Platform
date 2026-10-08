@@ -194,7 +194,7 @@ export function CreateContributionDialog({
     try {
       const res = await createContributionAction(values)
       if (res.success && res.contribution) {
-        toast.success(res.message || 'تم نشر المساهمة بنجاح')
+        toast.success(res.message || 'تم إرسال المساهمة بنجاح وبانتظار موافقة المشرف')
         onContributionCreated(res.contribution)
         reset()
         removeMedia()
@@ -220,7 +220,7 @@ export function CreateContributionDialog({
             </div>
             <div>
               <h3 className="font-bold text-ink-900 text-lg">مشاركة مساهمة جديدة</h3>
-              <p className="text-xs text-ink-500 font-medium">شارك زملاءك ملخصاً، مشروعاً، أو حلاً متميزاً</p>
+              <p className="text-xs text-ink-500 font-medium">شارك زملاءك ملخصاً، مشروعاً، أو حلاً متميزاً (تُنشر بعد مراجعة واعتماد المشرف)</p>
             </div>
           </div>
           <button

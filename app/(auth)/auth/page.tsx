@@ -7,11 +7,18 @@ export const metadata: Metadata = {
 }
 
 interface AuthPageProps {
-  searchParams: Promise<{ mode?: 'login' | 'signup' }>
+  searchParams: Promise<{ mode?: 'login' | 'signup' | 'signup_student' | 'signup_teacher' | 'signup_counselor' }>
 }
 
 export default async function AuthPage({ searchParams }: AuthPageProps) {
   const params = await searchParams
-  const initialMode = params?.mode === 'signup' ? 'signup' : 'login'
+  let initialMode: 'login' | 'signup_student' | 'signup_teacher' | 'signup_counselor' = 'login'
+  if (params?.mode === 'signup' || params?.mode === 'signup_student') {
+    initialMode = 'signup_student'
+  } else if (params?.mode === 'signup_teacher') {
+    initialMode = 'signup_teacher'
+  } else if (params?.mode === 'signup_counselor') {
+    initialMode = 'signup_counselor'
+  }
   return <AuthTabs initialMode={initialMode} />
 }

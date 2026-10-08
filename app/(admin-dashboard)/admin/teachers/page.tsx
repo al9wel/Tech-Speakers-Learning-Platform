@@ -18,7 +18,7 @@ export default async function AdminTeachersPage() {
   const admin = createAdminClient()
   const [authResult, profilesResult] = await Promise.all([
     admin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
-    admin.from('profiles').select('id, full_name, role, created_at').eq('role', 'teacher'),
+    admin.from('profiles').select('id, full_name, role, created_at, is_approved').eq('role', 'teacher').order('created_at', { ascending: false }),
   ])
 
   const authUserMap = new Map((authResult.data?.users ?? []).map((u) => [u.id, u]))
@@ -32,6 +32,7 @@ export default async function AdminTeachersPage() {
       full_name: p.full_name ?? '',
       role: 'teacher',
       created_at: p.created_at || authUser?.created_at,
+      is_approved: p.is_approved !== false,
     }
   })
 

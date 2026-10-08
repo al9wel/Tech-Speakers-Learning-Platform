@@ -17,6 +17,7 @@ export type UserItem = {
   full_name: string
   role: AppRole
   created_at?: string
+  is_approved?: boolean
 }
 
 interface UserDialogProps {

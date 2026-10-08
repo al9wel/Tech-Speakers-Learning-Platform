@@ -29,6 +29,8 @@ export default async function AdminPage() {
     { count: adminCount },
     { count: supervisorCount },
     { count: counselorCount },
+    { count: pendingTeacherCount },
+    { count: pendingCounselorCount },
   ] = await Promise.all([
     admin.from('profiles').select('*', { count: 'exact', head: true }),
     admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
@@ -36,6 +38,8 @@ export default async function AdminPage() {
     admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'admin'),
     admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'supervisor'),
     admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'counselor'),
+    admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'teacher').eq('is_approved', false),
+    admin.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'counselor').eq('is_approved', false),
   ])
 
   const counts = {
@@ -45,6 +49,8 @@ export default async function AdminPage() {
     admin: adminCount ?? 0,
     supervisor: supervisorCount ?? 0,
     counselor: counselorCount ?? 0,
+    pendingTeachers: pendingTeacherCount ?? 0,
+    pendingCounselors: pendingCounselorCount ?? 0,
   }
 
   const statCards = [
@@ -97,6 +103,47 @@ export default async function AdminPage() {
           <p className="text-sm text-ink-500">إدارة المنصة والمحتوى ومجموعات المستخدمين</p>
         </div>
       </div>
+
+      {/* Pending Requests Alert Banner */}
+      {(counts.pendingTeachers > 0 || counts.pendingCounselors > 0) && (
+        <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200/90 text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-soft">
+              <UserCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-amber-950">
+                لديك {counts.pendingTeachers + counts.pendingCounselors} طلب انضمام جديد بانتظار المراجعة والاعتماد
+              </h3>
+              <p className="text-xs text-amber-800 mt-0.5">
+                {counts.pendingTeachers > 0 && `${counts.pendingTeachers} معلم `}
+                {counts.pendingTeachers > 0 && counts.pendingCounselors > 0 && 'و '}
+                {counts.pendingCounselors > 0 && `${counts.pendingCounselors} مستشار `}
+                بانتظار موافقتك لتفعيل حساباتهم.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0">
+            {counts.pendingTeachers > 0 && (
+              <Link
+                href="/admin/teachers"
+                className="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition shadow-2xs"
+              >
+                مراجعة المعلمين ({counts.pendingTeachers})
+              </Link>
+            )}
+            {counts.pendingCounselors > 0 && (
+              <Link
+                href="/admin/counselors"
+                className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition shadow-2xs"
+              >
+                مراجعة المستشارين ({counts.pendingCounselors})
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-8">

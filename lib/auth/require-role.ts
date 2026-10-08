@@ -47,12 +47,16 @@ export async function requireRole(requiredRole: AppRole) {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('role, full_name')
+        .select('role, full_name, is_approved')
         .eq('id', user.id)
         .single()
 
     if (!profile || !isAppRole(profile.role)) {
         redirect('/error')
+    }
+
+    if (profile.is_approved === false) {
+        redirect('/auth/pending-approval')
     }
 
     if (profile.role !== requiredRole) {

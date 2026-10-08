@@ -4,10 +4,11 @@ import { ColumnDef } from '@tanstack/react-table'
 import type { UserItem } from '../components/UserDialog'
 import { UserDialog } from '../components/UserDialog'
 import { DeleteUserDialog } from '../components/DeleteUserDialog'
-import { ArrowUpDown, Shield, GraduationCap, Users, Heart, ShieldCheck } from 'lucide-react'
+import { ApprovalActions } from '../components/ApprovalActions'
+import { ArrowUpDown, Shield, GraduationCap, Users, Heart, ShieldCheck, CheckCircle2, Clock, type LucideIcon } from 'lucide-react'
 import type { AppRole } from '@/lib/auth/roles'
 
-const roleBadgeMap: Record<AppRole, { label: string; className: string; icon: any }> = {
+const roleBadgeMap: Record<AppRole, { label: string; className: string; icon: LucideIcon }> = {
   admin: { label: 'مشرف عام', className: 'bg-gold/20 text-gold-dark border-gold/30', icon: Shield },
   teacher: { label: 'معلم', className: 'bg-sage-50 text-sage-dark border-sage/30', icon: Users },
   student: { label: 'طالب', className: 'bg-ink-100 text-ink-800 border-ink-200', icon: GraduationCap },
@@ -23,7 +24,7 @@ export function getColumns(currentAdminId: string): ColumnDef<UserItem>[] {
         return (
           <button
             type="button"
-            className="flex items-center gap-1.5 font-bold text-ink-800 hover:text-ink-950 transition"
+            className="flex items-center gap-1.5 font-bold text-ink-800 hover:text-ink-950 transition cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             <span>الاسم الكامل</span>
@@ -59,7 +60,7 @@ export function getColumns(currentAdminId: string): ColumnDef<UserItem>[] {
         return (
           <button
             type="button"
-            className="flex items-center gap-1.5 font-bold text-ink-800 hover:text-ink-950 transition"
+            className="flex items-center gap-1.5 font-bold text-ink-800 hover:text-ink-950 transition cursor-pointer"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
             <span>البريد الإلكتروني</span>
@@ -95,6 +96,24 @@ export function getColumns(currentAdminId: string): ColumnDef<UserItem>[] {
       },
     },
     {
+      accessorKey: 'is_approved',
+      header: 'حالة الحساب',
+      cell: ({ row }) => {
+        const isApproved = row.original.is_approved !== false
+        return isApproved ? (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+            <CheckCircle2 className="w-3 h-3" />
+            <span>معتمد</span>
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 animate-pulse">
+            <Clock className="w-3 h-3 text-amber-600" />
+            <span>بانتظار الموافقة</span>
+          </span>
+        )
+      },
+    },
+    {
       accessorKey: 'created_at',
       header: 'تاريخ الإنشاء',
       cell: ({ row }) => {
@@ -109,6 +128,18 @@ export function getColumns(currentAdminId: string): ColumnDef<UserItem>[] {
       header: () => <div className="text-center">العمليات</div>,
       cell: ({ row }) => {
         const u = row.original
+        const isApproved = u.is_approved !== false
+
+        if (!isApproved) {
+          return (
+            <ApprovalActions
+              userId={u.id}
+              userName={u.full_name}
+              roleLabel={roleBadgeMap[u.role]?.label || 'المستخدم'}
+            />
+          )
+        }
+
         return (
           <div className="flex items-center justify-center gap-2">
             <UserDialog user={u} />
